@@ -1,0 +1,11 @@
+name: SweetTask
+version: '${version}'
+main: top.mrxiaom.sweet.taskplugin.SweetTask
+api-version: 1.13
+depend: [ MythicMobs, PlayerPoints ]
+softdepend: [ PlaceholderAPI ]
+authors: [ MrXiaoM ]
+commands:
+  sweettask:
+    description: 'The main command of SweetTask'
+    aliases: [ stask, task, st ]
