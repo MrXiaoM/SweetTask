@@ -1,8 +1,7 @@
 package top.mrxiaom.sweet.taskplugin;
         
-import org.jetbrains.annotations.NotNull;
 import top.mrxiaom.pluginbase.BukkitPlugin;
-import top.mrxiaom.pluginbase.EconomyHolder;
+import top.mrxiaom.sweet.taskplugin.database.TaskProcessDatabase;
 
 public class SweetTask extends BukkitPlugin {
     public static SweetTask getInstance() {
@@ -19,12 +18,12 @@ public class SweetTask extends BukkitPlugin {
                 .scanIgnore("top.mrxiaom.sweet.taskplugin.libs")
         );
     }
-
+    TaskProcessDatabase taskProcessDatabase;
 
     @Override
     protected void beforeEnable() {
         options.registerDatabase(
-                // 在这里添加数据库 (如果需要的话)
+                taskProcessDatabase = new TaskProcessDatabase(this)
         );
     }
 
