@@ -39,7 +39,7 @@ dependencies {
     implementation("de.tr7zw:item-nbt-api:2.14.0")
     implementation("com.zaxxer:HikariCP:4.0.3") { isTransitive = false }
     implementation("org.jetbrains:annotations:24.0.0")
-    implementation("top.mrxiaom:PluginBase:1.1.5")
+    implementation("top.mrxiaom:PluginBase:1.1.7")
 }
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
