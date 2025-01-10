@@ -14,8 +14,6 @@ import top.mrxiaom.pluginbase.database.IDatabase;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.func.AbstractPluginHolder;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
-import top.mrxiaom.sweet.taskplugin.tasks.IDataHolder;
-import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -98,12 +96,16 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
 
     @EventHandler
     public void on(PlayerQuitEvent e) {
-        caches.remove(id(e.getPlayer()));
+        Player player = e.getPlayer();
+        submitCache(player);
+        caches.remove(id(player));
     }
 
     @EventHandler
     public void on(PlayerKickEvent e) {
-        caches.remove(id(e.getPlayer()));
+        Player player = e.getPlayer();
+        submitCache(player);
+        caches.remove(id(player));
     }
 
     /**
@@ -166,13 +168,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         try (Connection conn = plugin.getConnection()) {
             List<String> list = new ArrayList<>();
             list.add(task.id);
-            for (Map.Entry<String, ITask> entry : task.subTasks.entrySet()) {
-                String subTaskId = entry.getKey();
-                ITask subTask = entry.getValue();
-                if (subTask instanceof IDataHolder) {
-                    list.add(subTaskId);
-                }
-            }
+            list.addAll(task.subTasks.keySet());
             try (PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO `" + TABLE_NAME + "`" +
                             "(`player`, `task_id`, `sub_task_id`, `data`, `expire_time`) " +
