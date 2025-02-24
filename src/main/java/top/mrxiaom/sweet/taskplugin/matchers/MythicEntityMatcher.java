@@ -1,9 +1,12 @@
 package top.mrxiaom.sweet.taskplugin.matchers;
 
 import org.bukkit.entity.LivingEntity;
+import top.mrxiaom.sweet.taskplugin.SweetTask;
+import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
 
 public class MythicEntityMatcher implements EntityMatcher {
     private final String mythicId;
+    private final IMythic mythic = SweetTask.getInstance().getMythic();
 
     public MythicEntityMatcher(String mythicId) {
         this.mythicId = mythicId;
@@ -15,7 +18,6 @@ public class MythicEntityMatcher implements EntityMatcher {
 
     @Override
     public boolean match(LivingEntity entity) {
-        // TODO: 判定 MythicMobs 生物
-        return false;
+        return mythicId.equals(mythic.getMobType(entity));
     }
 }

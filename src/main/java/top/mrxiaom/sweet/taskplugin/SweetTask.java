@@ -1,7 +1,12 @@
 package top.mrxiaom.sweet.taskplugin;
         
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.sweet.taskplugin.database.TaskProcessDatabase;
+import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
+import top.mrxiaom.sweet.taskplugin.mythic.Mythic4;
+import top.mrxiaom.sweet.taskplugin.mythic.Mythic5;
 import top.mrxiaom.sweet.taskplugin.tasks.*;
 
 public class SweetTask extends BukkitPlugin {
@@ -20,9 +25,27 @@ public class SweetTask extends BukkitPlugin {
         );
     }
     TaskProcessDatabase taskProcessDatabase;
+    IMythic mythic;
+
+    public IMythic getMythic() {
+        return mythic;
+    }
 
     @Override
     protected void beforeEnable() {
+        Plugin mythicPlugin = Bukkit.getPluginManager().getPlugin("MythicMobs");
+        if (mythicPlugin != null) {
+            String v = mythicPlugin.getDescription().getVersion();
+            if (v.startsWith("5.")) {
+                mythic = new Mythic5();
+                info("支持 MythicMobs " + v);
+            } else if (v.startsWith("4.")) {
+                mythic = new Mythic4();
+                info("支持 MythicMobs " + v);
+            } else {
+                warn("不支持的 MythicMobs 版本 " + v);
+            }
+        }
         registerBuiltInTasks();
         options.registerDatabase(
                 taskProcessDatabase = new TaskProcessDatabase(this)
