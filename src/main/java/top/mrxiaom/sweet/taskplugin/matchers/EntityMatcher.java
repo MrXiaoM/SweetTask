@@ -11,6 +11,7 @@ public interface EntityMatcher {
 
     @Nullable
     static EntityMatcher of(String s) {
+        if (s.equalsIgnoreCase("ANY")) return AnyEntityMatcher.INSTANCE;
         if (s.startsWith("mythic:")) {
             return new MythicEntityMatcher(s.substring(7));
         }

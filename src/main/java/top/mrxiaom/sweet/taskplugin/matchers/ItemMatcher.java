@@ -12,6 +12,7 @@ public interface ItemMatcher {
 
     @Nullable
     static ItemMatcher of(String s) {
+        if (s.equalsIgnoreCase("ANY")) return AnyItemMatcher.INSTANCE;
         if (s.startsWith("mythic:")) {
             return new MythicItemMatcher(s.substring(7));
         }

@@ -12,6 +12,7 @@ public interface BlockMatcher {
 
     @Nullable
     static BlockMatcher of(String s) {
+        if (s.equalsIgnoreCase("ANY")) return AnyBlockMatcher.INSTANCE;
         Pair<Material, Integer> pair = ItemStackUtil.parseMaterial(s);
         if (pair == null) return null;
         return new VanillaBlockMatcher(pair.getKey(), pair.getValue());
