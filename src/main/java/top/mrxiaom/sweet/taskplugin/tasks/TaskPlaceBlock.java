@@ -11,6 +11,10 @@ import static top.mrxiaom.sweet.taskplugin.utils.Utils.convert;
 import static top.mrxiaom.sweet.taskplugin.utils.Utils.getOrList;
 
 public class TaskPlaceBlock implements ITask {
+    @Override
+    public String type() {
+        return "place";
+    }
     public static void register() {
         ITask.registerParser("place", (args, actionTips, warn) -> {
             Pair<List<String>, Integer> pair = getOrList(args, 1);

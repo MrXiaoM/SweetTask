@@ -12,6 +12,10 @@ import static top.mrxiaom.sweet.taskplugin.utils.Utils.convert;
 import static top.mrxiaom.sweet.taskplugin.utils.Utils.getOrList;
 
 public class TaskSubmitItem implements ITask {
+    @Override
+    public String type() {
+        return "submit";
+    }
     public static void register() {
         ITask.registerParser("submit", (args, actionTips, warn) -> {
             Pair<List<String>, Integer> pair = getOrList(args, 1);

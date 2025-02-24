@@ -11,6 +11,10 @@ import static top.mrxiaom.sweet.taskplugin.utils.Utils.convert;
 import static top.mrxiaom.sweet.taskplugin.utils.Utils.getOrList;
 
 public class TaskKill implements ITask {
+    @Override
+    public String type() {
+        return "kill";
+    }
     public static void register() {
         ITask.registerParser("kill", (args, actionTips, warn) -> {
             Pair<List<String>, Integer> pair = getOrList(args, 1);

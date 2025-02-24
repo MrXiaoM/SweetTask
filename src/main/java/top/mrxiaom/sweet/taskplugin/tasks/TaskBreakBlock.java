@@ -11,6 +11,10 @@ import static top.mrxiaom.sweet.taskplugin.utils.Utils.convert;
 import static top.mrxiaom.sweet.taskplugin.utils.Utils.getOrList;
 
 public class TaskBreakBlock implements ITask {
+    @Override
+    public String type() {
+        return "break";
+    }
     public static void register() {
         ITask.registerParser("break", (args, actionTips, warn) -> {
             Pair<List<String>, Integer> pair = getOrList(args, 1);

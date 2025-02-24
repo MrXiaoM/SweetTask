@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public interface ITask {
+    String type();
     String actionTips();
 
     static ITask load(TaskManager parent, String parentTaskId, String s) {

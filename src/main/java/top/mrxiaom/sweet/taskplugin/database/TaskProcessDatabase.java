@@ -168,15 +168,21 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         try (Connection conn = plugin.getConnection()) {
             List<String> list = new ArrayList<>();
             list.add(task.id);
-            list.addAll(task.subTasks.keySet());
+            for (int i = 0; i < task.subTasks.size(); i++) {
+                list.add(i + "-" + task.subTasks.get(i).type());
+            }
             try (PreparedStatement ps = conn.prepareStatement(
                     "INSERT INTO `" + TABLE_NAME + "`" +
                             "(`player`, `task_id`, `sub_task_id`, `data`, `expire_time`) " +
                             "VALUES(?, ?, ?, 0, ?);")) {
                 for (String s : list) {
+                    // player
                     ps.setString(1, id);
+                    // task_id
                     ps.setString(2, task.id);
+                    // sub_task_id
                     ps.setString(3, s);
+                    // expire_time
                     ps.setTimestamp(4, Timestamp.valueOf(expireTime));
                     ps.addBatch();
                 }
