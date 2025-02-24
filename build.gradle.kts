@@ -32,14 +32,13 @@ dependencies {
     compileOnly("io.lumine:LumineUtils:1.20-SNAPSHOT")
     compileOnly("org.black_ixx:playerpoints:3.2.7")
 
-
     implementation("net.kyori:adventure-api:4.17.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.4")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
     implementation("de.tr7zw:item-nbt-api:2.14.0")
     implementation("com.zaxxer:HikariCP:4.0.3") { isTransitive = false }
     implementation("org.jetbrains:annotations:24.0.0")
-    implementation("top.mrxiaom:PluginBase:1.1.7")
+    implementation("top.mrxiaom:PluginBase:1.3.1")
 }
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
