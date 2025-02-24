@@ -1,0 +1,19 @@
+# 任务类型
+# DAILY 每日，WEEKLY 每周，MONTHLY 每月
+# ONE_TIME 一次性
+type: DAILY
+# 任务的稀有度（百分比）
+# 每日、每周、每月任务能抽到该任务的概率
+rarity: 50
+# 任务名
+name: '示例任务'
+# 子任务列表，编写规则详见插件文档
+sub-tasks:
+  - break DIAMOND_ORE or DEEPSLATE_DIAMOND_ORE 64
+# 任务完成奖励
+# [console]控制台执行
+# [player]玩家执行
+# [message]聊天提示
+# 均支持 PAPI 变量
+rewards:
+  - '[console]money give %player_name% 100'
