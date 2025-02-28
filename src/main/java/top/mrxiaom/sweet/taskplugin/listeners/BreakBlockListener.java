@@ -7,10 +7,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
-import top.mrxiaom.sweet.taskplugin.database.TaskProcessDatabase;
-import top.mrxiaom.sweet.taskplugin.database.entry.SubTaskCache;
-import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
-import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.matchers.BlockMatcher;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
@@ -21,7 +17,7 @@ import java.util.*;
 import static top.mrxiaom.sweet.taskplugin.utils.Utils.getListOrEmpty;
 
 @AutoRegister
-public class BreakBlockListener extends AbstractListener<BlockMatcher> {
+public class BreakBlockListener extends AbstractListener<Block, BlockMatcher> {
     public BreakBlockListener(SweetTask plugin) {
         super(plugin);
     }
@@ -37,28 +33,16 @@ public class BreakBlockListener extends AbstractListener<BlockMatcher> {
         }
     }
 
+    @Override
+    protected boolean isNotMatch(BlockMatcher matcher, Block entry) {
+        return !matcher.match(entry);
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent e) {
         if (e.isCancelled()) return;
-        TaskProcessDatabase database = plugin.getDatabase();
         Block block = e.getBlock();
         Player player = e.getPlayer();
-        TaskCache taskCache = database.getTasks(player);
-        boolean changed = false;
-        for (TaskWrappers<BlockMatcher> value : wrappers) {
-            if (!value.matcher.match(block)) continue;
-            for (TaskWrapper wrapper : value.subTasks) {
-                SubTaskCache cache = taskCache.tasks.get(wrapper.task.id);
-                int data = cache.get(wrapper, 0) + 1;
-                cache.put(wrapper, data);
-                if (!changed) {
-                    TaskManager.inst().showActionTips(player, wrapper, data);
-                }
-                changed = true;
-            }
-        }
-        if (changed) {
-            taskCache.scheduleSubmit(30);
-        }
+        plus(player, block, 1);
     }
 }
