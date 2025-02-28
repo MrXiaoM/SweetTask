@@ -1,5 +1,6 @@
 package top.mrxiaom.sweet.taskplugin;
         
+import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import top.mrxiaom.pluginbase.BukkitPlugin;
@@ -33,6 +34,14 @@ public class SweetTask extends BukkitPlugin {
 
     public TaskProcessDatabase getDatabase() {
         return taskProcessDatabase;
+    }
+
+    @Override
+    protected void beforeLoad() {
+        MinecraftVersion.replaceLogger(getLogger());
+        MinecraftVersion.disableUpdateCheck();
+        MinecraftVersion.disableBStats();
+        MinecraftVersion.getVersion();
     }
 
     @Override

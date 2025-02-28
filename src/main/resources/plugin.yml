@@ -2,8 +2,11 @@ name: SweetTask
 version: '${version}'
 main: top.mrxiaom.sweet.taskplugin.SweetTask
 api-version: 1.13
-depend: [ MythicMobs, PlayerPoints ]
-softdepend: [ PlaceholderAPI ]
+softdepend:
+  - Vault
+  - PlayerPoints
+  - PlaceholderAPI
+  - MythicMobs
 authors: [ MrXiaoM ]
 commands:
   sweettask:

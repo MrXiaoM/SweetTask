@@ -34,6 +34,17 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                 }
             }
         }, 30 * 20L, 30 * 20L);
+        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+        if (!players.isEmpty()) Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            for (Player player : players) {
+                getTasks(player);
+            }
+        });
+    }
+
+    @Override
+    public int priority() {
+        return 999;
     }
 
     public boolean isOnlineMode() {
@@ -112,39 +123,45 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         String id = id(player);
         TaskCache cache = caches.get(id);
         if (cache != null) return cache;
-        Map<String, SubTaskCache> tasks = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         try (Connection conn = plugin.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM `" + TABLE_NAME + "` " +
-                    "WHERE `player`=?")) {
-                ResultSet result = ps.executeQuery();
-                while (result.next()) {
-                    String taskId = result.getString("task_id");
-                    String subTaskId = result.getString("sub_task_id");
-                    int data = result.getInt("data");
-                    Timestamp expireTime = result.getTimestamp("expire_time");
-                    Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-                    if (now.after(expireTime)) {
-                        // 已过期任务不加入结果中
-                        continue;
-                    }
-                    SubTaskCache task = tasks.get(taskId);
-                    if (task == null) {
-                        task = new SubTaskCache(taskId, expireTime.toLocalDateTime());
-                    }
-                    task.put(subTaskId, data);
-                    tasks.put(taskId, task);
-                }
-            }
-            cache = new TaskCache(player, tasks);
-            caches.put(id, cache);
+            cache = refreshCache(conn, id, player);
         } catch (SQLException e) {
             warn(e);
         }
         if (cache != null) {
             return cache;
         } else {
-            return new TaskCache(player, tasks);
+            return new TaskCache(player, new TreeMap<>(String.CASE_INSENSITIVE_ORDER));
         }
+    }
+
+    private TaskCache refreshCache(Connection conn, String id, Player player) throws SQLException {
+        Map<String, SubTaskCache> subTasksMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM `" + TABLE_NAME + "` " +
+                "WHERE `player`=?")) {
+            ps.setString(1, id);
+            ResultSet result = ps.executeQuery();
+            while (result.next()) {
+                String taskId = result.getString("task_id");
+                String subTaskId = result.getString("sub_task_id");
+                int data = result.getInt("data");
+                Timestamp expireTime = result.getTimestamp("expire_time");
+                Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+                if (now.after(expireTime)) {
+                    // 已过期任务不加入结果中
+                    continue;
+                }
+                SubTaskCache task = subTasksMap.get(taskId);
+                if (task == null) {
+                    task = new SubTaskCache(taskId, expireTime.toLocalDateTime());
+                }
+                task.put(subTaskId, data);
+                subTasksMap.put(taskId, task);
+            }
+        }
+        TaskCache cache = new TaskCache(player, subTasksMap);
+        caches.put(id, cache);
+        return cache;
     }
 
     public void cleanExpiredTasks(Player player) {
@@ -189,6 +206,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                 }
                 ps.executeBatch();
             }
+            refreshCache(conn, id, player);
         } catch (SQLException e) {
             warn(e);
         }
