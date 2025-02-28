@@ -1,5 +1,6 @@
 package top.mrxiaom.sweet.taskplugin.database;
 
+import com.google.common.collect.Iterables;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -10,13 +11,17 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import top.mrxiaom.pluginbase.database.IDatabase;
+import top.mrxiaom.pluginbase.utils.Bytes;
 import top.mrxiaom.pluginbase.utils.Pair;
+import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.SubTaskCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractPluginHolder;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -25,9 +30,11 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
     private String TABLE_NAME;
     private final Map<String, TaskCache> caches = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private boolean onlineMode, disabling;
+    private long nextRefresh = 0;
     public TaskProcessDatabase(SweetTask plugin) {
         super(plugin);
         registerEvents();
+        registerBungee();
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (TaskCache cache : caches.values()) {
                 if (cache.needSubmit()) {
@@ -59,6 +66,14 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         return player.getName();
     }
 
+    private OfflinePlayer fromId(String id) {
+        if (isOnlineMode()) {
+            UUID uuid = UUID.fromString(id);
+            return Util.getOfflinePlayer(uuid).orElse(null);
+        }
+        return Util.getOfflinePlayer(id).orElse(null);
+    }
+
     @Override
     public void reload(Connection conn, String s) throws SQLException {
         FileConfiguration config = plugin.getConfig();
@@ -82,13 +97,41 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         }
     }
 
+    @Override
+    public void receiveBungee(String subChannel, DataInputStream in) throws IOException {
+        if (subChannel.equals("SweetTaskRefreshCache")) {
+            long now = System.currentTimeMillis();
+            if (now < nextRefresh) return;
+            nextRefresh = now + 3000L;
+            int size = in.readInt();
+            for (int i = 0; i < size; i++) {
+                String id = in.readUTF();
+                TaskCache cache = caches.remove(id);
+                if (cache != null && cache.player.isOnline()) {
+                    Bukkit.getScheduler().runTaskAsynchronously(plugin,
+                            () -> getTasks(cache.player));
+                }
+            }
+        }
+    }
+
+    public void noticeRefreshCache(List<String> ids) {
+        if (ids.isEmpty()) return;
+        Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+        if (player == null) return;
+        Bytes.sendByWhoeverOrNot("BungeeCord", Bytes.build(out -> {
+            out.writeInt(ids.size());
+            for (String id : ids) {
+                out.writeUTF(id);
+            }
+        }, "Forward", "ALL", "SweetTaskRefreshCache"));
+    }
+
     @EventHandler
     public void on(PlayerJoinEvent e) {
         if (disabling) return;
         Player player = e.getPlayer();
-        caches.remove(id(player));
         cleanExpiredTasks(player);
-        getTasks(player);
     }
 
     @EventHandler
@@ -167,6 +210,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
 
     public void cleanExpiredTasks(Player player) {
         String id = id(player);
+        caches.remove(id);
         String sentence;
         if (plugin.options.database().isMySQL()) {
             sentence = "DELETE FROM `" + TABLE_NAME + "` WHERE `player`=? AND NOW() >= `expire_time`;";
@@ -177,6 +221,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
             PreparedStatement ps = conn.prepareStatement(sentence)) {
             ps.setString(1, id);
             ps.execute();
+            refreshCache(conn, id, player);
         } catch (SQLException e) {
             warn(e);
         }
@@ -301,6 +346,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
             }
             plugin.info("[reset/" + task.id + "] 已从数据库中移除 " + players.size() + " 个玩家的任务数据");
             List<Pair<Player, String>> refreshList = new ArrayList<>();
+            List<String> ids = new ArrayList<>();
             // 重新添加任务到玩家
             for (Map.Entry<String, LocalDateTime> entry : players.entrySet()) {
                 String id = entry.getKey();
@@ -309,6 +355,8 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                 TaskCache removed = caches.remove(id);
                 if (removed != null && removed.player.isOnline()) {
                     refreshList.add(Pair.of(removed.player, id));
+                } else {
+                    ids.add(id);
                 }
             }
             plugin.info("[reset/" + task.id + "] 重置完成，" + refreshList.size() + " 个在线玩家的数据缓存已计划刷新");
@@ -316,7 +364,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
             for (Pair<Player, String> pair : refreshList) {
                 refreshCache(conn, pair.getValue(), pair.getKey());
             }
-            // TODO: 应该通过 BungeeCord 通知其它服务器刷新缓存
+            noticeRefreshCache(ids);
         } catch (SQLException e) {
             warn(e);
         }

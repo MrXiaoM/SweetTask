@@ -17,7 +17,7 @@ public class SweetTask extends BukkitPlugin {
 
     public SweetTask() {
         super(options()
-                .bungee(false)
+                .bungee(true)
                 .adventure(true)
                 .database(true)
                 .reconnectDatabaseWhenReloadConfig(false)
