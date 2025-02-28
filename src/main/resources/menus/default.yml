@@ -1,0 +1,107 @@
+title: '每日任务'
+inventory:
+  - '说框　　　　　　　'
+  - '　框　一二三　　　'
+  - '　框　四五　　刷　'
+  - '　框　　　　　　　'
+permission: 'sweet.task.open.%id%'
+operations:
+  refresh:
+    available:
+      - '  &f剩余次数: &e%times%'
+      - ''
+      - '&a左键&7 | &f刷新今日任务'
+    task-done:
+      - '&c&m左键&r&7 | &f已完成过任务'
+    max-times:
+      - '  &f剩余次数: &e0'
+      - ''
+      - '&c&m左键&r&7 | &f刷新次数用完了'
+format:
+  subtasks:
+    - '  &7● &f%action%'
+task-icons:
+  一:
+    type: DAILY/1
+    display: '&e&l%name%'
+    lore:
+      - ''
+      - description
+      - sub_tasks
+      - ''
+      - '  &f任务奖励:'
+      - rewards
+      - ''
+      - operation
+  二:
+    type: DAILY/2
+    display: '&e&l%name%'
+    lore:
+      - ''
+      - description
+      - sub_tasks
+      - ''
+      - '  &f任务奖励:'
+      - rewards
+      - ''
+      - operation
+  三:
+    type: DAILY/3
+    display: '&e&l%name%'
+    lore:
+      - ''
+      - description
+      - sub_tasks
+      - ''
+      - '  &f任务奖励:'
+      - rewards
+      - ''
+      - operation
+  四:
+    type: DAILY/4
+    display: '&e&l%name%'
+    lore:
+      - ''
+      - description
+      - sub_tasks
+      - ''
+      - '  &f任务奖励:'
+      - rewards
+      - ''
+      - operation
+  五:
+    type: DAILY/5
+    display: '&e&l%name%'
+    lore:
+      - ''
+      - description
+      - sub_tasks
+      - ''
+      - '  &f任务奖励:'
+      - rewards
+      - ''
+      - operation
+other-icons:
+  框:
+    material: WHITE_STAINED_GLASS_PANE
+    display: '&f&l*'
+  说:
+    material: ITEM_FRAME
+    display: '&a&l每日任务'
+    lore:
+      - ''
+      - '  &f在这里，你可以查看以及  '
+      - '  &f提交任务。'
+      - '  &f每天 &e4:00 &f刷新任务'
+      - ''
+  刷:
+    material: HOPPER
+    display: '&e&l刷新任务'
+    lore:
+      - ''
+      - '  &f在完成任务之前，你可以  '
+      - '  &f刷新今日任务列表'
+      - ''
+      - refresh_operation
+    left_click_commands:
+      - '[player]sweettask refresh'

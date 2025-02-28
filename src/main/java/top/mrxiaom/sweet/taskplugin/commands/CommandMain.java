@@ -19,6 +19,8 @@ import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractModule;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
+import top.mrxiaom.sweet.taskplugin.gui.MenuModel;
+import top.mrxiaom.sweet.taskplugin.gui.Menus;
 
 import java.util.*;
 
@@ -31,8 +33,31 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length == 1 && "hello".equalsIgnoreCase(args[0])) {
-            return t(sender, "Hello World!");
+        if (args.length >= 2 && "open".equalsIgnoreCase(args[0])) {
+            MenuModel menu = Menus.inst().get(args[1]);
+            if (menu == null) {
+                return t(sender, "菜单不存在");
+            }
+            Player target;
+            if (args.length == 3) {
+                if (!sender.hasPermission("sweet.task.open-others")) {
+                    return t(sender, "&c你没有进行此操作的权限");
+                }
+                target = Util.getOnlinePlayer(args[2]).orElse(null);
+                if (target == null) {
+                    return t(sender, "&e玩家不在线 (或不存在)");
+                }
+            } else {
+                target = sender instanceof Player ? (Player) sender : null;
+                if (target == null) {
+                    return t(sender, "&e只有玩家才能执行该操作");
+                }
+                if (!menu.hasPermission(target)) {
+                    return t(target, "&c你没有进行此操作的权限");
+                }
+            }
+            Menus.inst().create(target, menu).open();
+            return true;
         }
         if (args.length == 2 && "reset".equalsIgnoreCase(args[0]) && sender.isOp()) {
             LoadedTask task = TaskManager.inst().getTask(args[1]);
@@ -57,9 +82,9 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
 
     private static final List<String> emptyList = Lists.newArrayList();
     private static final List<String> listArg0 = Lists.newArrayList(
-            "hello");
+            "open");
     private static final List<String> listOpArg0 = Lists.newArrayList(
-            "reset", "reload");
+            "open", "reset", "reload");
     private static final List<String> listArg1Reload = Lists.newArrayList("database");
     @Nullable
     @Override
@@ -75,6 +100,14 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 if ("reset".equalsIgnoreCase(args[0])) {
                     return startsWith(TaskManager.inst().getTasksId(), args[1]);
                 }
+            }
+            if ("open".equalsIgnoreCase(args[0])) {
+                return startsWith(Menus.inst().keys(sender), args[1]);
+            }
+        }
+        if (args.length == 3) {
+            if ("open".equalsIgnoreCase(args[0]) && sender.hasPermission("sweet.task.open-others")) {
+                return null;
             }
         }
         return emptyList;

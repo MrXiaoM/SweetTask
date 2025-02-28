@@ -3,3 +3,8 @@
 # 用于多服同步
 tasks-folder:
   - './tasks'
+
+# menus 文件夹路径
+# 用于多服同步
+menus-folder:
+  - './menus'
