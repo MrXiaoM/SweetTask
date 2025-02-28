@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.pluginbase.DatabaseHolder;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
@@ -41,7 +42,13 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             plugin.getDatabase().resetTask(task);
             return t(sender, "&a刷新完成，详见服务器控制台");
         }
-        if (args.length == 1 && "reload".equalsIgnoreCase(args[0]) && sender.isOp()) {
+        if (args.length >= 1 && "reload".equalsIgnoreCase(args[0]) && sender.isOp()) {
+            if (args.length == 2 && "database".equalsIgnoreCase(args[1])) {
+                DatabaseHolder db = plugin.options.database();
+                db.reloadConfig();
+                db.reconnect();
+                return t(sender, "&a已重新连接数据库");
+            }
             plugin.reloadConfig();
             return t(sender, "&a配置文件已重载");
         }
@@ -53,6 +60,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             "hello");
     private static final List<String> listOpArg0 = Lists.newArrayList(
             "reset", "reload");
+    private static final List<String> listArg1Reload = Lists.newArrayList("database");
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
@@ -61,6 +69,9 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
         }
         if (args.length == 2) {
             if (sender.isOp()) {
+                if ("reload".equalsIgnoreCase(args[0])) {
+                    return startsWith(listArg1Reload, args[1]);
+                }
                 if ("reset".equalsIgnoreCase(args[0])) {
                     return startsWith(TaskManager.inst().getTasksId(), args[1]);
                 }
