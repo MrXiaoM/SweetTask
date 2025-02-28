@@ -8,8 +8,10 @@ rarity: 50
 # 任务名
 name: '示例任务'
 # 子任务列表，编写规则详见插件文档
+# 在子任务确定之后，尽量不要添加或删除任务
+# 如果要这么做，请在修改后执行 /sweettask reset <任务ID> 重置所有玩家的子任务计数
 sub-tasks:
-  - break DIAMOND_ORE or DEEPSLATE_DIAMOND_ORE 64
+  - break DIAMOND_ORE or DEEPSLATE_DIAMOND_ORE 64; &f挖掘钻石矿石 &e%current%&7/&e%max%
 # 任务完成奖励
 # [console]控制台执行
 # [player]玩家执行
