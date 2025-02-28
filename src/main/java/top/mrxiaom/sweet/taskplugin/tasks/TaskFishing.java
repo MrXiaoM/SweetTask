@@ -46,4 +46,9 @@ public class TaskFishing implements ITask {
     public String actionTips() {
         return actionTips;
     }
+
+    @Override
+    public int getTargetValue() {
+        return target;
+    }
 }

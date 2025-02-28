@@ -45,4 +45,9 @@ public class TaskPlaceBlock implements ITask {
     public String actionTips() {
         return actionTips;
     }
+
+    @Override
+    public int getTargetValue() {
+        return target;
+    }
 }

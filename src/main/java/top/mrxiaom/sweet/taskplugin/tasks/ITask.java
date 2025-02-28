@@ -1,6 +1,5 @@
 package top.mrxiaom.sweet.taskplugin.tasks;
 
-import org.bukkit.entity.Player;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 
 import java.util.Map;
@@ -9,6 +8,7 @@ import java.util.TreeMap;
 public interface ITask {
     String type();
     String actionTips();
+    int getTargetValue();
 
     static ITask load(TaskManager parent, String parentTaskId, String s) {
         String[] args;

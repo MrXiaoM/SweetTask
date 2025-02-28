@@ -46,4 +46,9 @@ public class TaskSubmitItem implements ITask {
     public String actionTips() {
         return actionTips;
     }
+
+    @Override
+    public int getTargetValue() {
+        return target;
+    }
 }
