@@ -3,10 +3,10 @@ package top.mrxiaom.sweet.taskplugin.utils;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
-import top.mrxiaom.sweet.taskplugin.matchers.BlockMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -59,6 +59,16 @@ public class Utils {
             warn.accept("未输入" + name + "列表");
             return null;
         }
+        return list;
+    }
+
+    public static <K, T> List<T> getListOrEmpty(Map<K, List<T>> map, K key) {
+        List<T> value = map.get(key);
+        if (value != null) {
+            return value;
+        }
+        List<T> list = new ArrayList<>();
+        map.put(key, list);
         return list;
     }
 }

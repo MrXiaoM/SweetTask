@@ -26,12 +26,25 @@ public class SubTaskCache {
         put(index + "-" + subTask, data);
     }
 
+    public void put(TaskWrapper wrapper, int data) {
+        put(wrapper.index, wrapper.subTask.type(), data);
+    }
+
     @Nullable
     public Integer get(int index, String subTask) {
         return subTaskData.get(index + "-" + subTask);
     }
 
+    @Nullable
+    public Integer get(TaskWrapper wrapper) {
+        return get(wrapper.index, wrapper.subTask.type());
+    }
+
     public int get(int index, String subTask, int def) {
         return subTaskData.getOrDefault(index + "-" + subTask, def);
+    }
+
+    public int get(TaskWrapper wrapper, int def) {
+        return get(wrapper.index, wrapper.subTask.type(), def);
     }
 }
