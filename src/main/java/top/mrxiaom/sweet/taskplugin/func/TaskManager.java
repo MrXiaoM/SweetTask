@@ -67,6 +67,10 @@ public class TaskManager extends AbstractModule {
         return Collections.unmodifiableCollection(tasks.values());
     }
 
+    public Set<String> getTasksId() {
+        return tasks.keySet();
+    }
+
     public static TaskManager inst() {
         return instanceOf(TaskManager.class);
     }

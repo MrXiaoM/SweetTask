@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import top.mrxiaom.pluginbase.database.IDatabase;
+import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.SubTaskCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
@@ -184,31 +185,35 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
     public void addTask(Player player, LoadedTask task, LocalDateTime expireTime) {
         String id = id(player);
         try (Connection conn = plugin.getConnection()) {
-            List<String> list = new ArrayList<>();
-            list.add(task.id);
-            for (int i = 0; i < task.subTasks.size(); i++) {
-                list.add(i + "-" + task.subTasks.get(i).type());
-            }
-            try (PreparedStatement ps = conn.prepareStatement(
-                    "INSERT INTO `" + TABLE_NAME + "`" +
-                            "(`player`, `task_id`, `sub_task_id`, `data`, `expire_time`) " +
-                            "VALUES(?, ?, ?, 0, ?);")) {
-                for (String s : list) {
-                    // player
-                    ps.setString(1, id);
-                    // task_id
-                    ps.setString(2, task.id);
-                    // sub_task_id
-                    ps.setString(3, s);
-                    // expire_time
-                    ps.setTimestamp(4, Timestamp.valueOf(expireTime));
-                    ps.addBatch();
-                }
-                ps.executeBatch();
-            }
+            addTask(conn, id, task, expireTime);
             refreshCache(conn, id, player);
         } catch (SQLException e) {
             warn(e);
+        }
+    }
+
+    private void addTask(Connection conn, String id, LoadedTask task, LocalDateTime expireTime) throws SQLException {
+        List<String> list = new ArrayList<>();
+        list.add(task.id);
+        for (int i = 0; i < task.subTasks.size(); i++) {
+            list.add(i + "-" + task.subTasks.get(i).type());
+        }
+        try (PreparedStatement ps = conn.prepareStatement(
+                "INSERT INTO `" + TABLE_NAME + "`" +
+                        "(`player`, `task_id`, `sub_task_id`, `data`, `expire_time`) " +
+                        "VALUES(?, ?, ?, 0, ?);")) {
+            for (String s : list) {
+                // player
+                ps.setString(1, id);
+                // task_id
+                ps.setString(2, task.id);
+                // sub_task_id
+                ps.setString(3, s);
+                // expire_time
+                ps.setTimestamp(4, Timestamp.valueOf(expireTime));
+                ps.addBatch();
+            }
+            ps.executeBatch();
         }
     }
 
@@ -259,5 +264,61 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         ps.setTimestamp(5, Timestamp.valueOf(expire));
         if (mysql) ps.setInt(6, data);
         ps.addBatch();
+    }
+    public void resetTask(LoadedTask task) {
+        try (Connection conn = plugin.getConnection()) {
+            plugin.info("[reset/" + task.id + "] 正在重置任务数据");
+            Map<String, LocalDateTime> players = new HashMap<>();
+            // 获取接了这些任务的玩家列表，及其到期时间
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT `player`, `expire_time` FROM `" + TABLE_NAME + "` " +
+                    "WHERE `task_id`=? AND `sub_task_id`=?"
+            )) {
+                ps.setString(1, task.id);
+                ps.setString(2, task.id);
+                ResultSet resultSet = ps.executeQuery();
+                while (resultSet.next()) {
+                    String player = resultSet.getString("player");
+                    Timestamp expireTime = resultSet.getTimestamp("expire_time");
+                    players.put(player, expireTime.toLocalDateTime());
+                }
+            }
+            if (players.isEmpty()) {
+                plugin.info("[reset/" + task.id + "] 没有人正在进行这个任务，无需重置");
+                return;
+            }
+            // 从数据库中删除
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "DELETE FROM `" + TABLE_NAME + "` " +
+                    "WHERE `player`=? AND `task_id`=?"
+            )) {
+                for (String id : players.keySet()) {
+                    ps.setString(1, id);
+                    ps.setString(2, task.id);
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
+            plugin.info("[reset/" + task.id + "] 已从数据库中移除 " + players.size() + " 个玩家的任务数据");
+            List<Pair<Player, String>> refreshList = new ArrayList<>();
+            // 重新添加任务到玩家
+            for (Map.Entry<String, LocalDateTime> entry : players.entrySet()) {
+                String id = entry.getKey();
+                LocalDateTime expireTime = entry.getValue();
+                addTask(conn, id, task, expireTime);
+                TaskCache removed = caches.remove(id);
+                if (removed != null && removed.player.isOnline()) {
+                    refreshList.add(Pair.of(removed.player, id));
+                }
+            }
+            plugin.info("[reset/" + task.id + "] 重置完成，" + refreshList.size() + " 个在线玩家的数据缓存已计划刷新");
+            // 如果需要的话，刷新缓存
+            for (Pair<Player, String> pair : refreshList) {
+                refreshCache(conn, pair.getValue(), pair.getKey());
+            }
+            // TODO: 应该通过 BungeeCord 通知其它服务器刷新缓存
+        } catch (SQLException e) {
+            warn(e);
+        }
     }
 }
