@@ -3,6 +3,8 @@ package top.mrxiaom.sweet.taskplugin.matchers;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Objects;
+
 public class VanillaItemMatcher implements ItemMatcher{
     private final Material material;
     private final Integer dataValue;
@@ -28,5 +30,18 @@ public class VanillaItemMatcher implements ItemMatcher{
             return material.equals(item.getType());
         }
         return material.equals(item.getType()) && dataValue.shortValue() == item.getDurability();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof VanillaItemMatcher)) return false;
+        VanillaItemMatcher that = (VanillaItemMatcher) o;
+        return material == that.material && Objects.equals(dataValue, that.dataValue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(material, dataValue);
     }
 }
