@@ -8,9 +8,7 @@ import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static top.mrxiaom.pluginbase.func.AbstractGuiModule.loadActions;
 
@@ -18,17 +16,20 @@ public class LoadedTask {
     public final String id;
     public final double rarity;
     public final String name;
+    public final List<String> description;
     public final List<ITask> subTasks;
     public final List<IAction> rewards;
+    public final List<String> rewardsLore;
 
-    public LoadedTask(String id, double rarity, String name, List<ITask> subTasks, List<IAction> rewards) {
+    public LoadedTask(String id, double rarity, String name, List<String> description, List<ITask> subTasks, List<IAction> rewards, List<String> rewardsLore) {
         this.id = id;
         this.rarity = rarity;
         this.name = name;
+        this.description = description;
         this.subTasks = subTasks;
         this.rewards = rewards;
+        this.rewardsLore = rewardsLore;
     }
-
 
     public void giveRewards(Player player) {
         for (IAction reward : rewards) {
@@ -44,6 +45,7 @@ public class LoadedTask {
             return null;
         }
         String name = config.getString("name", id);
+        List<String> description = config.getStringList("description");
         List<ITask> subTasks = new ArrayList<>();
         for (String s : config.getStringList("sub-tasks")) {
             ITask task = ITask.load(parent, id, s);
@@ -52,6 +54,7 @@ public class LoadedTask {
             }
         }
         List<IAction> rewards = loadActions(config, "rewards");
-        return new LoadedTask(id, rarity, name, subTasks, rewards);
+        List<String> rewardsLore = config.getStringList("rewards-lore");
+        return new LoadedTask(id, rarity, name, description, subTasks, rewards, rewardsLore);
     }
 }
