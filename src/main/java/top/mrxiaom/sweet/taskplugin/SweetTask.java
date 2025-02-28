@@ -31,6 +31,10 @@ public class SweetTask extends BukkitPlugin {
         return mythic;
     }
 
+    public TaskProcessDatabase getDatabase() {
+        return taskProcessDatabase;
+    }
+
     @Override
     protected void beforeEnable() {
         Plugin mythicPlugin = Bukkit.getPluginManager().getPlugin("MythicMobs");
