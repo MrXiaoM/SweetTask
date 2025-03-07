@@ -1,5 +1,6 @@
 package top.mrxiaom.sweet.taskplugin.gui;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -75,6 +76,13 @@ public class MenuModel implements IModel {
         TaskIcon icon = taskIcons.get(id);
         if (icon != null) {
             // TODO: 渲染主要任务图标
+
+            // 找不到相关任务时
+            if (icon.redirectIcon != null) {
+                otherIcons.get(icon.redirectIcon);
+            } else {
+                return new ItemStack(Material.AIR);
+            }
         }
         LoadedIcon otherIcon = otherIcons.get(id);
         if (otherIcon != null) {

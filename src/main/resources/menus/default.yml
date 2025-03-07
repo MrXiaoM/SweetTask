@@ -22,7 +22,11 @@ format:
     - '  &7● &f%action%'
 task-icons:
   一:
+    # 格子类型，格式为 任务类型/第几个任务
+    # 任务类型有 DAILY, WEEKLY, MONTHLY
     type: DAILY/1
+    # 没有任务时，使用 other-icons 里的哪个图标来代替
+    redirect: ''
     display: '&e&l%name%'
     lore:
       - ''

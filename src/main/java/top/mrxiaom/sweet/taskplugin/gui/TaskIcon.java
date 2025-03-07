@@ -18,11 +18,13 @@ public class TaskIcon {
      */
     public final int index;
     public final LoadedIcon icon;
+    public final Character redirectIcon;
 
-    public TaskIcon(EnumTaskType type, int index, LoadedIcon icon) {
+    public TaskIcon(EnumTaskType type, int index, LoadedIcon icon, Character redirectIcon) {
         this.type = type;
         this.index = index;
         this.icon = icon;
+        this.redirectIcon = redirectIcon;
     }
 
     @Nullable
@@ -39,6 +41,7 @@ public class TaskIcon {
             return null;
         }
         LoadedIcon icon = LoadedIcon.load(section, key);
-        return new TaskIcon(type, count - 1, icon);
+        String redirectIcon = section.getString(key + ".redirect", "");
+        return new TaskIcon(type, count - 1, icon, !redirectIcon.isEmpty() ? redirectIcon.charAt(0) : null);
     }
 }
