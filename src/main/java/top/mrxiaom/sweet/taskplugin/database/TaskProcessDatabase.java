@@ -94,8 +94,13 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         if (loadFlag) {
             loadFlag = false;
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    getTasks(player);
+                try (Connection connection = plugin.getConnection()) {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        String id = id(player);
+                        refreshCache(connection, id, player);
+                    }
+                } catch (SQLException e) {
+                    warn(e);
                 }
             });
         }
