@@ -31,6 +31,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
     private final Map<String, TaskCache> caches = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private boolean onlineMode, disabling;
     private long nextRefresh = 0;
+    private boolean loadFlag = false;
     public TaskProcessDatabase(SweetTask plugin) {
         super(plugin);
         registerEvents();
@@ -42,12 +43,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                 }
             }
         }, 30 * 20L, 30 * 20L);
-        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
-        if (!players.isEmpty()) Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            for (Player player : players) {
-                getTasks(player);
-            }
-        });
+        loadFlag = !Bukkit.getOnlinePlayers().isEmpty();
     }
 
     @Override
@@ -94,6 +90,14 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                         "PRIMARY KEY(`player`,`task_id`,`sub_task_id`)" +
                 ");")) {
             ps.execute();
+        }
+        if (loadFlag) {
+            loadFlag = false;
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    getTasks(player);
+                }
+            });
         }
     }
 
