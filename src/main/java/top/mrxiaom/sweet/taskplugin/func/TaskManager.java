@@ -1,8 +1,10 @@
 package top.mrxiaom.sweet.taskplugin.func;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.AdventureUtil;
@@ -19,12 +21,58 @@ import java.util.*;
 @AutoRegister
 public class TaskManager extends AbstractModule {
     private final Map<String, LoadedTask> tasks = new HashMap<>();
+    private final Comparator<Pair<String, Integer>> permComparator = Comparator.comparingInt(Pair::getValue);
+    private final List<Pair<String, Integer>> taskDailyCounts = new ArrayList<>();
+    private final List<Pair<String, Integer>> taskWeeklyCounts = new ArrayList<>();
+    private final List<Pair<String, Integer>> taskMonthlyCounts = new ArrayList<>();
+    private int taskDailyCount, taskWeeklyCount, taskMonthlyCount;
     public TaskManager(SweetTask plugin) {
         super(plugin);
     }
 
     @Override
     public void reloadConfig(MemoryConfiguration config) {
+        ConfigurationSection section;
+        taskDailyCounts.clear();
+        taskWeeklyCounts.clear();
+        taskMonthlyCounts.clear();
+        taskDailyCount = taskWeeklyCount = taskMonthlyCount = 0;
+
+        section = config.getConfigurationSection("counts.daily");
+        if (section != null) for (String key : section.getKeys(false)) {
+            int count = section.getInt(key);
+            if (count < 0) continue;
+            if (key.equals("default")) {
+                taskDailyCount = count;
+            }
+            String perm = "sweettask.count.daily." + key;
+            taskDailyCounts.add(Pair.of(perm, count));
+        }
+        section = config.getConfigurationSection("counts.weekly");
+        if (section != null) for (String key : section.getKeys(false)) {
+            int count = section.getInt(key);
+            if (count < 0) continue;
+            if (key.equals("default")) {
+                taskWeeklyCount = count;
+            }
+            String perm = "sweettask.count.weekly." + key;
+            taskWeeklyCounts.add(Pair.of(perm, count));
+        }
+        section = config.getConfigurationSection("counts.monthly");
+        if (section != null) for (String key : section.getKeys(false)) {
+            int count = section.getInt(key);
+            if (count < 0) continue;
+            if (key.equals("default")) {
+                taskMonthlyCount = count;
+            }
+            String perm = "sweettask.count.monthly." + key;
+            taskMonthlyCounts.add(Pair.of(perm, count));
+        }
+
+        taskDailyCounts.sort(permComparator.reversed());
+        taskWeeklyCounts.sort(permComparator.reversed());
+        taskMonthlyCounts.sort(permComparator.reversed());
+
         tasks.clear();
         for (String path : config.getStringList("tasks-folder")) {
             File folder = plugin.resolve(path);
@@ -56,6 +104,27 @@ public class TaskManager extends AbstractModule {
         String actionMessage = Pair.replace(tips, replacements);
         replacements.clear();
         AdventureUtil.sendActionBar(player, actionMessage);
+    }
+
+    public int getDailyCount(Permissible player) {
+        return getCount(taskDailyCounts, player, taskDailyCount);
+    }
+
+    public int getWeeklyCount(Permissible player) {
+        return getCount(taskWeeklyCounts, player, taskWeeklyCount);
+    }
+
+    public int getMonthlyCount(Permissible player) {
+        return getCount(taskMonthlyCounts, player, taskMonthlyCount);
+    }
+
+    private int getCount(List<Pair<String, Integer>> permList, Permissible player, int def) {
+        for (Pair<String, Integer> pair : permList) {
+            if (player.hasPermission(pair.getKey())) {
+                return pair.getValue();
+            }
+        }
+        return def;
     }
 
     @Nullable

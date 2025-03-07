@@ -8,3 +8,17 @@ tasks-folder:
 # 用于多服同步
 menus-folder:
   - './menus'
+
+# 周期任务权限对应数量
+# 格式为 sweettask.count.<类型>.<键>，如 sweettask.count.daily.default
+# 越大的数量越优先
+counts:
+  # 每日任务数量
+  daily:
+    default: 5
+  # 每周任务数量
+  weekly:
+    default: 0
+  # 每月任务数量
+  monthly:
+    default: 0
