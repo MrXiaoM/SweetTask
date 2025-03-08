@@ -10,14 +10,20 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
+import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
+import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractGuisModule;
+import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
+import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
 import java.io.File;
+import java.util.List;
 
 @AutoRegister
 public class Menus extends AbstractGuisModule<MenuModel> {
@@ -51,9 +57,41 @@ public class Menus extends AbstractGuisModule<MenuModel> {
 
     public class Impl extends Gui<MenuModel> {
         public PlayerCache playerCache;
+        public List<Pair<LoadedTask, TaskCache>> tasksDaily, tasksWeekly, tasksMonthly;
         protected Impl(@NotNull Player player, @NotNull MenuModel model, PlayerCache playerCache) {
             super(player, model);
+            this.setPlayerCache(playerCache);
+        }
+
+        public void setPlayerCache(PlayerCache playerCache) {
             this.playerCache = playerCache;
+            if (tasksDaily != null) tasksDaily.clear();
+            if (tasksWeekly != null) tasksWeekly.clear();
+            if (tasksMonthly != null) tasksMonthly.clear();
+            this.tasksDaily = playerCache.getTasksByType(EnumTaskType.DAILY);
+            this.tasksWeekly = playerCache.getTasksByType(EnumTaskType.WEEKLY);
+            this.tasksMonthly = playerCache.getTasksByType(EnumTaskType.MONTHLY);
+        }
+
+        @Nullable
+        public Pair<LoadedTask, TaskCache> getTask(EnumTaskType type, int index) {
+            if (index < 0) return null;
+            List<Pair<LoadedTask, TaskCache>> list;
+            switch (type) {
+                case DAILY:
+                    list = tasksDaily;
+                    break;
+                case WEEKLY:
+                    list = tasksWeekly;
+                    break;
+                case MONTHLY:
+                    list = tasksMonthly;
+                    break;
+                default:
+                    throw new IllegalArgumentException(type.name() + " is not supported.");
+            }
+            if (index >= list.size()) return null;
+            return list.get(index);
         }
 
         @Override

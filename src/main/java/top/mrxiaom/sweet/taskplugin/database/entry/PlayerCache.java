@@ -3,8 +3,7 @@ package top.mrxiaom.sweet.taskplugin.database.entry;
 import com.google.common.collect.Lists;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-import top.mrxiaom.sweet.taskplugin.SweetTask;
-import top.mrxiaom.sweet.taskplugin.database.TaskProcessDatabase;
+import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
@@ -12,6 +11,7 @@ import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +48,9 @@ public class PlayerCache {
         this.refreshCountExpireTime = refreshCountExpireTime;
     }
 
+    /**
+     * 提交刷新，检查过期时间的同时，使刷新次数+1
+     */
     public void submitRefresh() {
         TaskManager manager = TaskManager.inst();
         if (LocalDateTime.now().isAfter(refreshCountExpireTime)) {
@@ -58,13 +61,23 @@ public class PlayerCache {
         manager.plugin.getDatabase().submitRefreshCount(player, refreshCount, refreshCountExpireTime);
     }
 
-    public boolean canRefresh(EnumTaskType type, int limit) {
+    /**
+     * 是否可以刷新任务列表
+     * @param type 任务类型
+     * @param limit 限制数量
+     * @return <ul>
+     *     <li><code>null</code> 代表已经完成过任务了</li>
+     *     <li><code>false</code> 代表刷新次数已用尽</li>
+     *     <li><code>true</code> 代表可以刷新</li>
+     * </ul>
+     */
+    public Boolean canRefresh(EnumTaskType type, int limit) {
         TaskManager manager = TaskManager.inst();
         for (TaskCache taskCache : tasks.values()) {
             LoadedTask task = manager.getTask(taskCache.taskId);
             if (task != null) {
                 if (task.type.equals(type) && taskCache.hasDone()) {
-                    return false;
+                    return null;
                 }
             }
         }
@@ -102,5 +115,17 @@ public class PlayerCache {
             return true;
         }
         return false;
+    }
+
+    public List<Pair<LoadedTask, TaskCache>> getTasksByType(EnumTaskType type) {
+        TaskManager manager = TaskManager.inst();
+        List<Pair<LoadedTask, TaskCache>> tasks = new ArrayList<>();
+        for (TaskCache cache : this.tasks.values()) {
+            LoadedTask task = manager.getTask(cache.taskId);
+            if (task != null && task.type.equals(type)) {
+                tasks.add(Pair.of(task, cache));
+            }
+        }
+        return tasks;
     }
 }

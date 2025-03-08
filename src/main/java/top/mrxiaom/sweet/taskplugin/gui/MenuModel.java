@@ -11,6 +11,9 @@ import top.mrxiaom.pluginbase.func.gui.IModel;
 import top.mrxiaom.pluginbase.func.gui.IModifier;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
 import top.mrxiaom.pluginbase.gui.IGui;
+import top.mrxiaom.pluginbase.utils.Pair;
+import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
+import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,13 +78,17 @@ public class MenuModel implements IModel {
         Menus.Impl gui = (Menus.Impl) instance;
         TaskIcon icon = taskIcons.get(id);
         if (icon != null) {
-            // TODO: 渲染主要任务图标
-
-            // 找不到相关任务时
-            if (icon.redirectIcon != null) {
-                otherIcons.get(icon.redirectIcon);
+            // 寻找图标对应任务
+            Pair<LoadedTask, TaskCache> pair = gui.getTask(icon.type, icon.index);
+            if (pair != null) {
+                return icon.generateIcon(player, pair.getKey(), pair.getValue());
             } else {
-                return new ItemStack(Material.AIR);
+                // 找不到相关任务时
+                if (icon.redirectIcon != null) {
+                    otherIcons.get(icon.redirectIcon);
+                } else {
+                    return new ItemStack(Material.AIR);
+                }
             }
         }
         LoadedIcon otherIcon = otherIcons.get(id);
@@ -106,7 +113,18 @@ public class MenuModel implements IModel {
             Menus.Impl gui, Player player,
             TaskIcon icon, ClickType click, int slot
     ) {
-        // TODO: 主要图标点击
+        Pair<LoadedTask, TaskCache> pair = gui.getTask(icon.type, icon.index);
+        if (pair != null) {
+            LoadedTask task = pair.getKey();
+            TaskCache cache = pair.getValue();
+            // TODO: 主要图标点击
+
+        } else {
+            LoadedIcon otherIcon = otherIcons.get(icon.redirectIcon);
+            if (otherIcon != null) {
+                otherIcon.click(player, click);
+            }
+        }
         return false;
     }
 

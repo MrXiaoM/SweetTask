@@ -6,6 +6,8 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
+import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
 import java.util.List;
@@ -27,6 +29,11 @@ public class TaskIcon {
         this.index = index;
         this.icon = icon;
         this.redirectIcon = redirectIcon;
+    }
+
+    public ItemStack generateIcon(Player player, LoadedTask task, TaskCache cache) {
+        // TODO: 主要图标
+        return null;
     }
 
     @Nullable
