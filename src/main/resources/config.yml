@@ -9,6 +9,9 @@ tasks-folder:
 menus-folder:
   - './menus'
 
+# 任务到期具体时间
+reset-time: '4:00:00'
+
 # 周期任务权限对应数量
 # 格式为 sweettask.count.<类型>.<键>，如 sweettask.count.daily.default
 # 越大的数量越优先
