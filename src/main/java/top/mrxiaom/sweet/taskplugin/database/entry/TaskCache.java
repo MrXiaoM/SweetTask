@@ -47,4 +47,9 @@ public class TaskCache {
     public int get(TaskWrapper wrapper, int def) {
         return get(wrapper.index, wrapper.subTask.type(), def);
     }
+
+    public boolean hasDone() {
+        Integer i = subTaskData.get(taskId);
+        return i != null && i == 1;
+    }
 }

@@ -27,11 +27,11 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class TaskProcessDatabase extends AbstractPluginHolder implements IDatabase, Listener {
-    private String TABLE_NAME;
+    private String TABLE_NAME, REFRESH_TABLE_NAME;
     private final Map<String, PlayerCache> caches = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private boolean onlineMode, disabling;
     private long nextRefresh = 0;
-    private boolean loadFlag = false;
+    private boolean loadFlag;
     public TaskProcessDatabase(SweetTask plugin) {
         super(plugin);
         registerEvents();
@@ -80,6 +80,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
             this.onlineMode = onlineMode.equals("true");
         }
         TABLE_NAME = (s + "task_process").toUpperCase();
+        REFRESH_TABLE_NAME = (s + "task_refresh").toUpperCase();
         try (PreparedStatement ps = conn.prepareStatement(
                 "CREATE TABLE if NOT EXISTS `" + TABLE_NAME + "`(" +
                         "`player` varchar(48)," + // 玩家名
@@ -89,6 +90,15 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                         "`expire_time` timestamp," + // 过期时间
                         "PRIMARY KEY(`player`,`task_id`,`sub_task_id`)" +
                 ");")) {
+            ps.execute();
+        }
+        try (PreparedStatement ps = conn.prepareStatement(
+                "CREATE TABLE if NOT EXISTS `" + REFRESH_TABLE_NAME + "`(" +
+                        "`player` varchar(48) PRIMARY KEY," + // 玩家名
+                        "`count`, int," + // 已刷新次数
+                        "`expire_time` timestamp," + // 下一次可刷新时间
+                ");"
+        )) {
             ps.execute();
         }
         if (loadFlag) {
@@ -168,6 +178,36 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         caches.clear();
     }
 
+    public void submitRefreshCount(Player player, int refreshCount, LocalDateTime expireTime) {
+        String id = id(player);
+        String sentence;
+        boolean mysql = plugin.options.database().isMySQL();
+        if (mysql) {
+            sentence = "INSERT INTO `" + TABLE_NAME + "`" +
+                    "(`player`, `count`, `expire_time`) " +
+                    "VALUES(?, ?, ?) " +
+                    "on duplicate key update `count`=?, `expire_time`=?;";
+        } else if (plugin.options.database().isSQLite()) {
+            sentence = "INSERT OR REPLACE INTO `" + TABLE_NAME + "`" +
+                    "(`player`, `count`, `expire_time`) " +
+                    "VALUES(?, ?, ?);";
+        } else return;
+        try (Connection conn = plugin.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sentence)) {
+            Timestamp timestamp = Timestamp.valueOf(expireTime);
+            ps.setString(1, id);
+            ps.setInt(2, refreshCount);
+            ps.setTimestamp(3, timestamp);
+            if (mysql) {
+                ps.setInt(4, refreshCount);
+                ps.setTimestamp(5, timestamp);
+            }
+            ps.execute();
+        } catch (SQLException e) {
+            warn(e);
+        }
+    }
+
     /**
      * 从数据库拉取玩家当前任务列表及其子任务数据。<br>
      * 带有缓存，缓存将在玩家进入或离开服务器时到期。
@@ -212,7 +252,23 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                 subTasksMap.put(taskId, task);
             }
         }
+        Integer refreshCount = null;
+        LocalDateTime refreshCountExpireTime = null;
+        try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM `" + REFRESH_TABLE_NAME + "` " +
+                "WHERE `player`=?")) {
+            ps.setString(1, id);
+            try (ResultSet result = ps.executeQuery()) {
+                if (result.next()) {
+                    refreshCount = result.getInt("count");
+                    refreshCountExpireTime = result.getTimestamp("expire_time").toLocalDateTime();
+
+                }
+            }
+        }
         PlayerCache cache = new PlayerCache(player, subTasksMap);
+        if (refreshCount != null && refreshCountExpireTime != null) {
+            cache.setRefreshCount(refreshCount, refreshCountExpireTime);
+        }
         caches.put(id, cache);
         return cache;
     }
