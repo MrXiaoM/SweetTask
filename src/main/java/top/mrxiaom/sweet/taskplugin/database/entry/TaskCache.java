@@ -1,68 +1,50 @@
 package top.mrxiaom.sweet.taskplugin.database.entry;
 
-import com.google.common.collect.Lists;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
-import top.mrxiaom.sweet.taskplugin.tasks.ITask;
+import top.mrxiaom.sweet.taskplugin.listeners.TaskWrapper;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class TaskCache {
-    public final Player player;
-    public final Map<String, SubTaskCache> tasks;
-    private Long nextSubmit = null;
+    public final String taskId;
+    public final Map<String, Integer> subTaskData;
+    public final LocalDateTime expireTime;
 
-    public TaskCache(Player player, Map<String, SubTaskCache> tasks) {
-        this.player = player;
-        this.tasks = tasks;
-        removeOutdatedTasks();
+    public TaskCache(String taskId, LocalDateTime expireTime) {
+        this.taskId = taskId;
+        this.expireTime = expireTime;
+        this.subTaskData = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     }
 
-    public void scheduleSubmit(int seconds) {
-        if (nextSubmit == null) {
-            nextSubmit = System.currentTimeMillis() + seconds * 1000L;
-        }
+    public void put(String subTask, int data) {
+        subTaskData.put(subTask, data);
     }
 
-    public void addTask(LoadedTask task, LocalDateTime expireTime) {
-        SubTaskCache cache = new SubTaskCache(task.id, expireTime);
-        cache.put(task.id, 0);
-        for (int i = 0; i < task.subTasks.size(); i++) {
-            ITask subTask = task.subTasks.get(i);
-            cache.put(i, subTask.type(), 0);
-        }
+    public void put(int index, String subTask, int data) {
+        put(index + "-" + subTask, data);
+    }
+
+    public void put(TaskWrapper wrapper, int data) {
+        put(wrapper.index, wrapper.subTask.type(), data);
     }
 
     @Nullable
-    public LocalDateTime nextSubmitTime() {
-        if (nextSubmit == null) return null;
-        return new Timestamp(nextSubmit).toLocalDateTime();
+    public Integer get(int index, String subTask) {
+        return subTaskData.get(index + "-" + subTask);
     }
 
-    public boolean removeOutdatedTasks() {
-        boolean modified = false;
-        LocalDateTime now = LocalDateTime.now();
-        List<String> keys = Lists.newArrayList(tasks.keySet());
-        for (String key : keys) {
-            SubTaskCache sub = tasks.get(key);
-            if (now.isAfter(sub.expireTime)) {
-                tasks.remove(key);
-                modified = true;
-            }
-        }
-        return modified;
+    @Nullable
+    public Integer get(TaskWrapper wrapper) {
+        return get(wrapper.index, wrapper.subTask.type());
     }
 
-    public boolean needSubmit() {
-        if (nextSubmit == null) return false;
-        if (System.currentTimeMillis() > nextSubmit) {
-            nextSubmit = null;
-            return true;
-        }
-        return false;
+    public int get(int index, String subTask, int def) {
+        return subTaskData.getOrDefault(index + "-" + subTask, def);
+    }
+
+    public int get(TaskWrapper wrapper, int def) {
+        return get(wrapper.index, wrapper.subTask.type(), def);
     }
 }

@@ -15,8 +15,8 @@ import top.mrxiaom.pluginbase.utils.Bytes;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
-import top.mrxiaom.sweet.taskplugin.database.entry.SubTaskCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
+import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractPluginHolder;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 
@@ -28,7 +28,7 @@ import java.util.*;
 
 public class TaskProcessDatabase extends AbstractPluginHolder implements IDatabase, Listener {
     private String TABLE_NAME;
-    private final Map<String, TaskCache> caches = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private final Map<String, PlayerCache> caches = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private boolean onlineMode, disabling;
     private long nextRefresh = 0;
     private boolean loadFlag = false;
@@ -37,7 +37,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         registerEvents();
         registerBungee();
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            for (TaskCache cache : caches.values()) {
+            for (PlayerCache cache : caches.values()) {
                 if (cache.needSubmit()) {
                     submitCache(cache.player);
                 }
@@ -115,7 +115,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
             int size = in.readInt();
             for (int i = 0; i < size; i++) {
                 String id = in.readUTF();
-                TaskCache cache = caches.remove(id);
+                PlayerCache cache = caches.remove(id);
                 if (cache != null && cache.player.isOnline()) {
                     Bukkit.getScheduler().runTaskAsynchronously(plugin,
                             () -> getTasks(cache.player));
@@ -162,7 +162,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
     @Override
     public void onDisable() {
         disabling = true;
-        for (TaskCache cache : caches.values()) {
+        for (PlayerCache cache : caches.values()) {
             submitCache(cache);
         }
         caches.clear();
@@ -172,9 +172,9 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
      * 从数据库拉取玩家当前任务列表及其子任务数据。<br>
      * 带有缓存，缓存将在玩家进入或离开服务器时到期。
      */
-    public TaskCache getTasks(Player player) {
+    public PlayerCache getTasks(Player player) {
         String id = id(player);
-        TaskCache cache = caches.get(id);
+        PlayerCache cache = caches.get(id);
         if (cache != null) return cache;
         try (Connection conn = plugin.getConnection()) {
             cache = refreshCache(conn, id, player);
@@ -184,12 +184,12 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         if (cache != null) {
             return cache;
         } else {
-            return new TaskCache(player, new TreeMap<>(String.CASE_INSENSITIVE_ORDER));
+            return new PlayerCache(player, new TreeMap<>(String.CASE_INSENSITIVE_ORDER));
         }
     }
 
-    private TaskCache refreshCache(Connection conn, String id, Player player) throws SQLException {
-        Map<String, SubTaskCache> subTasksMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private PlayerCache refreshCache(Connection conn, String id, Player player) throws SQLException {
+        Map<String, TaskCache> subTasksMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM `" + TABLE_NAME + "` " +
                 "WHERE `player`=?")) {
             ps.setString(1, id);
@@ -204,15 +204,15 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                     // 已过期任务不加入结果中
                     continue;
                 }
-                SubTaskCache task = subTasksMap.get(taskId);
+                TaskCache task = subTasksMap.get(taskId);
                 if (task == null) {
-                    task = new SubTaskCache(taskId, expireTime.toLocalDateTime());
+                    task = new TaskCache(taskId, expireTime.toLocalDateTime());
                 }
                 task.put(subTaskId, data);
                 subTasksMap.put(taskId, task);
             }
         }
-        TaskCache cache = new TaskCache(player, subTasksMap);
+        PlayerCache cache = new PlayerCache(player, subTasksMap);
         caches.put(id, cache);
         return cache;
     }
@@ -273,13 +273,13 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
 
     public void submitCache(Player player) {
         String id = id(player);
-        TaskCache cache = caches.get(id);
+        PlayerCache cache = caches.get(id);
         if (cache != null) {
             submitCache(cache);
         }
     }
 
-    public void submitCache(TaskCache cache) {
+    public void submitCache(PlayerCache cache) {
         String id = id(cache.player);
         String sentence;
         boolean mysql = plugin.options.database().isMySQL();
@@ -295,12 +295,12 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         } else return;
         try (Connection conn = plugin.getConnection();
             PreparedStatement ps = conn.prepareStatement(sentence)) {
-            for (SubTaskCache subTaskCache : cache.tasks.values()) {
-                addBatchCache(ps, mysql, id, subTaskCache.taskId,
-                        subTaskCache.taskId, 0, subTaskCache.expireTime);
-                for (Map.Entry<String, Integer> entry : subTaskCache.subTaskData.entrySet()) {
-                    addBatchCache(ps, mysql, id, subTaskCache.taskId,
-                            entry.getKey(), entry.getValue(), subTaskCache.expireTime);
+            for (TaskCache taskCache : cache.tasks.values()) {
+                addBatchCache(ps, mysql, id, taskCache.taskId,
+                        taskCache.taskId, 0, taskCache.expireTime);
+                for (Map.Entry<String, Integer> entry : taskCache.subTaskData.entrySet()) {
+                    addBatchCache(ps, mysql, id, taskCache.taskId,
+                            entry.getKey(), entry.getValue(), taskCache.expireTime);
                 }
             }
             ps.executeBatch();
@@ -361,7 +361,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                 String id = entry.getKey();
                 LocalDateTime expireTime = entry.getValue();
                 addTask(conn, id, task, expireTime);
-                TaskCache removed = caches.remove(id);
+                PlayerCache removed = caches.remove(id);
                 if (removed != null && removed.player.isOnline()) {
                     refreshList.add(Pair.of(removed.player, id));
                 } else {

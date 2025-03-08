@@ -14,7 +14,7 @@ import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
 import top.mrxiaom.pluginbase.utils.Util;
-import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
+import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractGuisModule;
 
 import java.io.File;
@@ -41,8 +41,8 @@ public class Menus extends AbstractGuisModule<MenuModel> {
     }
 
     public Impl create(Player player, MenuModel menu) {
-        TaskCache taskCache = plugin.getDatabase().getTasks(player);
-        return new Impl(player, menu, taskCache);
+        PlayerCache playerCache = plugin.getDatabase().getTasks(player);
+        return new Impl(player, menu, playerCache);
     }
 
     public static Menus inst() {
@@ -50,10 +50,10 @@ public class Menus extends AbstractGuisModule<MenuModel> {
     }
 
     public class Impl extends Gui<MenuModel> {
-        public TaskCache taskCache;
-        protected Impl(@NotNull Player player, @NotNull MenuModel model, TaskCache taskCache) {
+        public PlayerCache playerCache;
+        protected Impl(@NotNull Player player, @NotNull MenuModel model, PlayerCache playerCache) {
             super(player, model);
-            this.taskCache = taskCache;
+            this.playerCache = playerCache;
         }
 
         @Override

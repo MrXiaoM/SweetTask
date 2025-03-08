@@ -12,8 +12,8 @@ import top.mrxiaom.pluginbase.utils.AdventureUtil;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
-import top.mrxiaom.sweet.taskplugin.database.entry.SubTaskCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
+import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.listeners.TaskWrapper;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
@@ -158,25 +158,25 @@ public class TaskManager extends AbstractModule {
         AdventureUtil.sendActionBar(player, actionMessage);
     }
 
-    public void checkTasksAsync(TaskCache taskCaches) {
+    public void checkTasksAsync(PlayerCache playerCaches) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            if (checkTasks(taskCaches)) {
-                plugin.getDatabase().cleanExpiredTasks(taskCaches.player);
-                plugin.getDatabase().submitCache(taskCaches);
+            if (checkTasks(playerCaches)) {
+                plugin.getDatabase().cleanExpiredTasks(playerCaches.player);
+                plugin.getDatabase().submitCache(playerCaches);
             }
         });
     }
 
-    public boolean checkTasks(TaskCache taskCaches) {
-        boolean modified = taskCaches.removeOutdatedTasks();
-        Player player = taskCaches.player;
+    public boolean checkTasks(PlayerCache playerCaches) {
+        boolean modified = playerCaches.removeOutdatedTasks();
+        Player player = playerCaches.player;
         int needDaily = getDailyCount(player);
         int needWeekly = getWeeklyCount(player);
         int needMonthly = getMonthlyCount(player);
         Set<String> tasksDaily = new HashSet<>();
         Set<String> tasksWeekly = new HashSet<>();
         Set<String> tasksMonthly = new HashSet<>();
-        for (SubTaskCache sub : taskCaches.tasks.values()) {
+        for (TaskCache sub : playerCaches.tasks.values()) {
             LoadedTask task = getTask(sub.taskId);
             if (task == null) continue;
             switch (task.type) {
@@ -205,7 +205,7 @@ public class TaskManager extends AbstractModule {
                 if (task != null) {
                     modified = true;
                     LocalDateTime expireTime = nextOutdate(task.type);
-                    taskCaches.addTask(task, expireTime);
+                    playerCaches.addTask(task, expireTime);
                 }
             }
         }
@@ -220,7 +220,7 @@ public class TaskManager extends AbstractModule {
                 if (task != null) {
                     modified = true;
                     LocalDateTime expireTime = nextOutdate(task.type);
-                    taskCaches.addTask(task, expireTime);
+                    playerCaches.addTask(task, expireTime);
                 }
             }
         }
@@ -235,7 +235,7 @@ public class TaskManager extends AbstractModule {
                 if (task != null) {
                     modified = true;
                     LocalDateTime expireTime = nextOutdate(task.type);
-                    taskCaches.addTask(task, expireTime);
+                    playerCaches.addTask(task, expireTime);
                 }
             }
         }

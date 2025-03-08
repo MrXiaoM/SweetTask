@@ -4,12 +4,11 @@ import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
-import top.mrxiaom.sweet.taskplugin.database.entry.SubTaskCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
+import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractModule;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
-import top.mrxiaom.sweet.taskplugin.matchers.BlockMatcher;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
     protected abstract void handleLoadTask(Map<T, List<TaskWrapper>> map, LoadedTask task, ITask subTask, int index);
     protected abstract boolean isNotMatch(T matcher, E entry);
     protected void plus(Player player, E entry, int add) {
-        TaskCache taskCollection = null;
+        PlayerCache taskCollection = null;
         boolean changed = false;
         // 遍历所有满足条件的 wrapper
         for (TaskWrappers<T> value : wrappers) {
@@ -61,7 +60,7 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
             }
             // 对所有满足条件的子任务数据 进行增加
             for (TaskWrapper wrapper : value.subTasks) {
-                SubTaskCache taskCache = taskCollection.tasks.get(wrapper.task.id);
+                TaskCache taskCache = taskCollection.tasks.get(wrapper.task.id);
                 int max = wrapper.subTask.getTargetValue();
                 // 增加后的数值
                 int data = Math.min(taskCache.get(wrapper, 0) + add, max);
