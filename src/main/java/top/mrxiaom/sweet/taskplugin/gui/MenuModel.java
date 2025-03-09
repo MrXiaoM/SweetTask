@@ -12,8 +12,11 @@ import top.mrxiaom.pluginbase.func.gui.IModifier;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
 import top.mrxiaom.pluginbase.gui.IGui;
 import top.mrxiaom.pluginbase.utils.Pair;
+import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
+import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
+import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,12 +79,13 @@ public class MenuModel implements IModel {
             char id, int index, int appearTimes
     ) {
         Menus.Impl gui = (Menus.Impl) instance;
+        TaskManager manager = TaskManager.inst();
         TaskIcon icon = taskIcons.get(id);
         if (icon != null) {
             // 寻找图标对应任务
             Pair<LoadedTask, TaskCache> pair = gui.getTask(icon.type, icon.index);
             if (pair != null) {
-                return icon.generateIcon(player, pair.getKey(), pair.getValue());
+                return icon.generateIcon(player, formatSubTasks, pair.getKey(), pair.getValue());
             } else {
                 // 找不到相关任务时
                 if (icon.redirectIcon != null) {
@@ -95,13 +99,56 @@ public class MenuModel implements IModel {
         if (otherIcon != null) {
             IModifier<List<String>> loreModifier = old -> {
                 List<String> lore = new ArrayList<>();
+                EnumTaskType refreshType = null;
+                int refreshLimit = 0, refreshCount = 0, refreshAvailable = 0;
+                Boolean refresh = null;
                 for (String s : old) {
-                    if (s.equals("refresh_operation")) {
-                        // TODO: 替换 refresh_operation
+                    if (refreshType != null) break;
+                    if (s.startsWith("refresh_operation:")) {
+                        EnumTaskType type = Util.valueOr(EnumTaskType.class, s.substring(18).trim(), null);
+                        if (type != null) switch (type) {
+                            case DAILY:
+                                refreshLimit = manager.getDailyCount(player);
+                                refreshCount = gui.playerCache.getRefreshCountDaily();
+                                break;
+                            case WEEKLY:
+                                refreshLimit = manager.getWeeklyCount(player);
+                                refreshCount = gui.playerCache.getRefreshCountWeekly();
+                                break;
+                            case MONTHLY:
+                                refreshLimit = manager.getMonthlyCount(player);
+                                refreshCount = gui.playerCache.getRefreshCountMonthly();
+                                break;
+                            default:
+                                continue;
+                        }
+                        refreshType = type;
+                        refreshAvailable = Math.max(0, refreshLimit - refreshCount);
+                        refresh = gui.playerCache.canRefresh(type, refreshLimit);
+                    }
+                }
+                List<Pair<String, Object>> replacements = new ArrayList<>();
+                replacements.add(Pair.of("%count%", refreshCount));
+                replacements.add(Pair.of("%max%", refreshLimit));
+                replacements.add(Pair.of("%times%", refreshAvailable));
+                for (String s : old) {
+                    if (s.startsWith("refresh_operation:") && refreshType != null) {
+                        List<String> list;
+                        if (refresh == null) {
+                            list = opRefreshTaskDone;
+                        } else if (refresh) {
+                            list = opRefreshAvailable;
+                        } else {
+                            list = opRefreshMaxTimes;
+                        }
+                        for (String line : list) {
+                            lore.add(Pair.replace(line, replacements));
+                        }
                         continue;
                     }
-                    lore.add(s);
+                    lore.add(Pair.replace(s, replacements));
                 }
+                replacements.clear();
                 return lore;
             };
             return otherIcon.generateIcon(player, null, loreModifier);

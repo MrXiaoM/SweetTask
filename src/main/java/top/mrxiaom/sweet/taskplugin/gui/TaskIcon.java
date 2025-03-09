@@ -31,7 +31,7 @@ public class TaskIcon {
         this.redirectIcon = redirectIcon;
     }
 
-    public ItemStack generateIcon(Player player, LoadedTask task, TaskCache cache) {
+    public ItemStack generateIcon(Player player, List<String> formatSubTasks, LoadedTask task, TaskCache cache) {
         // TODO: 主要图标
         return null;
     }

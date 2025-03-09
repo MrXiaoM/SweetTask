@@ -94,6 +94,18 @@ public class PlayerCache {
         manager.plugin.getDatabase().submitRefreshCount(player, refreshCountDaily, refreshCountWeekly, refreshCountMonthly);
     }
 
+    public int getRefreshCountDaily() {
+        return refreshCountDaily;
+    }
+
+    public int getRefreshCountWeekly() {
+        return refreshCountWeekly;
+    }
+
+    public int getRefreshCountMonthly() {
+        return refreshCountMonthly;
+    }
+
     /**
      * 是否可以刷新任务列表
      * @param type 任务类型
