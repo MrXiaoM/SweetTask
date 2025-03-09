@@ -18,7 +18,9 @@ import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractPluginHolder;
+import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
+import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -95,8 +97,12 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         try (PreparedStatement ps = conn.prepareStatement(
                 "CREATE TABLE if NOT EXISTS `" + REFRESH_TABLE_NAME + "`(" +
                         "`player` varchar(48) PRIMARY KEY," + // 玩家名
-                        "`count`, int," + // 已刷新次数
-                        "`expire_time` timestamp," + // 下一次可刷新时间
+                        "`count_daily`, int," + // 每日任务 已刷新次数
+                        "`expire_time_daily` timestamp," + // 每日任务 下一次可刷新时间
+                        "`count_weekly`, int," + // 每周任务 已刷新次数
+                        "`expire_time_weekly` timestamp," + // 每周任务 下一次可刷新时间
+                        "`count_monthly`, int," + // 每月任务 已刷新次数
+                        "`expire_time_monthly` timestamp" + // 每月任务 下一次可刷新时间
                 ");"
         )) {
             ps.execute();
@@ -178,29 +184,42 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         caches.clear();
     }
 
-    public void submitRefreshCount(Player player, int refreshCount, LocalDateTime expireTime) {
+    public void submitRefreshCount(Player player, int refreshCountDaily, int refreshCountWeekly, int refreshCountMonthly) {
         String id = id(player);
         String sentence;
         boolean mysql = plugin.options.database().isMySQL();
         if (mysql) {
             sentence = "INSERT INTO `" + TABLE_NAME + "`" +
-                    "(`player`, `count`, `expire_time`) " +
+                    "(`player`, `count_daily`, `expire_time_daily`, `count_weekly`, `expire_time_weekly`, `count_monthly`, `expire_time_monthly`) " +
                     "VALUES(?, ?, ?) " +
-                    "on duplicate key update `count`=?, `expire_time`=?;";
+                    "on duplicate key update `count_daily`=?, `expire_time_daily`=?, " +
+                    "`count_weekly`=?, `expire_time_weekly`=? " +
+                    "`count_monthly`=?, `expire_time_monthly`=?;";
         } else if (plugin.options.database().isSQLite()) {
             sentence = "INSERT OR REPLACE INTO `" + TABLE_NAME + "`" +
-                    "(`player`, `count`, `expire_time`) " +
+                    "(`player`, `count_daily`, `expire_time_daily`, `count_weekly`, `expire_time_weekly`, `count_monthly`, `expire_time_monthly`) " +
                     "VALUES(?, ?, ?);";
         } else return;
         try (Connection conn = plugin.getConnection();
             PreparedStatement ps = conn.prepareStatement(sentence)) {
-            Timestamp timestamp = Timestamp.valueOf(expireTime);
+            TaskManager manager = TaskManager.inst();
+            Timestamp timestampDaily = Timestamp.valueOf(manager.nextOutdate(EnumTaskType.DAILY));
+            Timestamp timestampWeekly = Timestamp.valueOf(manager.nextOutdate(EnumTaskType.WEEKLY));
+            Timestamp timestampMonthly = Timestamp.valueOf(manager.nextOutdate(EnumTaskType.MONTHLY));
             ps.setString(1, id);
-            ps.setInt(2, refreshCount);
-            ps.setTimestamp(3, timestamp);
+            ps.setInt(2, refreshCountDaily);
+            ps.setTimestamp(3, timestampDaily);
+            ps.setInt(4, refreshCountWeekly);
+            ps.setTimestamp(5, timestampWeekly);
+            ps.setInt(6, refreshCountMonthly);
+            ps.setTimestamp(7, timestampMonthly);
             if (mysql) {
-                ps.setInt(4, refreshCount);
-                ps.setTimestamp(5, timestamp);
+                ps.setInt(8, refreshCountDaily);
+                ps.setTimestamp(9, timestampDaily);
+                ps.setInt(10, refreshCountWeekly);
+                ps.setTimestamp(11, timestampWeekly);
+                ps.setInt(12, refreshCountMonthly);
+                ps.setTimestamp(13, timestampMonthly);
             }
             ps.execute();
         } catch (SQLException e) {
@@ -252,22 +271,25 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                 subTasksMap.put(taskId, task);
             }
         }
-        Integer refreshCount = null;
-        LocalDateTime refreshCountExpireTime = null;
+        Integer refreshCountDaily = null, refreshCountWeekly = null, refreshCountMonthly = null;
+        LocalDateTime refreshCountExpireDaily = null, refreshCountExpireWeekly = null, refreshCountExpireMonthly = null;
         try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM `" + REFRESH_TABLE_NAME + "` " +
                 "WHERE `player`=?")) {
             ps.setString(1, id);
             try (ResultSet result = ps.executeQuery()) {
                 if (result.next()) {
-                    refreshCount = result.getInt("count");
-                    refreshCountExpireTime = result.getTimestamp("expire_time").toLocalDateTime();
-
+                    refreshCountDaily = result.getInt("count_daily");
+                    refreshCountExpireDaily = result.getTimestamp("expire_time_daily").toLocalDateTime();
+                    refreshCountWeekly = result.getInt("count_weekly");
+                    refreshCountExpireWeekly = result.getTimestamp("expire_time_weekly").toLocalDateTime();
+                    refreshCountMonthly = result.getInt("count_monthly");
+                    refreshCountExpireMonthly = result.getTimestamp("expire_time_monthly").toLocalDateTime();
                 }
             }
         }
         PlayerCache cache = new PlayerCache(player, subTasksMap);
-        if (refreshCount != null && refreshCountExpireTime != null) {
-            cache.setRefreshCount(refreshCount, refreshCountExpireTime);
+        if (refreshCountDaily != null) {
+            cache.setRefreshCount(refreshCountDaily, refreshCountExpireDaily, refreshCountWeekly, refreshCountExpireWeekly, refreshCountMonthly, refreshCountExpireMonthly);
         }
         caches.put(id, cache);
         return cache;

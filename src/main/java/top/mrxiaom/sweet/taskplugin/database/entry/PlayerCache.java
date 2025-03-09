@@ -19,8 +19,12 @@ public class PlayerCache {
     public final Player player;
     public final Map<String, TaskCache> tasks;
     private Long nextSubmit = null;
-    private int refreshCount = 0;
-    private LocalDateTime refreshCountExpireTime;
+    private int refreshCountDaily;
+    private int refreshCountWeekly;
+    private int refreshCountMonthly;
+    private LocalDateTime refreshCountExpireDaily;
+    private LocalDateTime refreshCountExpireWeekly;
+    private LocalDateTime refreshCountExpireMonthly;
 
     public PlayerCache(Player player, Map<String, TaskCache> tasks) {
         this.player = player;
@@ -43,22 +47,51 @@ public class PlayerCache {
         }
     }
 
-    public void setRefreshCount(int refreshCount, LocalDateTime refreshCountExpireTime) {
-        this.refreshCount = refreshCount;
-        this.refreshCountExpireTime = refreshCountExpireTime;
+    public void setRefreshCount(
+            int refreshCountDaily, LocalDateTime refreshCountExpireDaily,
+            int refreshCountWeekly, LocalDateTime refreshCountExpireWeekly,
+            int refreshCountMonthly, LocalDateTime refreshCountExpireMonthly
+    ) {
+        this.refreshCountDaily = refreshCountDaily;
+        this.refreshCountExpireDaily = refreshCountExpireDaily;
+        this.refreshCountWeekly = refreshCountWeekly;
+        this.refreshCountExpireWeekly = refreshCountExpireWeekly;
+        this.refreshCountMonthly = refreshCountMonthly;
+        this.refreshCountExpireMonthly = refreshCountExpireMonthly;
     }
 
     /**
      * 提交刷新，检查过期时间的同时，使刷新次数+1
      */
-    public void submitRefresh() {
+    public void submitRefresh(EnumTaskType type) {
         TaskManager manager = TaskManager.inst();
-        if (LocalDateTime.now().isAfter(refreshCountExpireTime)) {
-            refreshCountExpireTime = manager.nextOutdate(EnumTaskType.DAILY);
-            refreshCount = 0;
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(refreshCountExpireDaily)) {
+            refreshCountExpireDaily = manager.nextOutdate(EnumTaskType.DAILY);
+            refreshCountDaily = 0;
         }
-        refreshCount++;
-        manager.plugin.getDatabase().submitRefreshCount(player, refreshCount, refreshCountExpireTime);
+        if (now.isAfter(refreshCountExpireWeekly)) {
+            refreshCountExpireWeekly = manager.nextOutdate(EnumTaskType.WEEKLY);
+            refreshCountWeekly = 0;
+        }
+        if (now.isAfter(refreshCountExpireMonthly)) {
+            refreshCountExpireMonthly = manager.nextOutdate(EnumTaskType.MONTHLY);
+            refreshCountMonthly = 0;
+        }
+        switch (type) {
+            case DAILY:
+                refreshCountDaily++;
+                break;
+            case WEEKLY:
+                refreshCountWeekly++;
+                break;
+            case MONTHLY:
+                refreshCountMonthly++;
+                break;
+            default:
+                return;
+        }
+        manager.plugin.getDatabase().submitRefreshCount(player, refreshCountDaily, refreshCountWeekly, refreshCountMonthly);
     }
 
     /**
@@ -81,11 +114,28 @@ public class PlayerCache {
                 }
             }
         }
-        if (LocalDateTime.now().isAfter(refreshCountExpireTime)) {
-            refreshCountExpireTime = manager.nextOutdate(EnumTaskType.DAILY);
-            refreshCount = 0;
+        if (type.equals(EnumTaskType.DAILY)) {
+            if (LocalDateTime.now().isAfter(refreshCountExpireDaily)) {
+                refreshCountExpireDaily = manager.nextOutdate(EnumTaskType.DAILY);
+                refreshCountDaily = 0;
+            }
+            return refreshCountDaily < limit;
         }
-        return refreshCount < limit;
+        if (type.equals(EnumTaskType.WEEKLY)) {
+            if (LocalDateTime.now().isAfter(refreshCountExpireWeekly)) {
+                refreshCountExpireWeekly = manager.nextOutdate(EnumTaskType.WEEKLY);
+                refreshCountWeekly = 0;
+            }
+            return refreshCountWeekly < limit;
+        }
+        if (type.equals(EnumTaskType.MONTHLY)) {
+            if (LocalDateTime.now().isAfter(refreshCountExpireMonthly)) {
+                refreshCountExpireMonthly = manager.nextOutdate(EnumTaskType.MONTHLY);
+                refreshCountMonthly = 0;
+            }
+            return refreshCountMonthly < limit;
+        }
+        return false;
     }
 
     @Nullable
