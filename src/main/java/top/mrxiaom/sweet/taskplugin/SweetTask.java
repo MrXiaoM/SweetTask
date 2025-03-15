@@ -4,6 +4,7 @@ import de.tr7zw.changeme.nbtapi.utils.MinecraftVersion;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import top.mrxiaom.pluginbase.BukkitPlugin;
+import top.mrxiaom.pluginbase.utils.PAPI;
 import top.mrxiaom.sweet.taskplugin.database.TaskProcessDatabase;
 import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
 import top.mrxiaom.sweet.taskplugin.mythic.Mythic4;
@@ -67,6 +68,9 @@ public class SweetTask extends BukkitPlugin {
 
     @Override
     protected void afterEnable() {
+        if (PAPI.isEnabled()) {
+            new Placeholders(this).register();
+        }
         getLogger().info("SweetTask 加载完毕");
     }
 
