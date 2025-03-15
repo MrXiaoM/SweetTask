@@ -203,48 +203,61 @@ public class TaskManager extends AbstractModule {
                     break;
             }
         }
+        if (DEBUG) info("玩家" + player.getName() + "需要 " + needDaily + "每日、" + needWeekly + "每周、" + needMonthly + "每月任务");
         if (needDaily > 0) {
             List<String> available = new ArrayList<>(tasksByDaily.keySet());
             available.removeAll(tasksDaily);
+            if (DEBUG) info("可用的每日任务数量: " + available.size());
             while (--needDaily >= 0) {
                 if (available.isEmpty()) break;
                 int index = new Random().nextInt(available.size());
                 String id = available.remove(index);
                 LoadedTask task = getTask(id);
                 if (task != null) {
+                    if (DEBUG) info("添加任务 " + task.id + ": " + task.name);
                     modified = true;
                     LocalDateTime expireTime = nextOutdate(task.type);
                     playerCaches.addTask(task, expireTime);
+                } else {
+                    if (DEBUG) warn("任务 " + id + " 不存在");
                 }
             }
         }
         if (needWeekly > 0) {
             List<String> available = new ArrayList<>(tasksByWeekly.keySet());
             available.removeAll(tasksWeekly);
+            if (DEBUG) info("可用的每周任务数量: " + available.size());
             while (--needWeekly >= 0) {
                 if (available.isEmpty()) break;
                 int index = new Random().nextInt(available.size());
                 String id = available.remove(index);
                 LoadedTask task = getTask(id);
                 if (task != null) {
+                    if (DEBUG) info("添加任务 " + task.id + ": " + task.name);
                     modified = true;
                     LocalDateTime expireTime = nextOutdate(task.type);
                     playerCaches.addTask(task, expireTime);
+                } else {
+                    if (DEBUG) warn("任务 " + id + " 不存在");
                 }
             }
         }
         if (needMonthly > 0) {
             List<String> available = new ArrayList<>(tasksByMonthly.keySet());
             available.removeAll(tasksMonthly);
+            if (DEBUG) info("可用的每月任务数量: " + available.size());
             while (--needMonthly >= 0) {
                 if (available.isEmpty()) break;
                 int index = new Random().nextInt(available.size());
                 String id = available.remove(index);
                 LoadedTask task = getTask(id);
                 if (task != null) {
+                    if (DEBUG) info("添加任务 " + task.id + ": " + task.name);
                     modified = true;
                     LocalDateTime expireTime = nextOutdate(task.type);
                     playerCaches.addTask(task, expireTime);
+                } else {
+                    if (DEBUG) warn("任务 " + id + " 不存在");
                 }
             }
         }

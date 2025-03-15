@@ -12,6 +12,7 @@ import top.mrxiaom.sweet.taskplugin.mythic.Mythic5;
 import top.mrxiaom.sweet.taskplugin.tasks.*;
 
 public class SweetTask extends BukkitPlugin {
+    public static boolean DEBUG = false;
     public static SweetTask getInstance() {
         return (SweetTask) BukkitPlugin.getInstance();
     }

@@ -28,6 +28,8 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static top.mrxiaom.sweet.taskplugin.SweetTask.DEBUG;
+
 public class TaskProcessDatabase extends AbstractPluginHolder implements IDatabase, Listener {
     private String TABLE_NAME, REFRESH_TABLE_NAME;
     private final Map<String, PlayerCache> caches = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -254,6 +256,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                 "WHERE `player`=?")) {
             ps.setString(1, id);
             ResultSet result = ps.executeQuery();
+            if (DEBUG) plugin.info("玩家 " + player.getName() + " 的数据已拉取");
             while (result.next()) {
                 String taskId = result.getString("task_id");
                 String subTaskId = result.getString("sub_task_id");
@@ -261,6 +264,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                 Timestamp expireTime = result.getTimestamp("expire_time");
                 Timestamp now = Timestamp.valueOf(LocalDateTime.now());
                 if (now.after(expireTime)) {
+                    if (DEBUG) plugin.warn("任务 " + taskId + " -> " + subTaskId + " 已到期 (" + expireTime.getTime() + ")");
                     // 已过期任务不加入结果中
                     continue;
                 }
@@ -269,6 +273,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                     task = new TaskCache(taskId, expireTime.toLocalDateTime());
                 }
                 task.put(subTaskId, data);
+                if (DEBUG) plugin.info("  " + taskId + " -> " + subTaskId + " = " + data);
                 subTasksMap.put(taskId, task);
             }
         }
@@ -372,6 +377,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                     "(`player`, `task_id`, `sub_task_id`, `data`, `expire_time`) " +
                     "VALUES(?, ?, ?, ?, ?);";
         } else return;
+        if (DEBUG) plugin.info("正在提交玩家 " + cache.player.getName() + " 的任务缓存");
         try (Connection conn = plugin.getConnection();
             PreparedStatement ps = conn.prepareStatement(sentence)) {
             for (TaskCache taskCache : cache.tasks.values()) {
