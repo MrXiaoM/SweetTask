@@ -45,6 +45,7 @@ public class PlayerCache {
             ITask subTask = task.subTasks.get(i);
             cache.put(i, subTask.type(), 0);
         }
+        tasks.put(task.id, cache);
     }
 
     public void setRefreshCount(

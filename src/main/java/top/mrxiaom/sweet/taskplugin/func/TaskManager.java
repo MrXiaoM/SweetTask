@@ -1,6 +1,5 @@
 package top.mrxiaom.sweet.taskplugin.func;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -25,6 +24,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+
+import static top.mrxiaom.sweet.taskplugin.SweetTask.DEBUG;
 
 @AutoRegister
 public class TaskManager extends AbstractModule {
@@ -142,7 +143,7 @@ public class TaskManager extends AbstractModule {
                 }
             });
         }
-        info("加载了 " + tasks.size() + " 个任务");
+        info("加载了 " + tasks.size() + " 个任务，每日[" + tasksByDaily.size() + "]，每周[" + tasksByWeekly.size() + "]，每月[" + tasksByMonthly.size() + "]");
     }
 
     public void showActionTips(Player player, TaskWrapper wrapper, int data) {
@@ -165,8 +166,8 @@ public class TaskManager extends AbstractModule {
     public void checkTasksAsync(PlayerCache playerCaches, Runnable done) {
         plugin.getScheduler().runTaskAsync(() -> {
             if (checkTasks(playerCaches)) {
-                plugin.getDatabase().cleanExpiredTasks(playerCaches.player);
                 plugin.getDatabase().submitCache(playerCaches);
+                //plugin.getDatabase().cleanExpiredTasks(playerCaches.player);
             }
             if (done != null) {
                 plugin.getScheduler().runTask(done);
@@ -175,7 +176,7 @@ public class TaskManager extends AbstractModule {
     }
 
     public boolean checkTasks(PlayerCache playerCaches) {
-        boolean modified = playerCaches.removeOutdatedTasks();
+        boolean modified = playerCaches.removeOutdatedTasks(); // 先清理一下过期的任务
         Player player = playerCaches.player;
         int needDaily = getDailyCount(player);
         int needWeekly = getWeeklyCount(player);
@@ -183,9 +184,10 @@ public class TaskManager extends AbstractModule {
         Set<String> tasksDaily = new HashSet<>();
         Set<String> tasksWeekly = new HashSet<>();
         Set<String> tasksMonthly = new HashSet<>();
-        for (TaskCache sub : playerCaches.tasks.values()) {
+        for (TaskCache sub : playerCaches.tasks.values()) { // 遍历所有已缓存任务
             LoadedTask task = getTask(sub.taskId);
             if (task == null) continue;
+            // 根据已缓存任务，计算各类型任务需求数量
             switch (task.type) {
                 case DAILY:
                     tasksDaily.add(task.id);
