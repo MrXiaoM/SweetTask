@@ -5,6 +5,14 @@ type: DAILY
 # 任务的稀有度（百分比）
 # 每日、每周、每月任务能抽到该任务的概率
 rarity: 50
+# 任务图标，普通图标 和 已完成图标。可用格式如下
+# 原版图标：物品ID 如 DIAMOND
+# MythicMobs图标：mythic-物品 如 mythic-ExampleItem
+# ItemsAdder图标：ia-物品 如 ia-_iainternal:icon_arrow_chest
+# 找不到图标时默认使用PAPER
+icon:
+  normal: DIAMOND_ORE
+  done: BOOK
 # 任务名
 name: '示例任务'
 # 任务描述

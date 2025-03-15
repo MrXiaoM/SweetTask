@@ -72,7 +72,8 @@ public class TaskIcon {
             }
             return lore;
         };
-        return icon.generateIcon(player, displayModifier, loreModifier);
+        ItemStack baseItem = task.getIcon(cache.hasDone());
+        return icon.generateIcon(baseItem, player, displayModifier, loreModifier);
     }
 
     @Nullable
