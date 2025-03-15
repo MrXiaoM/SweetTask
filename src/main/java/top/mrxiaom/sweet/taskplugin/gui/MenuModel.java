@@ -233,8 +233,8 @@ public class MenuModel implements IModel {
                     t(player, "&e任务未完成");
                 }
                 // TODO: 提示任务未完成，或者已提交任务物品
-                return true;
             }
+            return true;
         } else {
             LoadedIcon otherIcon = otherIcons.get(icon.redirectIcon);
             if (otherIcon != null) {
