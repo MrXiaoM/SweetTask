@@ -3,7 +3,7 @@ package top.mrxiaom.sweet.taskplugin.func.entry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
-import top.mrxiaom.pluginbase.func.gui.actions.IAction;
+import top.mrxiaom.pluginbase.api.IAction;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
@@ -12,7 +12,7 @@ import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 import java.util.ArrayList;
 import java.util.List;
 
-import static top.mrxiaom.pluginbase.func.AbstractGuiModule.loadActions;
+import static top.mrxiaom.pluginbase.actions.ActionProviders.loadActions;
 
 public class LoadedTask {
     public final String id;
