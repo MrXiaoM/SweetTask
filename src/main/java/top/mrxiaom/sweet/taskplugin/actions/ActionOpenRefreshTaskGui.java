@@ -8,11 +8,12 @@ import top.mrxiaom.pluginbase.func.GuiManager;
 import top.mrxiaom.pluginbase.gui.IGui;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
-import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.func.AbstractPluginHolder;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
 import java.util.List;
+
+import static top.mrxiaom.pluginbase.func.AbstractPluginHolder.t;
 
 public class ActionOpenRefreshTaskGui implements IAction {
     public static final IActionProvider PROVIDER = s -> {
@@ -36,6 +37,6 @@ public class ActionOpenRefreshTaskGui implements IAction {
         GuiManager guiManager = AbstractPluginHolder.get(GuiManager.class).orElseThrow(IllegalStateException::new);
         IGui parent = guiManager.getOpeningGui(player);
         // TODO: 打开刷新任务菜单
-
+        t(player, "&e暂不支持刷新商店，敬请期待");
     }
 }
