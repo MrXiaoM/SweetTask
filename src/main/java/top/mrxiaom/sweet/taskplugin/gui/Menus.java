@@ -16,6 +16,7 @@ import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractGuisModule;
@@ -61,6 +62,10 @@ public class Menus extends AbstractGuisModule<MenuModel> {
         protected Impl(@NotNull Player player, @NotNull MenuModel model, PlayerCache playerCache) {
             super(player, model);
             this.setPlayerCache(playerCache);
+        }
+
+        public SweetTask getPlugin() {
+            return plugin;
         }
 
         public void setPlayerCache(PlayerCache playerCache) {

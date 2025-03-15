@@ -5,6 +5,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.gui.IModel;
@@ -17,6 +18,8 @@ import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
+import top.mrxiaom.sweet.taskplugin.tasks.ITask;
+import top.mrxiaom.sweet.taskplugin.tasks.TaskSubmitItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -158,17 +161,77 @@ public class MenuModel implements IModel {
 
     public boolean click(
             Menus.Impl gui, Player player,
-            TaskIcon icon, ClickType click, int slot
+            TaskIcon icon, ClickType click, int invSlot
     ) {
         Pair<LoadedTask, TaskCache> pair = gui.getTask(icon.type, icon.index);
         if (pair != null) {
             LoadedTask task = pair.getKey();
             TaskCache cache = pair.getValue();
-            // TODO: 主要图标点击
-
+            // 主要图标点击
+            if (cache.hasDone()) return false;
+            boolean taskDone = true;
+            boolean submitItemFlag = false;
+            for (int i = 0; i < task.subTasks.size(); i++) {
+                ITask subTask = task.subTasks.get(i);
+                String taskType = subTask.type();
+                Integer value = cache.get(i, taskType);
+                if (value == null) {
+                    cache.put(i, taskType, 0);
+                    value = 0;
+                }
+                if (subTask instanceof TaskSubmitItem) {
+                    TaskSubmitItem submitItem = (TaskSubmitItem) subTask;
+                    // 提交任务物品
+                    PlayerInventory inv = player.getInventory();
+                    int target = submitItem.getTargetValue();
+                    if (value < target) {
+                        for (int slot = 0; slot < inv.getSize(); slot++) {
+                            ItemStack item = inv.getItem(slot);
+                            if (submitItem.isItemMatch(item)) {
+                                int amount = item.getAmount();
+                                if (value + amount > target) {
+                                    item.setAmount(amount - (target - value));
+                                    value = target;
+                                } else {
+                                    value += amount;
+                                    item.setAmount(0);
+                                    item.setType(Material.AIR);
+                                    item = null;
+                                }
+                                inv.setItem(slot, item);
+                                cache.put(i, taskType, value);
+                                submitItemFlag = true;
+                                if (value == target) break;
+                            }
+                        }
+                    }
+                }
+                if (value < subTask.getTargetValue()) {
+                    taskDone = false;
+                }
+            }
+            if (taskDone) {
+                cache.put(task.id, 1);
+                task.giveRewards(player);
+                gui.getPlugin().getDatabase().submitCache(player);
+            } else {
+                // TODO: 提示任务未完成，或者已提交任务物品
+                return true;
+            }
         } else {
             LoadedIcon otherIcon = otherIcons.get(icon.redirectIcon);
             if (otherIcon != null) {
+                EnumTaskType type = null;
+                for (String s : otherIcon.lore) {
+                    if (type != null) break;
+                    if (s.startsWith("refresh_operation:")) {
+                        type = Util.valueOr(EnumTaskType.class, s.substring(18).trim(), null);
+                    }
+                }
+                if (type != null) {
+                    // TODO: 点击刷新图标
+                    return false;
+                }
                 otherIcon.click(player, click);
             }
         }

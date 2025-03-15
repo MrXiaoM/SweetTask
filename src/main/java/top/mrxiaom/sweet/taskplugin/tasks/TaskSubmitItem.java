@@ -1,9 +1,13 @@
 package top.mrxiaom.sweet.taskplugin.tasks;
 
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Contract;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,5 +54,14 @@ public class TaskSubmitItem implements ITask {
     @Override
     public int getTargetValue() {
         return target;
+    }
+
+    @Contract("null -> false")
+    public boolean isItemMatch(ItemStack item) {
+        if (item == null || item.getType().equals(Material.AIR)) return false;
+        for (ItemMatcher matcher : items) {
+            if (matcher.match(item)) return true;
+        }
+        return false;
     }
 }
