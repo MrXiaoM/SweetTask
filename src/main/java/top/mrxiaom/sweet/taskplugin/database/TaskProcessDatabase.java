@@ -38,7 +38,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         super(plugin);
         registerEvents();
         registerBungee();
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
+        plugin.getScheduler().runTaskTimerAsync(() -> {
             for (PlayerCache cache : caches.values()) {
                 if (cache.needSubmit()) {
                     submitCache(cache.player);
@@ -109,7 +109,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         }
         if (loadFlag) {
             loadFlag = false;
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            plugin.getScheduler().runTaskAsync(() -> {
                 try (Connection connection = plugin.getConnection()) {
                     for (Player player : Bukkit.getOnlinePlayers()) {
                         String id = id(player);
@@ -133,8 +133,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                 String id = in.readUTF();
                 PlayerCache cache = caches.remove(id);
                 if (cache != null && cache.player.isOnline()) {
-                    Bukkit.getScheduler().runTaskAsynchronously(plugin,
-                            () -> getTasks(cache.player));
+                    plugin.getScheduler().runTaskAsync(() -> getTasks(cache.player));
                 }
             }
         }

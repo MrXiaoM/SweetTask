@@ -113,7 +113,7 @@ public class Menus extends AbstractGuisModule<MenuModel> {
             TaskIcon icon = model.getTaskIcon(clickedId);
             if (icon != null) {
                 if (model.click(this, player, icon, click, slot)) {
-                    Bukkit.getScheduler().runTask(plugin, () -> updateInventory(view));
+                    plugin.getScheduler().runTask(() -> updateInventory(view));
                 }
                 return;
             }
