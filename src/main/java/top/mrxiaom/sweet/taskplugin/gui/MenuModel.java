@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static top.mrxiaom.pluginbase.func.AbstractPluginHolder.t;
+
 public class MenuModel implements IModel {
     private final String id, title;
     private final char[] inventory;
@@ -215,6 +217,11 @@ public class MenuModel implements IModel {
                 task.giveRewards(player);
                 gui.getPlugin().getDatabase().submitCache(player);
             } else {
+                if (submitItemFlag) {
+                    t(player, "&a已提交物品到任务");
+                } else {
+                    t(player, "&e任务未完成");
+                }
                 // TODO: 提示任务未完成，或者已提交任务物品
                 return true;
             }
