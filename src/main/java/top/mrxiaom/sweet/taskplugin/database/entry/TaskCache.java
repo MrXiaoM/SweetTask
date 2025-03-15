@@ -1,7 +1,9 @@
 package top.mrxiaom.sweet.taskplugin.database.entry;
 
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.listeners.TaskWrapper;
+import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -51,5 +53,27 @@ public class TaskCache {
     public boolean hasDone() {
         Integer i = subTaskData.get(taskId);
         return i != null && i == 1;
+    }
+
+    public boolean checkDone(TaskWrapper wrapper) {
+        return checkDone(wrapper.task);
+    }
+
+    public boolean checkDone(LoadedTask task) {
+        if (!task.id.equals(taskId)) return false;
+        boolean taskDone = true;
+        for (int i = 0; i < task.subTasks.size(); i++) {
+            ITask subTask = task.subTasks.get(i);
+            String taskType = subTask.type();
+            Integer value = get(i, taskType);
+            if (value == null) {
+                put(i, taskType, 0);
+                value = 0;
+            }
+            if (value < subTask.getTargetValue()) {
+                taskDone = false;
+            }
+        }
+        return taskDone;
     }
 }

@@ -62,14 +62,23 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
             for (TaskWrapper wrapper : value.subTasks) {
                 TaskCache taskCache = taskCollection.tasks.get(wrapper.task.id);
                 int max = wrapper.subTask.getTargetValue();
+                int old = taskCache.get(wrapper, 0);
+                if (old >= max) continue; // 已经满了的子任务进度不提示消息
                 // 增加后的数值
-                int data = Math.min(taskCache.get(wrapper, 0) + add, max);
+                int data = Math.min(old + add, max);
                 taskCache.put(wrapper, data);
                 if (!changed) {
                     // 只打印第一条 Action 消息
                     TaskManager.inst().showActionTips(player, wrapper, data);
                 }
                 changed = true;
+                // 如果数据增加后，任务完成了
+                if (taskCache.checkDone(wrapper)) {
+                    // TODO: 从配置文件读取，该类型的任务应该弹出什么提示。比如，每日任务显示以下消息
+                    // <green>你已完成任务<yellow> %name%<green>! <click:run_command:/sweettask open default><gray>[<white><u>点此查看</u><gray>]</click>
+                    // 同理，每周任务和每月任务都应该要有单独的提示，以打开不同的菜单
+                    t(player, "&a你已完成任务 &e" + wrapper.task.name + "&a!");
+                }
             }
         }
         // 如果有改动，计划在 30 秒后提交数据
