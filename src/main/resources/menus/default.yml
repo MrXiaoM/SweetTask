@@ -106,6 +106,6 @@ other-icons:
       - '  &f在完成任务之前，你可以  '
       - '  &f刷新今日任务列表'
       - ''
-      - refresh_operation
+      - refresh_operation:DAILY
     left_click_commands:
-      - '[player]sweettask refresh'
+      - '[refresh]daily'

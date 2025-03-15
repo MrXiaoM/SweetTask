@@ -13,16 +13,15 @@ import top.mrxiaom.pluginbase.DatabaseHolder;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
-import top.mrxiaom.sweet.taskplugin.database.TaskProcessDatabase;
-import top.mrxiaom.sweet.taskplugin.database.entry.SubTaskCache;
-import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractModule;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.gui.MenuModel;
 import top.mrxiaom.sweet.taskplugin.gui.Menus;
+import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @AutoRegister
 public class CommandMain extends AbstractModule implements CommandExecutor, TabCompleter, Listener {
@@ -59,6 +58,14 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             Menus.inst().create(target, menu).open();
             return true;
         }
+        if (args.length == 2 && "refresh".equalsIgnoreCase(args[0])) {
+            EnumTaskType type = Util.valueOr(EnumTaskType.class, args[1], null);
+            if (type == null) {
+                return t(sender, "&e无效的任务类型");
+            }
+            // TODO: 打开刷新任务菜单
+            return true;
+        }
         if (args.length == 2 && "reset".equalsIgnoreCase(args[0]) && sender.isOp()) {
             LoadedTask task = TaskManager.inst().getTask(args[1]);
             if (task == null) {
@@ -82,10 +89,14 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
 
     private static final List<String> emptyList = Lists.newArrayList();
     private static final List<String> listArg0 = Lists.newArrayList(
-            "open");
+            "open", "refresh");
     private static final List<String> listOpArg0 = Lists.newArrayList(
-            "open", "reset", "reload");
+            "open", "refresh", "reset", "reload");
     private static final List<String> listArg1Reload = Lists.newArrayList("database");
+    private static final List<String> listArg1Refresh = Arrays.stream(EnumTaskType.values())
+            .map(Enum::name)
+            .map(String::toLowerCase)
+            .collect(Collectors.toList());
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
@@ -103,6 +114,9 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             }
             if ("open".equalsIgnoreCase(args[0])) {
                 return startsWith(Menus.inst().keys(sender), args[1]);
+            }
+            if ("refresh".equalsIgnoreCase(args[0])) {
+                return startsWith(listArg1Refresh, args[1]);
             }
         }
         if (args.length == 3) {

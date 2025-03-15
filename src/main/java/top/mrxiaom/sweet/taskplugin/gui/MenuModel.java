@@ -221,17 +221,6 @@ public class MenuModel implements IModel {
         } else {
             LoadedIcon otherIcon = otherIcons.get(icon.redirectIcon);
             if (otherIcon != null) {
-                EnumTaskType type = null;
-                for (String s : otherIcon.lore) {
-                    if (type != null) break;
-                    if (s.startsWith("refresh_operation:")) {
-                        type = Util.valueOr(EnumTaskType.class, s.substring(18).trim(), null);
-                    }
-                }
-                if (type != null) {
-                    // TODO: 点击刷新图标
-                    return false;
-                }
                 otherIcon.click(player, click);
             }
         }
