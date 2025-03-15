@@ -35,7 +35,7 @@ public class TaskIcon {
         this.redirectIcon = redirectIcon;
     }
 
-    public ItemStack generateIcon(Player player, List<String> formatSubTasks, LoadedTask task, TaskCache cache) {
+    public ItemStack generateIcon(Player player, List<String> formatSubTasks, List<String> operation, LoadedTask task, TaskCache cache) {
         IModifier<String> displayModifier = oldName -> oldName.replace("%name%", task.name);
         IModifier<List<String>> loreModifier = oldLore -> {
             List<String> lore = new ArrayList<>();
@@ -65,7 +65,7 @@ public class TaskIcon {
                         lore.addAll(task.rewardsLore);
                         continue;
                     case "operation":
-                        // TODO: 可执行操作
+                        lore.addAll(operation);
                         continue;
                 }
                 lore.add(s);

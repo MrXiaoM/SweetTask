@@ -32,11 +32,16 @@ public class MenuModel implements IModel {
     private final String id, title;
     private final char[] inventory;
     private final String permission;
-    private final List<String> opRefreshAvailable, opRefreshTaskDone, opRefreshMaxTimes, formatSubTasks;
+    private final List<String> opRefreshAvailable, opRefreshTaskDone, opRefreshMaxTimes,
+            opTaskAvailable, opTaskDone, formatSubTasks;
     private final Map<Character, TaskIcon> taskIcons;
     private final Map<Character, LoadedIcon> otherIcons;
 
-    public MenuModel(String id, String title, char[] inventory, String permission, List<String> opRefreshAvailable, List<String> opRefreshTaskDone, List<String> opRefreshMaxTimes, List<String> formatSubTasks, Map<Character, TaskIcon> taskIcons, Map<Character, LoadedIcon> otherIcons) {
+    public MenuModel(String id, String title, char[] inventory, String permission,
+                     List<String> opRefreshAvailable, List<String> opRefreshTaskDone, List<String> opRefreshMaxTimes,
+                     List<String> opTaskAvailable, List<String> opTaskDone, List<String> formatSubTasks,
+                     Map<Character, TaskIcon> taskIcons, Map<Character, LoadedIcon> otherIcons
+    ) {
         this.id = id;
         this.title = title;
         this.inventory = inventory;
@@ -44,6 +49,8 @@ public class MenuModel implements IModel {
         this.opRefreshAvailable = opRefreshAvailable;
         this.opRefreshTaskDone = opRefreshTaskDone;
         this.opRefreshMaxTimes = opRefreshMaxTimes;
+        this.opTaskAvailable = opTaskAvailable;
+        this.opTaskDone = opTaskDone;
         this.formatSubTasks = formatSubTasks;
         this.taskIcons = taskIcons;
         this.otherIcons = otherIcons;
@@ -90,7 +97,10 @@ public class MenuModel implements IModel {
             // 寻找图标对应任务
             Pair<LoadedTask, TaskCache> pair = gui.getTask(icon.type, icon.index);
             if (pair != null) {
-                return icon.generateIcon(player, formatSubTasks, pair.getKey(), pair.getValue());
+                List<String> operation = pair.getValue().hasDone()
+                        ? opTaskDone
+                        : opTaskAvailable;
+                return icon.generateIcon(player, formatSubTasks, operation, pair.getKey(), pair.getValue());
             } else {
                 // 找不到相关任务时
                 if (icon.redirectIcon != null) {
@@ -242,6 +252,8 @@ public class MenuModel implements IModel {
         List<String> opRefreshAvailable = config.getStringList("operations.refresh.available"),
                 opRefreshTaskDone = config.getStringList("operations.refresh.task-done"),
                 opRefreshMaxTimes = config.getStringList("operations.refresh.max-times"),
+                opTaskAvailable = config.getStringList("operations.task.available"),
+                opTaskDone = config.getStringList("operations.task.done"),
                 formatSubTasks = config.getStringList("format.subtasks");
 
         Map<Character, TaskIcon> taskIcons = new HashMap<>();
@@ -270,7 +282,8 @@ public class MenuModel implements IModel {
             otherIcons.put(iconId, loaded);
         }
         return new MenuModel(id, title, inventory, permission.isEmpty() ? null : permission,
-                opRefreshAvailable, opRefreshTaskDone, opRefreshMaxTimes, formatSubTasks,
+                opRefreshAvailable, opRefreshTaskDone, opRefreshMaxTimes,
+                opTaskAvailable, opTaskDone, formatSubTasks,
                 taskIcons, otherIcons);
     }
 }

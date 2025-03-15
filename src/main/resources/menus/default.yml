@@ -17,6 +17,10 @@ operations:
       - '  &f剩余次数: &e0'
       - ''
       - '&c&m左键&r&7 | &f刷新次数用完了'
+  task:
+    available:
+      - '&a左键&7 | &f提交任务'
+    done: []
 format:
   subtasks:
     - '  &7● &f%action%'
