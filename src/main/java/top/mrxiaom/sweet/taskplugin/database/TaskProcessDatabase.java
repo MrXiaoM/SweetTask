@@ -97,11 +97,11 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         try (PreparedStatement ps = conn.prepareStatement(
                 "CREATE TABLE if NOT EXISTS `" + REFRESH_TABLE_NAME + "`(" +
                         "`player` varchar(48) PRIMARY KEY," + // 玩家名
-                        "`count_daily`, int," + // 每日任务 已刷新次数
+                        "`count_daily` int," + // 每日任务 已刷新次数
                         "`expire_time_daily` timestamp," + // 每日任务 下一次可刷新时间
-                        "`count_weekly`, int," + // 每周任务 已刷新次数
+                        "`count_weekly` int," + // 每周任务 已刷新次数
                         "`expire_time_weekly` timestamp," + // 每周任务 下一次可刷新时间
-                        "`count_monthly`, int," + // 每月任务 已刷新次数
+                        "`count_monthly` int," + // 每月任务 已刷新次数
                         "`expire_time_monthly` timestamp" + // 每月任务 下一次可刷新时间
                 ");"
         )) {
