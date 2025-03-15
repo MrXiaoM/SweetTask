@@ -13,6 +13,7 @@ import top.mrxiaom.pluginbase.DatabaseHolder;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
+import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractModule;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
@@ -55,7 +56,8 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                     return t(target, "&c你没有进行此操作的权限");
                 }
             }
-            Menus.inst().create(target, menu).open();
+            PlayerCache cache = plugin.getDatabase().getTasks(target);
+            TaskManager.inst().checkTasksAsync(cache, () -> Menus.inst().create(target, menu).open());
             return true;
         }
         if (args.length == 2 && "refresh".equalsIgnoreCase(args[0])) {

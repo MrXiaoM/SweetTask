@@ -159,10 +159,17 @@ public class TaskManager extends AbstractModule {
     }
 
     public void checkTasksAsync(PlayerCache playerCaches) {
+        checkTasksAsync(playerCaches, null);
+    }
+
+    public void checkTasksAsync(PlayerCache playerCaches, Runnable done) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             if (checkTasks(playerCaches)) {
                 plugin.getDatabase().cleanExpiredTasks(playerCaches.player);
                 plugin.getDatabase().submitCache(playerCaches);
+            }
+            if (done != null) {
+                Bukkit.getScheduler().runTask(plugin, done);
             }
         });
     }

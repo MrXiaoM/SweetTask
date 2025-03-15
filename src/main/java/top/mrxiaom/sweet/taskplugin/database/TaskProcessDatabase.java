@@ -157,6 +157,8 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         if (disabling) return;
         Player player = e.getPlayer();
         cleanExpiredTasks(player);
+        PlayerCache cache = getTasks(player);
+        TaskManager.inst().checkTasksAsync(cache);
     }
 
     @EventHandler
