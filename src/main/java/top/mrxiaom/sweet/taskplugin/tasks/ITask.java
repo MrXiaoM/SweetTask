@@ -1,7 +1,10 @@
 package top.mrxiaom.sweet.taskplugin.tasks;
 
+import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -9,6 +12,14 @@ public interface ITask {
     String type();
     String actionTips();
     int getTargetValue();
+
+    default List<Pair<String, Object>> actionReplacements(int data) {
+        int target = getTargetValue();
+        List<Pair<String, Object>> replacements = new ArrayList<>();
+        replacements.add(Pair.of("%current%", Math.min(data, target)));
+        replacements.add(Pair.of("%max%", target));
+        return replacements;
+    }
 
     static ITask load(TaskManager parent, String parentTaskId, String s) {
         String[] args;

@@ -150,10 +150,7 @@ public class TaskManager extends AbstractModule {
         ITask subTask = wrapper.subTask;
         String tips = subTask.actionTips();
         if (tips.isEmpty() || player.hasPermission("sweet.task.settings.hide-actionbar")) return;
-        int target = subTask.getTargetValue();
-        List<Pair<String, Object>> replacements = new ArrayList<>();
-        replacements.add(Pair.of("%current%", Math.min(data, target)));
-        replacements.add(Pair.of("%max%", target));
+        List<Pair<String, Object>> replacements = subTask.actionReplacements(data);
         String actionMessage = Pair.replace(tips, replacements);
         replacements.clear();
         AdventureUtil.sendActionBar(player, actionMessage);

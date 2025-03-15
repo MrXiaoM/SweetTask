@@ -4,12 +4,16 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.pluginbase.func.gui.IModifier;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
+import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
+import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TaskIcon {
@@ -32,8 +36,43 @@ public class TaskIcon {
     }
 
     public ItemStack generateIcon(Player player, List<String> formatSubTasks, LoadedTask task, TaskCache cache) {
-        // TODO: 主要图标
-        return null;
+        IModifier<String> displayModifier = oldName -> oldName.replace("%name%", task.name);
+        IModifier<List<String>> loreModifier = oldLore -> {
+            List<String> lore = new ArrayList<>();
+            for (String s : oldLore) {
+                switch (s) {
+                    case "description":
+                        lore.addAll(task.description);
+                        continue;
+                    case "sub_tasks":
+                        for (int i = 0; i < task.subTasks.size(); i++) {
+                            ITask subTask = task.subTasks.get(i);
+                            String taskType = subTask.type();
+                            Integer value = cache.get(i, taskType);
+                            if (value == null) {
+                                lore.add("§cERROR " + taskType);
+                            } else {
+                                List<Pair<String, Object>> replacements = subTask.actionReplacements(value);
+                                String action = Pair.replace(subTask.actionTips(), replacements);
+                                replacements.clear();
+                                for (String line : formatSubTasks) {
+                                    lore.add(line.replace("%action%", action));
+                                }
+                            }
+                        }
+                        continue;
+                    case "rewards":
+                        lore.addAll(task.rewardsLore);
+                        continue;
+                    case "operation":
+                        // TODO: 可执行操作
+                        continue;
+                }
+                lore.add(s);
+            }
+            return lore;
+        };
+        return icon.generateIcon(player, displayModifier, loreModifier);
     }
 
     @Nullable

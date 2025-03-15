@@ -23,4 +23,4 @@ rewards:
   - '[console]money give %player_name% 100'
 # 奖励显示Lore
 rewards-lore:
-  '  &e100 金币'
+  - '  &e100 金币'
