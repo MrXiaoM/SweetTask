@@ -127,21 +127,21 @@ public class PlayerCache {
             }
         }
         if (type.equals(EnumTaskType.DAILY)) {
-            if (LocalDateTime.now().isAfter(refreshCountExpireDaily)) {
+            if (refreshCountExpireDaily == null || LocalDateTime.now().isAfter(refreshCountExpireDaily)) {
                 refreshCountExpireDaily = manager.nextOutdate(EnumTaskType.DAILY);
                 refreshCountDaily = 0;
             }
             return refreshCountDaily < limit;
         }
         if (type.equals(EnumTaskType.WEEKLY)) {
-            if (LocalDateTime.now().isAfter(refreshCountExpireWeekly)) {
+            if (refreshCountExpireWeekly == null || LocalDateTime.now().isAfter(refreshCountExpireWeekly)) {
                 refreshCountExpireWeekly = manager.nextOutdate(EnumTaskType.WEEKLY);
                 refreshCountWeekly = 0;
             }
             return refreshCountWeekly < limit;
         }
         if (type.equals(EnumTaskType.MONTHLY)) {
-            if (LocalDateTime.now().isAfter(refreshCountExpireMonthly)) {
+            if (refreshCountExpireMonthly == null || LocalDateTime.now().isAfter(refreshCountExpireMonthly)) {
                 refreshCountExpireMonthly = manager.nextOutdate(EnumTaskType.MONTHLY);
                 refreshCountMonthly = 0;
             }
