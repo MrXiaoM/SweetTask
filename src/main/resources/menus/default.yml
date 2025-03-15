@@ -20,7 +20,8 @@ operations:
   task:
     available:
       - '&a左键&7 | &f提交任务'
-    done: []
+    done:
+      - '&a&l已完成'
 format:
   subtasks:
     - '  &7● &f%action%'
