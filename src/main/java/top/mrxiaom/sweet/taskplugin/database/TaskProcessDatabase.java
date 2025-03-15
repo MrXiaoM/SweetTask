@@ -37,7 +37,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
     private long nextRefresh = 0;
     private boolean loadFlag;
     public TaskProcessDatabase(SweetTask plugin) {
-        super(plugin);
+        super(plugin, true);
         registerEvents();
         registerBungee();
         plugin.getScheduler().runTaskTimerAsync(() -> {
