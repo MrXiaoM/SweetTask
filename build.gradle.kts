@@ -30,6 +30,7 @@ dependencies {
     compileOnly("io.lumine:Mythic-Dist:4.13.0")
     compileOnly("io.lumine:Mythic:5.6.2")
     compileOnly("io.lumine:LumineUtils:1.20-SNAPSHOT")
+    compileOnly("net.milkbowl.vault:VaultAPI:1.7")
     compileOnly("org.black_ixx:playerpoints:3.2.7")
 
     implementation("net.kyori:adventure-api:4.17.0")
@@ -38,7 +39,7 @@ dependencies {
     implementation("de.tr7zw:item-nbt-api:2.14.0")
     implementation("com.zaxxer:HikariCP:4.0.3") { isTransitive = false }
     implementation("org.jetbrains:annotations:24.0.0")
-    implementation("top.mrxiaom:PluginBase:1.3.5")
+    implementation("top.mrxiaom:PluginBase:1.3.6")
 }
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
