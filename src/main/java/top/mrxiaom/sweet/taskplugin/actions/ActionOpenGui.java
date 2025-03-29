@@ -39,7 +39,7 @@ public class ActionOpenGui implements IAction {
         Menus menus = Menus.inst();
         AbstractModel<?, ?> model = menus.get(id);
         if (model != null) {
-            if (model instanceof IMenuCondition && !((IMenuCondition) model).check()) return;
+            if (model instanceof IMenuCondition && !((IMenuCondition) model).check(player)) return;
             menus.create(parent, player, model).open();
         }
     }
