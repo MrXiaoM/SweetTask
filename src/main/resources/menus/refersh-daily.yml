@@ -4,6 +4,7 @@ inventory:
   - '框　金　　　点　框'
   - '框框框框回框框框框'
 refresh-type: DAILY
+refresh-tips: '&a每日任务刷新成功'
 refresh-icons:
   金:
     cost:
@@ -18,6 +19,8 @@ refresh-icons:
       - '  &f价格: &e%money% 金币'
       - ''
       - '&a左键 &7| &f确认刷新'
+    tips:
+      no-money: '&e你没有足够的金币来刷新任务'
   点:
     cost:
       type: PLAYER_POINTS
@@ -31,6 +34,8 @@ refresh-icons:
       - '  &f价格: &e%money% 点券'
       - ''
       - '&a左键 &7| &f确认刷新'
+    tips:
+      no-money: '&e你没有足够的点券来刷新任务'
 other-icons:
   框:
     material: WHITE_STAINED_GLASS_PANE

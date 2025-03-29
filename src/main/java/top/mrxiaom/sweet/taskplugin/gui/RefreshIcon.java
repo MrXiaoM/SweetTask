@@ -19,11 +19,13 @@ public class RefreshIcon {
     public final IEconomy economy;
     public final double money;
     public final LoadedIcon icon;
+    public final String tipsNoMoney;
 
-    public RefreshIcon(IEconomy economy, double money, LoadedIcon icon) {
+    public RefreshIcon(IEconomy economy, double money, LoadedIcon icon, String tipsNoMoney) {
         this.economy = economy;
         this.money = money;
         this.icon = icon;
+        this.tipsNoMoney = tipsNoMoney;
     }
 
     public ItemStack generateIcon(Player player, EnumTaskType type, PlayerCache playerCache) {
@@ -57,6 +59,7 @@ public class RefreshIcon {
             return null;
         }
         LoadedIcon icon = LoadedIcon.load(section, key);
-        return new RefreshIcon(economy, money, icon);
+        String tipsNoMoney = section.getString(key + ".tips.no-money", "");
+        return new RefreshIcon(economy, money, icon, tipsNoMoney);
     }
 }

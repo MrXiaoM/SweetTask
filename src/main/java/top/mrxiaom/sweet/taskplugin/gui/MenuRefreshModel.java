@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
+import top.mrxiaom.pluginbase.utils.AdventureUtil;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
@@ -13,13 +14,17 @@ import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 import java.util.HashMap;
 import java.util.Map;
 
+import static top.mrxiaom.pluginbase.func.AbstractPluginHolder.t;
+
 public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshModel.Data> implements IMenuCondition {
     public final EnumTaskType refreshType;
-    public MenuRefreshModel(String id, String title, char[] inventory, String permission, EnumTaskType refreshType,
+    public final String refreshTips;
+    public MenuRefreshModel(String id, String title, char[] inventory, String permission, EnumTaskType refreshType, String refreshTips,
                             Map<Character, RefreshIcon> refreshIcons, Map<Character, LoadedIcon> otherIcons
     ) {
         super(id, title, inventory, permission, refreshIcons, otherIcons);
         this.refreshType = refreshType;
+        this.refreshTips = refreshTips;
     }
 
     @Override
@@ -61,7 +66,33 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
             Menus.Impl<RefreshIcon, Data> gui, Player player,
             RefreshIcon icon, ClickType click, int invSlot
     ) {
-        // TODO: 刷新任务
+        Boolean refresh = gui.playerCache.canRefresh(refreshType);
+        if (refresh == null) {
+            t(player, "&e你已经完成过任务了，不可刷新");
+            player.closeInventory();
+            return false;
+        }
+        if (!refresh) {
+            t(player, "&e你的刷新次数已耗尽");
+            player.closeInventory();
+            return false;
+        }
+        if (!icon.economy.has(player, icon.money)) {
+            if (!icon.tipsNoMoney.isEmpty()) {
+                AdventureUtil.sendMessage(player, icon.tipsNoMoney);
+            }
+            return false;
+        }
+        icon.economy.take(player, icon.money);
+        gui.playerCache.submitRefresh(refreshType);
+        if (!refreshTips.isEmpty()) {
+            AdventureUtil.sendMessage(player, refreshTips);
+        }
+        if (gui.parent != null) {
+            gui.parent.open();
+        } else {
+            player.closeInventory();
+        }
         return false;
     }
 
@@ -75,6 +106,7 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
             parent.warn("[menus/" + id + "] 刷新类型输入有误");
             return null;
         }
+        String refreshTips = config.getString("refresh-tips", "");
 
         Map<Character, RefreshIcon> refreshIcons = new HashMap<>();
         section = config.getConfigurationSection("refresh-icons");
@@ -102,6 +134,6 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
             otherIcons.put(iconId, loaded);
         }
         return new MenuRefreshModel(id, title, inventory, permission.isEmpty() ? null : permission,
-                refreshType, refreshIcons, otherIcons);
+                refreshType, refreshTips, refreshIcons, otherIcons);
     }
 }
