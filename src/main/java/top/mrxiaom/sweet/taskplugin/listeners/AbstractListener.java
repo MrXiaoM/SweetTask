@@ -3,12 +3,15 @@ package top.mrxiaom.sweet.taskplugin.listeners;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import top.mrxiaom.pluginbase.utils.AdventureUtil;
+import top.mrxiaom.pluginbase.utils.PAPI;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractModule;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
+import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 
 import java.util.ArrayList;
@@ -18,6 +21,7 @@ import java.util.Map;
 
 public abstract class AbstractListener<E, T> extends AbstractModule implements Listener {
     protected final List<TaskWrappers<T>> wrappers = new ArrayList<>();
+    private final Map<EnumTaskType, String> doneTips = new HashMap<>();
     public AbstractListener(SweetTask plugin) {
         super(plugin);
         registerEvents();
@@ -30,6 +34,13 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
 
     @Override
     public void reloadConfig(MemoryConfiguration config) {
+        doneTips.clear();
+        for (EnumTaskType value : EnumTaskType.values()) {
+            String msg = config.getString("done-tips." + value.name().toLowerCase().replace("_", "-"), null);
+            if (msg != null) {
+                doneTips.put(value, msg);
+            }
+        }
         wrappers.clear();
         TaskManager manager = TaskManager.inst();
         Map<T, List<TaskWrapper>> map = new HashMap<>();
@@ -74,10 +85,11 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
                 changed = true;
                 // 如果数据增加后，任务完成了
                 if (taskCache.checkDone(wrapper)) {
-                    // TODO: 从配置文件读取，该类型的任务应该弹出什么提示。比如，每日任务显示以下消息
-                    // <green>你已完成任务<yellow> %name%<green>! <click:run_command:/sweettask open default><gray>[<white><u>点此查看</u><gray>]</click>
-                    // 同理，每周任务和每月任务都应该要有单独的提示，以打开不同的菜单
-                    t(player, "&a你已完成任务 &e" + wrapper.task.name + "&a!");
+                    String msg = doneTips.get(wrapper.task.type);
+                    if (msg != null) {
+                        String parsed = PAPI.setPlaceholders(player, msg.replace("%name%", wrapper.task.name));
+                        AdventureUtil.sendMessage(player, parsed);
+                    }
                 }
             }
         }

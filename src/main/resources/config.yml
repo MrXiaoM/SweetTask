@@ -25,3 +25,10 @@ counts:
   # 每月任务数量
   monthly:
     default: 0
+
+# 不同类型的任务完成提示
+# 支持 MiniMessage，以及 PAPI 变量
+done-tips:
+  daily: '<green>你已完成任务<yellow> %name%<green>! <click:run_command:/sweettask open default><gray>[<white><u>点此查看</u><gray>]</click>'
+  weekly: '<green>你已完成任务<yellow> %name%<green>! <click:run_command:/sweettask open default-weekly><gray>[<white><u>点此查看</u><gray>]</click>'
+  monthly: '<green>你已完成任务<yellow> %name%<green>! <click:run_command:/sweettask open default-monthly><gray>[<white><u>点此查看</u><gray>]</click>'
