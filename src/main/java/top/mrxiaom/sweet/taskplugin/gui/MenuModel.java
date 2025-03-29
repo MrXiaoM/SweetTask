@@ -6,14 +6,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.Nullable;
-import top.mrxiaom.pluginbase.func.gui.IModel;
 import top.mrxiaom.pluginbase.func.gui.IModifier;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
-import top.mrxiaom.pluginbase.gui.IGui;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
@@ -28,74 +26,34 @@ import java.util.Map;
 
 import static top.mrxiaom.pluginbase.func.AbstractPluginHolder.t;
 
-public class MenuModel implements IModel {
-    private final String id, title;
-    private final char[] inventory;
-    private final String permission;
+public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
     private final List<String> opRefreshAvailable, opRefreshTaskDone, opRefreshMaxTimes,
             opTaskAvailable, opTaskDone, formatSubTasks;
-    private final Map<Character, TaskIcon> taskIcons;
-    private final Map<Character, LoadedIcon> otherIcons;
 
     public MenuModel(String id, String title, char[] inventory, String permission,
                      List<String> opRefreshAvailable, List<String> opRefreshTaskDone, List<String> opRefreshMaxTimes,
                      List<String> opTaskAvailable, List<String> opTaskDone, List<String> formatSubTasks,
                      Map<Character, TaskIcon> taskIcons, Map<Character, LoadedIcon> otherIcons
     ) {
-        this.id = id;
-        this.title = title;
-        this.inventory = inventory;
-        this.permission = permission;
+        super(id, title, inventory, permission, taskIcons, otherIcons);
         this.opRefreshAvailable = opRefreshAvailable;
         this.opRefreshTaskDone = opRefreshTaskDone;
         this.opRefreshMaxTimes = opRefreshMaxTimes;
         this.opTaskAvailable = opTaskAvailable;
         this.opTaskDone = opTaskDone;
         this.formatSubTasks = formatSubTasks;
-        this.taskIcons = taskIcons;
-        this.otherIcons = otherIcons;
-    }
-
-    @Override
-    public String id() {
-        return id;
-    }
-
-    @Override
-    public String title() {
-        return title;
-    }
-
-    @Override
-    public char[] inventory() {
-        return inventory;
-    }
-
-    public boolean hasPermission(Permissible p) {
-        return permission == null || p.hasPermission(permission);
-    }
-
-    @Override
-    public Map<Character, LoadedIcon> otherIcons() {
-        return otherIcons;
-    }
-
-    @Nullable
-    public TaskIcon getTaskIcon(Character id) {
-        return taskIcons.get(id);
     }
 
     @Override
     public ItemStack applyMainIcon(
-            IGui instance, Player player,
+            Menus.Impl<TaskIcon, Data> gui, Player player,
             char id, int index, int appearTimes
     ) {
-        Menus.Impl gui = (Menus.Impl) instance;
         TaskManager manager = TaskManager.inst();
-        TaskIcon icon = taskIcons.get(id);
+        TaskIcon icon = mainIcon(id);
         if (icon != null) {
             // 寻找图标对应任务
-            Pair<LoadedTask, TaskCache> pair = gui.getTask(icon.type, icon.index);
+            Pair<LoadedTask, TaskCache> pair = gui.data.getTask(icon.type, icon.index);
             if (pair != null) {
                 List<String> operation = pair.getValue().hasDone()
                         ? opTaskDone
@@ -104,13 +62,13 @@ public class MenuModel implements IModel {
             } else {
                 // 找不到相关任务时
                 if (icon.redirectIcon != null) {
-                    otherIcons.get(icon.redirectIcon);
+                    otherIcon(icon.redirectIcon);
                 } else {
                     return new ItemStack(Material.AIR);
                 }
             }
         }
-        LoadedIcon otherIcon = otherIcons.get(id);
+        LoadedIcon otherIcon = otherIcon(id);
         if (otherIcon != null) {
             IModifier<List<String>> loreModifier = old -> {
                 List<String> lore = new ArrayList<>();
@@ -171,11 +129,47 @@ public class MenuModel implements IModel {
         return null;
     }
 
+    @Override
+    public Data createData(Player player, PlayerCache playerCache) {
+        return new Data(playerCache);
+    }
+
+    public static class Data {
+        public List<Pair<LoadedTask, TaskCache>> tasksDaily, tasksWeekly, tasksMonthly;
+        public Data(PlayerCache playerCache) {
+            this.tasksDaily = playerCache.getTasksByType(EnumTaskType.DAILY);
+            this.tasksWeekly = playerCache.getTasksByType(EnumTaskType.WEEKLY);
+            this.tasksMonthly = playerCache.getTasksByType(EnumTaskType.MONTHLY);
+        }
+
+        @Nullable
+        public Pair<LoadedTask, TaskCache> getTask(EnumTaskType type, int index) {
+            if (index < 0) return null;
+            List<Pair<LoadedTask, TaskCache>> list;
+            switch (type) {
+                case DAILY:
+                    list = tasksDaily;
+                    break;
+                case WEEKLY:
+                    list = tasksWeekly;
+                    break;
+                case MONTHLY:
+                    list = tasksMonthly;
+                    break;
+                default:
+                    throw new IllegalArgumentException(type.name() + " is not supported.");
+            }
+            if (index >= list.size()) return null;
+            return list.get(index);
+        }
+    }
+
+    @Override
     public boolean click(
-            Menus.Impl gui, Player player,
+            Menus.Impl<TaskIcon, Data> gui, Player player,
             TaskIcon icon, ClickType click, int invSlot
     ) {
-        Pair<LoadedTask, TaskCache> pair = gui.getTask(icon.type, icon.index);
+        Pair<LoadedTask, TaskCache> pair = gui.data.getTask(icon.type, icon.index);
         if (pair != null) {
             LoadedTask task = pair.getKey();
             TaskCache cache = pair.getValue();
@@ -236,7 +230,7 @@ public class MenuModel implements IModel {
             }
             return true;
         } else {
-            LoadedIcon otherIcon = otherIcons.get(icon.redirectIcon);
+            LoadedIcon otherIcon = otherIcon(icon.redirectIcon);
             if (otherIcon != null) {
                 otherIcon.click(player, click);
             }

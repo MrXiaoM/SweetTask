@@ -17,7 +17,7 @@ import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractModule;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
-import top.mrxiaom.sweet.taskplugin.gui.MenuModel;
+import top.mrxiaom.sweet.taskplugin.gui.AbstractModel;
 import top.mrxiaom.sweet.taskplugin.gui.Menus;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
@@ -34,7 +34,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length >= 2 && "open".equalsIgnoreCase(args[0])) {
-            MenuModel menu = Menus.inst().get(args[1]);
+            AbstractModel<?, ?> menu = Menus.inst().get(args[1]);
             if (menu == null) {
                 return t(sender, "菜单不存在");
             }
@@ -58,14 +58,6 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             }
             PlayerCache cache = plugin.getDatabase().getTasks(target);
             TaskManager.inst().checkTasksAsync(cache, () -> Menus.inst().create(target, menu).open());
-            return true;
-        }
-        if (args.length == 2 && "refresh".equalsIgnoreCase(args[0])) {
-            EnumTaskType type = Util.valueOr(EnumTaskType.class, args[1], null);
-            if (type == null) {
-                return t(sender, "&e无效的任务类型");
-            }
-            // TODO: 打开刷新任务菜单
             return true;
         }
         if (args.length == 2 && "reset".equalsIgnoreCase(args[0]) && sender.isOp()) {

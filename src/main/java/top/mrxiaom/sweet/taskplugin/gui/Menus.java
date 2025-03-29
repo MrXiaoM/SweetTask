@@ -1,6 +1,6 @@
 package top.mrxiaom.sweet.taskplugin.gui;
 
-import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -10,24 +10,18 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
-import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
-import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractGuisModule;
-import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
-import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
 import java.io.File;
-import java.util.List;
 
 @AutoRegister
-public class Menus extends AbstractGuisModule<MenuModel> {
+public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
     public Menus(BukkitPlugin plugin) {
         super(plugin, "[menus]");
     }
@@ -43,60 +37,40 @@ public class Menus extends AbstractGuisModule<MenuModel> {
                     plugin.saveResource("menus/default.yml", new File(folder, "default.yml"));
                 }
             }
-            Util.reloadFolder(folder, false, (id, file) -> loadConfig(this, file, id, MenuModel::load));
+            Util.reloadFolder(folder, false, (id, file) -> loadConfig(this, file, id, this::load));
         }
     }
 
-    public Impl create(Player player, MenuModel menu) {
+    private AbstractModel<?, ?> load(Menus parent, ConfigurationSection config, String id) {
+        if (config.contains("task-icons")) {
+            return MenuModel.load(parent, config, id);
+        }
+        if (config.contains("refresh-icons")) {
+            // TODO: 刷新菜单
+        }
+        return null;
+    }
+
+    public Impl<?, ?> create(Player player, AbstractModel<?, ?> menu) {
         PlayerCache playerCache = plugin.getDatabase().getTasks(player);
-        return new Impl(player, menu, playerCache);
+        return new Impl<>(player, menu, playerCache);
     }
 
     public static Menus inst() {
         return instanceOf(Menus.class);
     }
 
-    public class Impl extends Gui<MenuModel> {
+    public class Impl<T, D> extends Gui<AbstractModel<T, D>> {
         public PlayerCache playerCache;
-        public List<Pair<LoadedTask, TaskCache>> tasksDaily, tasksWeekly, tasksMonthly;
-        protected Impl(@NotNull Player player, @NotNull MenuModel model, PlayerCache playerCache) {
+        public final D data;
+        protected Impl(@NotNull Player player, @NotNull AbstractModel<T, D> model, PlayerCache playerCache) {
             super(player, model);
-            this.setPlayerCache(playerCache);
+            this.playerCache = playerCache;
+            this.data = model.createData(player, playerCache);
         }
 
         public SweetTask getPlugin() {
             return plugin;
-        }
-
-        public void setPlayerCache(PlayerCache playerCache) {
-            this.playerCache = playerCache;
-            if (tasksDaily != null) tasksDaily.clear();
-            if (tasksWeekly != null) tasksWeekly.clear();
-            if (tasksMonthly != null) tasksMonthly.clear();
-            this.tasksDaily = playerCache.getTasksByType(EnumTaskType.DAILY);
-            this.tasksWeekly = playerCache.getTasksByType(EnumTaskType.WEEKLY);
-            this.tasksMonthly = playerCache.getTasksByType(EnumTaskType.MONTHLY);
-        }
-
-        @Nullable
-        public Pair<LoadedTask, TaskCache> getTask(EnumTaskType type, int index) {
-            if (index < 0) return null;
-            List<Pair<LoadedTask, TaskCache>> list;
-            switch (type) {
-                case DAILY:
-                    list = tasksDaily;
-                    break;
-                case WEEKLY:
-                    list = tasksWeekly;
-                    break;
-                case MONTHLY:
-                    list = tasksMonthly;
-                    break;
-                default:
-                    throw new IllegalArgumentException(type.name() + " is not supported.");
-            }
-            if (index >= list.size()) return null;
-            return list.get(index);
         }
 
         @Override
@@ -110,7 +84,7 @@ public class Menus extends AbstractGuisModule<MenuModel> {
             Character clickedId = getClickedId(slot);
             if (clickedId == null) return;
 
-            TaskIcon icon = model.getTaskIcon(clickedId);
+            T icon = model.mainIcon(clickedId);
             if (icon != null) {
                 if (model.click(this, player, icon, click, slot)) {
                     plugin.getScheduler().runTask(() -> updateInventory(view));
