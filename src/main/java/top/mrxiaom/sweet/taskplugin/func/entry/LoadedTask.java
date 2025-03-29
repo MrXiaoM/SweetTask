@@ -32,8 +32,14 @@ public class LoadedTask {
     public final List<ITask> subTasks;
     public final List<IAction> rewards;
     public final List<String> rewardsLore;
+    public final String overrideDoneTips;
 
-    public LoadedTask(String id, EnumTaskType type, double rarity, IconProvider iconNormal, IconProvider iconDone, String name, List<String> description, List<ITask> subTasks, List<IAction> rewards, List<String> rewardsLore) {
+    public LoadedTask(String id, EnumTaskType type, double rarity,
+                      IconProvider iconNormal, IconProvider iconDone,
+                      String name, List<String> description, List<ITask> subTasks,
+                      List<IAction> rewards, List<String> rewardsLore,
+                      String overrideDoneTips
+    ) {
         this.id = id;
         this.type = type;
         this.rarity = rarity;
@@ -44,6 +50,7 @@ public class LoadedTask {
         this.subTasks = subTasks;
         this.rewards = rewards;
         this.rewardsLore = rewardsLore;
+        this.overrideDoneTips = overrideDoneTips;
     }
 
     public void giveRewards(Player player) {
@@ -83,7 +90,8 @@ public class LoadedTask {
         }
         List<IAction> rewards = loadActions(config, "rewards");
         List<String> rewardsLore = config.getStringList("rewards-lore");
-        return new LoadedTask(id, type, rarity, iconNormal, iconDone, name, description, subTasks, rewards, rewardsLore);
+        String overrideDoneTips = config.getString("override-done-tips", null);
+        return new LoadedTask(id, type, rarity, iconNormal, iconDone, name, description, subTasks, rewards, rewardsLore, overrideDoneTips);
     }
 
     private static IconProvider getIcon(SweetTask plugin, ConfigurationSection config, String key) {

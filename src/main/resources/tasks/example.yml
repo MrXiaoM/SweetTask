@@ -32,3 +32,6 @@ rewards:
 # 奖励显示Lore
 rewards-lore:
   - '  &e100 金币'
+# 添加该选项，即可覆盖 config.yml 中的默认完成提示
+# 设为空字符串则关闭提示
+#override-done-tips: '<green>你已完成任务<yellow> %name%<green>! <click:run_command:/sweettask open default><gray>[<white><u>点此查看</u><gray>]</click>'

@@ -85,8 +85,11 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
                 changed = true;
                 // 如果数据增加后，任务完成了
                 if (taskCache.checkDone(wrapper)) {
-                    String msg = doneTips.get(wrapper.task.type);
-                    if (msg != null) {
+                    String msg = wrapper.task.overrideDoneTips;
+                    if (msg == null) {
+                        msg = doneTips.get(wrapper.task.type);
+                    }
+                    if (msg != null && !msg.isEmpty()) {
                         String parsed = PAPI.setPlaceholders(player, msg.replace("%name%", wrapper.task.name));
                         AdventureUtil.sendMessage(player, parsed);
                     }
