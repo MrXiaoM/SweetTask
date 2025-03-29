@@ -29,6 +29,12 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
         super(plugin, "[menus]");
     }
 
+    private void saveMenu(File folder, String... names) {
+        for (String name : names) {
+            plugin.saveResource("menus/" + name, new File(folder, name));
+        }
+    }
+
     @Override
     public void reloadConfig(MemoryConfiguration cfg) {
         super.reloadConfig(cfg);
@@ -36,9 +42,9 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
             File folder = plugin.resolve(path);
             if (!folder.exists()) {
                 Util.mkdirs(folder);
-                if (path.equals("./menus")) {
-                    plugin.saveResource("menus/default.yml", new File(folder, "default.yml"));
-                }
+                if (path.equals("./menus")) saveMenu(folder,
+                        "default.yml", "refresh-daily.yml"
+                );
             }
             Util.reloadFolder(folder, false, (id, file) -> loadConfig(this, file, id, this::load));
         }
@@ -49,7 +55,7 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
             return MenuModel.load(parent, config, id);
         }
         if (config.contains("refresh-icons")) {
-            // TODO: 刷新菜单
+            return MenuRefreshModel.load(parent, config, id);
         }
         return null;
     }

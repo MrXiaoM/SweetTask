@@ -1,0 +1,42 @@
+title: '刷新 每日任务'
+inventory:
+  - '框框框框框框框框框'
+  - '框　金　　　点　框'
+  - '框框框框回框框框框'
+refresh-type: DAILY
+refresh-icons:
+  金:
+    cost:
+      type: VAULT
+      money: 100
+    material: GOLD_INGOT
+    display: '&e&l刷新'
+    lore:
+      - ''
+      - '  &f在完成过任务之前，你可以刷新任务列表  '
+      - '  &f剩余次数: %count%'
+      - '  &f价格: &e%money% 金币'
+      - ''
+      - '&a左键 &7| &f确认刷新'
+  点:
+    cost:
+      type: PLAYER_POINTS
+      money: 10
+    material: DIAMOND
+    display: '&e&l刷新'
+    lore:
+      - ''
+      - '  &f在完成过任务之前，你可以刷新任务列表  '
+      - '  &f剩余次数: %count%'
+      - '  &f价格: &e%money% 点券'
+      - ''
+      - '&a左键 &7| &f确认刷新'
+other-icons:
+  框:
+    material: WHITE_STAINED_GLASS_PANE
+    display: '&f&l*'
+  回:
+    material: HOPPER
+    display: '&e&l返回'
+    left_click_commands:
+      - '[back]'

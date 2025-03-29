@@ -96,15 +96,39 @@ public class PlayerCache {
     }
 
     public int getRefreshCountDaily() {
+        if (refreshCountExpireDaily == null || LocalDateTime.now().isAfter(refreshCountExpireDaily)) {
+            refreshCountExpireDaily = TaskManager.inst().nextOutdate(EnumTaskType.DAILY);
+            refreshCountDaily = 0;
+        }
         return refreshCountDaily;
     }
 
     public int getRefreshCountWeekly() {
+        if (refreshCountExpireWeekly == null || LocalDateTime.now().isAfter(refreshCountExpireWeekly)) {
+            refreshCountExpireWeekly = TaskManager.inst().nextOutdate(EnumTaskType.WEEKLY);
+            refreshCountWeekly = 0;
+        }
         return refreshCountWeekly;
     }
 
     public int getRefreshCountMonthly() {
+        if (refreshCountExpireMonthly == null || LocalDateTime.now().isAfter(refreshCountExpireMonthly)) {
+            refreshCountExpireMonthly = TaskManager.inst().nextOutdate(EnumTaskType.MONTHLY);
+            refreshCountMonthly = 0;
+        }
         return refreshCountMonthly;
+    }
+
+    public Boolean canRefresh(EnumTaskType type) {
+        switch (type) {
+            case DAILY:
+                return canRefresh(type, TaskManager.inst().getDailyCount(player));
+            case WEEKLY:
+                return canRefresh(type, TaskManager.inst().getWeeklyCount(player));
+            case MONTHLY:
+                return canRefresh(type, TaskManager.inst().getMonthlyCount(player));
+        }
+        return false;
     }
 
     /**
@@ -128,27 +152,45 @@ public class PlayerCache {
             }
         }
         if (type.equals(EnumTaskType.DAILY)) {
-            if (refreshCountExpireDaily == null || LocalDateTime.now().isAfter(refreshCountExpireDaily)) {
-                refreshCountExpireDaily = manager.nextOutdate(EnumTaskType.DAILY);
-                refreshCountDaily = 0;
-            }
-            return refreshCountDaily < limit;
+            return getRefreshCountDaily() < limit;
         }
         if (type.equals(EnumTaskType.WEEKLY)) {
-            if (refreshCountExpireWeekly == null || LocalDateTime.now().isAfter(refreshCountExpireWeekly)) {
-                refreshCountExpireWeekly = manager.nextOutdate(EnumTaskType.WEEKLY);
-                refreshCountWeekly = 0;
-            }
-            return refreshCountWeekly < limit;
+            return getRefreshCountWeekly() < limit;
         }
         if (type.equals(EnumTaskType.MONTHLY)) {
-            if (refreshCountExpireMonthly == null || LocalDateTime.now().isAfter(refreshCountExpireMonthly)) {
-                refreshCountExpireMonthly = manager.nextOutdate(EnumTaskType.MONTHLY);
-                refreshCountMonthly = 0;
-            }
-            return refreshCountMonthly < limit;
+            return getRefreshCountMonthly() < limit;
         }
         return false;
+    }
+
+    public int getRefreshCount(EnumTaskType type) {
+        switch (type) {
+            case DAILY:
+                return getRefreshCountDaily();
+            case WEEKLY:
+                return getRefreshCountWeekly();
+            case MONTHLY:
+                return getRefreshCountMonthly();
+        }
+        return 0;
+    }
+
+    public int getRefreshCountRemain(EnumTaskType type) {
+        switch (type) {
+            case DAILY: {
+                int max = TaskManager.inst().getDailyCount(player);
+                return Math.max(0, max - getRefreshCountDaily());
+            }
+            case WEEKLY: {
+                int max = TaskManager.inst().getWeeklyCount(player);
+                return Math.max(0, max - getRefreshCountWeekly());
+            }
+            case MONTHLY: {
+                int max = TaskManager.inst().getMonthlyCount(player);
+                return Math.max(0, max - getRefreshCountMonthly());
+            }
+        }
+        return 0;
     }
 
     @Nullable

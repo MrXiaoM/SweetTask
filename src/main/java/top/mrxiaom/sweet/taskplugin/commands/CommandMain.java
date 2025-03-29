@@ -18,6 +18,7 @@ import top.mrxiaom.sweet.taskplugin.func.AbstractModule;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.gui.AbstractModel;
+import top.mrxiaom.sweet.taskplugin.gui.IMenuCondition;
 import top.mrxiaom.sweet.taskplugin.gui.Menus;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
@@ -57,7 +58,10 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
                 }
             }
             PlayerCache cache = plugin.getDatabase().getTasks(target);
-            TaskManager.inst().checkTasksAsync(cache, () -> Menus.inst().create(target, menu).open());
+            TaskManager.inst().checkTasksAsync(cache, () -> {
+                if (menu instanceof IMenuCondition && !((IMenuCondition) menu).check(target)) return;
+                Menus.inst().create(target, menu).open();
+            });
             return true;
         }
         if (args.length == 2 && "reset".equalsIgnoreCase(args[0]) && sender.isOp()) {

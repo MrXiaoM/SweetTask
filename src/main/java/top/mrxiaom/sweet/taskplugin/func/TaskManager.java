@@ -261,6 +261,18 @@ public class TaskManager extends AbstractModule {
         return modified;
     }
 
+    public int getLimitCount(Permissible player, EnumTaskType type) {
+        switch (type) {
+            case DAILY:
+                return getDailyCount(player);
+            case WEEKLY:
+                return getWeeklyCount(player);
+            case MONTHLY:
+                return getMonthlyCount(player);
+        }
+        return 0;
+    }
+
     public int getDailyCount(Permissible player) {
         return getCount(taskDailyCounts, player, taskDailyCount);
     }
