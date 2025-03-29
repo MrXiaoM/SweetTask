@@ -13,7 +13,7 @@ import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public abstract class AbstractModel<T, D> implements IModel {
+public abstract class AbstractModel<T, D extends IMenuData> implements IModel {
     private final String id, title;
     private final char[] inventory;
     protected final String permission;

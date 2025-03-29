@@ -134,9 +134,18 @@ public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
         return new Data(playerCache);
     }
 
-    public static class Data {
+    public static class Data implements IMenuData {
         public List<Pair<LoadedTask, TaskCache>> tasksDaily, tasksWeekly, tasksMonthly;
+        private final PlayerCache playerCache;
         public Data(PlayerCache playerCache) {
+            this.playerCache = playerCache;
+        }
+
+        @Override
+        public void load() {
+            if (this.tasksDaily != null) this.tasksDaily.clear();
+            if (this.tasksWeekly != null) this.tasksWeekly.clear();
+            if (this.tasksMonthly != null) this.tasksMonthly.clear();
             this.tasksDaily = playerCache.getTasksByType(EnumTaskType.DAILY);
             this.tasksWeekly = playerCache.getTasksByType(EnumTaskType.WEEKLY);
             this.tasksMonthly = playerCache.getTasksByType(EnumTaskType.MONTHLY);
