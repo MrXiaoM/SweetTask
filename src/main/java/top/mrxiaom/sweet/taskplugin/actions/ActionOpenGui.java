@@ -9,6 +9,9 @@ import top.mrxiaom.pluginbase.gui.IGui;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.func.AbstractPluginHolder;
+import top.mrxiaom.sweet.taskplugin.gui.AbstractModel;
+import top.mrxiaom.sweet.taskplugin.gui.IMenuCondition;
+import top.mrxiaom.sweet.taskplugin.gui.Menus;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
 import java.util.List;
@@ -32,9 +35,12 @@ public class ActionOpenGui implements IAction {
 
     @Override
     public void run(Player player, @Nullable List<Pair<String, Object>> replacements) {
-        GuiManager guiManager = AbstractPluginHolder.get(GuiManager.class).orElseThrow(IllegalStateException::new);
-        IGui parent = guiManager.getOpeningGui(player);
-        // TODO: 打开刷新任务菜单
-        t(player, "&e暂不支持刷新商店，敬请期待");
+        IGui parent = GuiManager.inst().getOpeningGui(player);
+        Menus menus = Menus.inst();
+        AbstractModel<?, ?> model = menus.get(id);
+        if (model != null) {
+            if (model instanceof IMenuCondition && !((IMenuCondition) model).check()) return;
+            menus.create(parent, player, model).open();
+        }
     }
 }

@@ -18,7 +18,7 @@ public class ActionBack implements IAction {
     public static final ActionBack INSTANCE = new ActionBack();
     public static final IActionProvider PROVIDER = s -> {
         if (s.equals("[back]") || s.equals("back")) {
-            return new ActionBack();
+            return INSTANCE;
         }
         return null;
     };
@@ -26,12 +26,9 @@ public class ActionBack implements IAction {
 
     @Override
     public void run(Player player, @Nullable List<Pair<String, Object>> replacements) {
-        GuiManager guiManager = AbstractPluginHolder.get(GuiManager.class).orElseThrow(IllegalStateException::new);
-        IGui gui = guiManager.getOpeningGui(player);
+        IGui gui = GuiManager.inst().getOpeningGui(player);
         if (gui instanceof Menus.Impl) {
             ((Menus.Impl<?, ?>) gui).parent.open();
         }
-        // TODO: 打开刷新任务菜单
-        t(player, "&e暂不支持刷新商店，敬请期待");
     }
 }
