@@ -15,21 +15,19 @@ import java.util.List;
 
 import static top.mrxiaom.pluginbase.func.AbstractPluginHolder.t;
 
-public class ActionOpenRefreshTaskGui implements IAction {
+public class ActionOpenGui implements IAction {
     public static final IActionProvider PROVIDER = s -> {
-        if (s.startsWith("[refresh]")) {
-            EnumTaskType type = Util.valueOr(EnumTaskType.class, s.substring(9), null);
-            return type == null ? null : new ActionOpenRefreshTaskGui(type);
+        if (s.startsWith("[open]")) {
+            return new ActionOpenGui(s.substring(9));
         }
-        if (s.startsWith("refresh:")) {
-            EnumTaskType type = Util.valueOr(EnumTaskType.class, s.substring(8), null);
-            return type == null ? null : new ActionOpenRefreshTaskGui(type);
+        if (s.startsWith("open:")) {
+            return new ActionOpenGui(s.substring(8));
         }
         return null;
     };
-    public final EnumTaskType type;
-    public ActionOpenRefreshTaskGui(EnumTaskType type) {
-        this.type = type;
+    public final String id;
+    public ActionOpenGui(String id) {
+        this.id = id;
     }
 
     @Override

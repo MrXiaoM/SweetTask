@@ -6,7 +6,8 @@ import org.bukkit.plugin.Plugin;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.actions.ActionProviders;
 import top.mrxiaom.pluginbase.utils.PAPI;
-import top.mrxiaom.sweet.taskplugin.actions.ActionOpenRefreshTaskGui;
+import top.mrxiaom.sweet.taskplugin.actions.ActionBack;
+import top.mrxiaom.sweet.taskplugin.actions.ActionOpenGui;
 import top.mrxiaom.sweet.taskplugin.database.TaskProcessDatabase;
 import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
 import top.mrxiaom.sweet.taskplugin.mythic.Mythic4;
@@ -63,7 +64,8 @@ public class SweetTask extends BukkitPlugin {
                 warn("不支持的 MythicMobs 版本 " + v);
             }
         }
-        ActionProviders.registerActionProvider(ActionOpenRefreshTaskGui.PROVIDER);
+        ActionProviders.registerActionProvider(ActionOpenGui.PROVIDER);
+        ActionProviders.registerActionProvider(ActionBack.PROVIDER);
         registerBuiltInTasks();
         options.registerDatabase(
                 taskProcessDatabase = new TaskProcessDatabase(this)
