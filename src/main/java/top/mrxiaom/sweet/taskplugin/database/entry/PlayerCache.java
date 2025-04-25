@@ -67,15 +67,15 @@ public class PlayerCache {
     public void submitRefresh(EnumTaskType type) {
         TaskManager manager = TaskManager.inst();
         LocalDateTime now = LocalDateTime.now();
-        if (now.isAfter(refreshCountExpireDaily)) {
+        if (refreshCountExpireDaily == null || now.isAfter(refreshCountExpireDaily)) {
             refreshCountExpireDaily = manager.nextOutdate(EnumTaskType.DAILY);
             refreshCountDaily = 0;
         }
-        if (now.isAfter(refreshCountExpireWeekly)) {
+        if (refreshCountExpireWeekly == null || now.isAfter(refreshCountExpireWeekly)) {
             refreshCountExpireWeekly = manager.nextOutdate(EnumTaskType.WEEKLY);
             refreshCountWeekly = 0;
         }
-        if (now.isAfter(refreshCountExpireMonthly)) {
+        if (refreshCountExpireMonthly == null || now.isAfter(refreshCountExpireMonthly)) {
             refreshCountExpireMonthly = manager.nextOutdate(EnumTaskType.MONTHLY);
             refreshCountMonthly = 0;
         }
