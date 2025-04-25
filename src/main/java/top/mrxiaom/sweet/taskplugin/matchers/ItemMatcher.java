@@ -16,7 +16,7 @@ public interface ItemMatcher {
         if (s.startsWith("mythic:")) {
             return new MythicItemMatcher(s.substring(7));
         }
-        Pair<Material, Integer> pair = ItemStackUtil.parseMaterial(s);
+        Pair<Material, Integer> pair = ItemStackUtil.parseMaterial(s.toUpperCase());
         if (pair != null) {
             return new VanillaItemMatcher(pair.getKey(), pair.getValue());
         }
