@@ -194,14 +194,14 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         if (mysql) {
             sentence = "INSERT INTO `" + TABLE_NAME + "`" +
                     "(`player`, `count_daily`, `expire_time_daily`, `count_weekly`, `expire_time_weekly`, `count_monthly`, `expire_time_monthly`) " +
-                    "VALUES(?, ?, ?) " +
+                    "VALUES(?, ?, ?, ?, ?, ?, ?) " +
                     "on duplicate key update `count_daily`=?, `expire_time_daily`=?, " +
                     "`count_weekly`=?, `expire_time_weekly`=? " +
                     "`count_monthly`=?, `expire_time_monthly`=?;";
         } else if (plugin.options.database().isSQLite()) {
             sentence = "INSERT OR REPLACE INTO `" + TABLE_NAME + "`" +
                     "(`player`, `count_daily`, `expire_time_daily`, `count_weekly`, `expire_time_weekly`, `count_monthly`, `expire_time_monthly`) " +
-                    "VALUES(?, ?, ?);";
+                    "VALUES(?, ?, ?, ?, ?, ?, ?);";
         } else return;
         try (Connection conn = plugin.getConnection();
             PreparedStatement ps = conn.prepareStatement(sentence)) {
