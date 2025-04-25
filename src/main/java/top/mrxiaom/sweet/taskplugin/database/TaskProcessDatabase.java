@@ -87,18 +87,18 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         REFRESH_TABLE_NAME = (s + "task_refresh").toUpperCase();
         try (PreparedStatement ps = conn.prepareStatement(
                 "CREATE TABLE if NOT EXISTS `" + TABLE_NAME + "`(" +
-                        "`player` varchar(48)," + // 玩家名
+                        "`player` varchar(48)," + // 玩家ID
                         "`task_id` varchar(48)," + // 主任务ID
-                        "`sub_task_id` varchar(48)," + // 子任务ID，与主任务ID相同代表占位数据
-                        "`data` int," + // 子任务数据值，占位数据为0
-                        "`expire_time` timestamp," + // 过期时间
+                        "`sub_task_id` varchar(48)," + // 子任务ID，与 主任务ID 相同代表这是一条占位数据
+                        "`data` int," + // 子任务数据值。当 子任务ID 与 主任务ID 相同时，这个值代表任务是否已提交完成，0 为未提交，1 为已提交
+                        "`expire_time` timestamp," + // 过期时间，为了方便起见，同一个主任务的过期时间均相同
                         "PRIMARY KEY(`player`,`task_id`,`sub_task_id`)" +
                 ");")) {
             ps.execute();
         }
         try (PreparedStatement ps = conn.prepareStatement(
                 "CREATE TABLE if NOT EXISTS `" + REFRESH_TABLE_NAME + "`(" +
-                        "`player` varchar(48) PRIMARY KEY," + // 玩家名
+                        "`player` varchar(48) PRIMARY KEY," + // 玩家ID
                         "`count_daily` int," + // 每日任务 已刷新次数
                         "`expire_time_daily` timestamp," + // 每日任务 下一次可刷新时间
                         "`count_weekly` int," + // 每周任务 已刷新次数
