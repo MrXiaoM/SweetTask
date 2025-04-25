@@ -64,7 +64,7 @@ public class PlayerCache {
     /**
      * 提交刷新，检查过期时间的同时，使刷新次数+1
      */
-    public void submitRefresh(EnumTaskType type) {
+    public void submitRefresh(EnumTaskType type, Runnable done) {
         TaskManager manager = TaskManager.inst();
         LocalDateTime now = LocalDateTime.now();
         if (refreshCountExpireDaily == null || now.isAfter(refreshCountExpireDaily)) {
@@ -93,6 +93,11 @@ public class PlayerCache {
                 return;
         }
         manager.plugin.getDatabase().submitRefreshCount(player, refreshCountDaily, refreshCountWeekly, refreshCountMonthly);
+        tasks.clear();
+        manager.checkTasksAsync(this, () -> {
+            manager.plugin.getDatabase().submitCache(this, true);
+            done.run();
+        });
     }
 
     public int getRefreshCountDaily() {

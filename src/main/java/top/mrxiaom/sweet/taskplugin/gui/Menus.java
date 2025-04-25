@@ -76,11 +76,16 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
         public final @Nullable IGui parent;
         public PlayerCache playerCache;
         public final D data;
+        private boolean clickLock = false;
         protected Impl(@Nullable IGui parent, @NotNull Player player, @NotNull AbstractModel<T, D> model, PlayerCache playerCache) {
             super(player, model);
             this.parent = parent;
             this.playerCache = playerCache;
             this.data = model.createData(player, playerCache);
+        }
+
+        public void setClickLock(boolean lock) {
+            clickLock = lock;
         }
 
         public SweetTask getPlugin() {
@@ -101,6 +106,7 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
                 InventoryView view, InventoryClickEvent event
         ) {
             event.setCancelled(true);
+            if (clickLock) return;
             Character clickedId = getClickedId(slot);
             if (clickedId == null) return;
 

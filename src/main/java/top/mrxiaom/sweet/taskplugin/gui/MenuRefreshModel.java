@@ -66,6 +66,7 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
             Menus.Impl<RefreshIcon, Data> gui, Player player,
             RefreshIcon icon, ClickType click, int invSlot
     ) {
+        gui.setClickLock(true);
         Boolean refresh = gui.playerCache.canRefresh(refreshType);
         if (refresh == null) {
             t(player, "&e你已经完成过任务了，不可刷新");
@@ -84,15 +85,17 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
             return false;
         }
         icon.economy.take(player, icon.money);
-        gui.playerCache.submitRefresh(refreshType);
-        if (!refreshTips.isEmpty()) {
-            AdventureUtil.sendMessage(player, refreshTips);
-        }
-        if (gui.parent != null) {
-            gui.parent.open();
-        } else {
-            player.closeInventory();
-        }
+        gui.playerCache.submitRefresh(refreshType, () -> {
+            if (!refreshTips.isEmpty()) {
+                AdventureUtil.sendMessage(player, refreshTips);
+            }
+            if (gui.parent != null) {
+                gui.parent.open();
+            } else {
+                player.closeInventory();
+            }
+            gui.setClickLock(false);
+        });
         return false;
     }
 
