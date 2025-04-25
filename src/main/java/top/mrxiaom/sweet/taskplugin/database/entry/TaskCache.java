@@ -6,6 +6,7 @@ import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 public class TaskCache {
@@ -17,6 +18,13 @@ public class TaskCache {
         this.taskId = taskId;
         this.expireTime = expireTime;
         this.subTaskData = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    }
+
+    public Set<Map.Entry<String, Integer>> data() {
+        if (!subTaskData.containsKey(taskId)) {
+            subTaskData.put(taskId, 0);
+        }
+        return subTaskData.entrySet();
     }
 
     public void put(String subTask, int data) {

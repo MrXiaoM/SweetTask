@@ -163,7 +163,7 @@ public class TaskManager extends AbstractModule {
     public void checkTasksAsync(PlayerCache playerCaches, Runnable done) {
         plugin.getScheduler().runTaskAsync(() -> {
             if (checkTasks(playerCaches)) {
-                plugin.getDatabase().submitCache(playerCaches);
+                plugin.getDatabase().submitCache(playerCaches, false);
                 //plugin.getDatabase().cleanExpiredTasks(playerCaches.player);
             }
             if (done != null) {

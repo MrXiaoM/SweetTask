@@ -154,7 +154,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
     }
 
     @EventHandler
-    public void on(PlayerJoinEvent e) {
+    public void onPlayerJoin(PlayerJoinEvent e) {
         if (disabling) return;
         Player player = e.getPlayer();
         cleanExpiredTasks(player);
@@ -163,7 +163,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
     }
 
     @EventHandler
-    public void on(PlayerQuitEvent e) {
+    public void onPlayerQuit(PlayerQuitEvent e) {
         if (disabling) return;
         Player player = e.getPlayer();
         submitCache(player);
@@ -171,7 +171,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
     }
 
     @EventHandler
-    public void on(PlayerKickEvent e) {
+    public void onPlayerKick(PlayerKickEvent e) {
         if (disabling) return;
         Player player = e.getPlayer();
         submitCache(player);
@@ -182,7 +182,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
     public void onDisable() {
         disabling = true;
         for (PlayerCache cache : caches.values()) {
-            submitCache(cache);
+            submitCache(cache, false);
         }
         caches.clear();
     }
@@ -251,12 +251,12 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
     }
 
     private PlayerCache refreshCache(Connection conn, String id, Player player) throws SQLException {
-        Map<String, TaskCache> subTasksMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, TaskCache> tasksMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        // 获取玩家的任务数据
         try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM `" + TABLE_NAME + "` " +
                 "WHERE `player`=?")) {
             ps.setString(1, id);
             ResultSet result = ps.executeQuery();
-            if (DEBUG) plugin.info("玩家 " + player.getName() + " 的数据已拉取");
             while (result.next()) {
                 String taskId = result.getString("task_id");
                 String subTaskId = result.getString("sub_task_id");
@@ -268,34 +268,39 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                     // 已过期任务不加入结果中
                     continue;
                 }
-                TaskCache task = subTasksMap.get(taskId);
-                if (task == null) {
-                    task = new TaskCache(taskId, expireTime.toLocalDateTime());
-                }
+                TaskCache task = tasksMap.computeIfAbsent(taskId, it -> new TaskCache(it, expireTime.toLocalDateTime()));
                 task.put(subTaskId, data);
-                if (DEBUG) plugin.info("  任务" + taskId + ": " + subTaskId + " = " + data);
-                subTasksMap.put(taskId, task);
             }
         }
-        Integer refreshCountDaily = null, refreshCountWeekly = null, refreshCountMonthly = null;
-        LocalDateTime refreshCountExpireDaily = null, refreshCountExpireWeekly = null, refreshCountExpireMonthly = null;
+        PlayerCache cache = new PlayerCache(player, tasksMap);
+        if (DEBUG) {
+            plugin.info("玩家 " + player.getName() + " 的数据已拉取");
+            for (TaskCache task : tasksMap.values()) {
+                plugin.info("  任务 " + task.taskId + " 的数据如下:");
+                for (Map.Entry<String, Integer> entry : task.subTaskData.entrySet()) {
+                    plugin.info("    " + entry.getKey() + " = " + entry.getValue());
+                }
+            }
+        }
+        // 获取玩家的刷新次数以及到期时间数据
         try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM `" + REFRESH_TABLE_NAME + "` " +
                 "WHERE `player`=?")) {
             ps.setString(1, id);
             try (ResultSet result = ps.executeQuery()) {
                 if (result.next()) {
-                    refreshCountDaily = result.getInt("count_daily");
-                    refreshCountExpireDaily = result.getTimestamp("expire_time_daily").toLocalDateTime();
-                    refreshCountWeekly = result.getInt("count_weekly");
-                    refreshCountExpireWeekly = result.getTimestamp("expire_time_weekly").toLocalDateTime();
-                    refreshCountMonthly = result.getInt("count_monthly");
-                    refreshCountExpireMonthly = result.getTimestamp("expire_time_monthly").toLocalDateTime();
+                    int refreshCountDaily = result.getInt("count_daily");
+                    int refreshCountWeekly = result.getInt("count_weekly");
+                    int refreshCountMonthly = result.getInt("count_monthly");
+                    LocalDateTime refreshCountExpireDaily = result.getTimestamp("expire_time_daily").toLocalDateTime();
+                    LocalDateTime refreshCountExpireWeekly = result.getTimestamp("expire_time_weekly").toLocalDateTime();
+                    LocalDateTime refreshCountExpireMonthly = result.getTimestamp("expire_time_monthly").toLocalDateTime();
+                    cache.setRefreshCount(
+                            refreshCountDaily, refreshCountExpireDaily,
+                            refreshCountWeekly, refreshCountExpireWeekly,
+                            refreshCountMonthly, refreshCountExpireMonthly
+                    );
                 }
             }
-        }
-        PlayerCache cache = new PlayerCache(player, subTasksMap);
-        if (refreshCountDaily != null) {
-            cache.setRefreshCount(refreshCountDaily, refreshCountExpireDaily, refreshCountWeekly, refreshCountExpireWeekly, refreshCountMonthly, refreshCountExpireMonthly);
         }
         caches.put(id, cache);
         return cache;
@@ -359,11 +364,11 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         String id = id(player);
         PlayerCache cache = caches.get(id);
         if (cache != null) {
-            submitCache(cache);
+            submitCache(cache, false);
         }
     }
 
-    public void submitCache(PlayerCache cache) {
+    public void submitCache(PlayerCache cache, boolean clear) {
         String id = id(cache.player);
         String sentence;
         boolean mysql = plugin.options.database().isMySQL();
@@ -378,17 +383,18 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                     "VALUES(?, ?, ?, ?, ?);";
         } else return;
         if (DEBUG) plugin.info("正在提交玩家 " + cache.player.getName() + " 的任务缓存");
-        try (Connection conn = plugin.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sentence)) {
-            for (TaskCache taskCache : cache.tasks.values()) {
-                addBatchCache(ps, mysql, id, taskCache.taskId,
-                        taskCache.taskId, 0, taskCache.expireTime);
-                for (Map.Entry<String, Integer> entry : taskCache.subTaskData.entrySet()) {
-                    addBatchCache(ps, mysql, id, taskCache.taskId,
-                            entry.getKey(), entry.getValue(), taskCache.expireTime);
+        try (Connection conn = plugin.getConnection()) {
+            if (clear) clearTasks(conn, id); // 删除所有任务数据
+            try (PreparedStatement ps = conn.prepareStatement(sentence)) {
+                // 添加本地的任务数据
+                for (TaskCache taskCache : cache.tasks.values()) {
+                    for (Map.Entry<String, Integer> entry : taskCache.data()) {
+                        addBatchCache(ps, mysql, id, taskCache.taskId,
+                                entry.getKey(), entry.getValue(), taskCache.expireTime);
+                    }
                 }
+                ps.executeBatch();
             }
-            ps.executeBatch();
         } catch (SQLException e) {
             warn(e);
         }
@@ -461,6 +467,15 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
             noticeRefreshCache(ids);
         } catch (SQLException e) {
             warn(e);
+        }
+    }
+
+    private void clearTasks(Connection conn, String player) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement(
+                "DELETE FROM TABLE `" + TABLE_NAME +"` WHERE `player`=?;"
+        )) {
+            ps.setString(1, player);
+            ps.execute();
         }
     }
 }
