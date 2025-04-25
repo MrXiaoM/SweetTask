@@ -22,6 +22,7 @@ import java.util.Map;
 public abstract class AbstractListener<E, T> extends AbstractModule implements Listener {
     protected final List<TaskWrappers<T>> wrappers = new ArrayList<>();
     private final Map<EnumTaskType, String> doneTips = new HashMap<>();
+    protected boolean disableReverseListener;
     public AbstractListener(SweetTask plugin) {
         super(plugin);
         registerEvents();
@@ -34,6 +35,7 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
 
     @Override
     public void reloadConfig(MemoryConfiguration config) {
+        disableReverseListener = !config.getBoolean("enable-reverse-listener");
         doneTips.clear();
         for (EnumTaskType value : EnumTaskType.values()) {
             String msg = config.getString("done-tips." + value.name().toLowerCase().replace("_", "-"), null);
@@ -76,7 +78,7 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
                 int old = taskCache.get(wrapper, 0);
                 if (old >= max) continue; // 已经满了的子任务进度不提示消息
                 // 增加后的数值
-                int data = Math.min(old + add, max);
+                int data = strict(old + add, 0, max);
                 taskCache.put(wrapper, data);
                 if (!changed) {
                     // 只打印第一条 Action 消息
@@ -102,4 +104,10 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
         }
     }
 
+    @SuppressWarnings({"ManualMinMaxCalculation", "SameParameterValue"})
+    private static int strict(int value, int min, int max) {
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
 }

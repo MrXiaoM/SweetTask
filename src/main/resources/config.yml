@@ -32,3 +32,8 @@ done-tips:
   daily: '<green>你已完成任务<yellow> %name%<green>! <click:run_command:/sweettask open default><gray>[<white><u>点此查看</u><gray>]</click>'
   weekly: '<green>你已完成任务<yellow> %name%<green>! <click:run_command:/sweettask open default-weekly><gray>[<white><u>点此查看</u><gray>]</click>'
   monthly: '<green>你已完成任务<yellow> %name%<green>! <click:run_command:/sweettask open default-monthly><gray>[<white><u>点此查看</u><gray>]</click>'
+
+# 是否启用逆向监听器，若启用
+# - 放置方块任务，在破坏方块时，会减少进度
+# - 破坏方块任务，在放置方块时，会减少进度
+enable-reverse-listener: true

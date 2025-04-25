@@ -4,6 +4,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
@@ -45,5 +46,13 @@ public class PlaceBlockListener extends AbstractListener<Block, BlockMatcher> {
         Block block = e.getBlock();
         Player player = e.getPlayer();
         plus(player, block, 1);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onBlockBreak(BlockBreakEvent e) {
+        if (e.isCancelled() || disableReverseListener) return;
+        Block block = e.getBlock();
+        Player player = e.getPlayer();
+        plus(player, block, -1);
     }
 }
