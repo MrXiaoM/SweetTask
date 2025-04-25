@@ -35,8 +35,8 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (SweetTask.DEBUG && Debug.onCommand(plugin, sender, args)) return true;
-        if (args.length >= 2 && "open".equalsIgnoreCase(args[0])) {
-            AbstractModel<?, ?> menu = Menus.inst().get(args[1]);
+        if (args.length >= 1 && "open".equalsIgnoreCase(args[0])) {
+            AbstractModel<?, ?> menu = Menus.inst().get(args.length >= 2 ? args[1] : "default");
             if (menu == null) {
                 return t(sender, "菜单不存在");
             }
