@@ -32,7 +32,7 @@ public class TaskCache {
     }
 
     public int get(int index, String subTask) {
-        return subTaskData.getOrDefault(index + "-" + subTask, 0);
+        return get(index, subTask, 0);
     }
 
     public int get(TaskWrapper wrapper) {
