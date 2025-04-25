@@ -264,7 +264,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                 Timestamp expireTime = result.getTimestamp("expire_time");
                 Timestamp now = Timestamp.valueOf(LocalDateTime.now());
                 if (now.after(expireTime)) {
-                    if (DEBUG) plugin.warn("任务 " + taskId + " -> " + subTaskId + " 已到期 (" + expireTime.getTime() + ")");
+                    if (DEBUG) plugin.warn("  任务" + taskId + ": 子任务 " + subTaskId + " 已到期 (" + expireTime.getTime() + ")");
                     // 已过期任务不加入结果中
                     continue;
                 }
@@ -273,7 +273,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                     task = new TaskCache(taskId, expireTime.toLocalDateTime());
                 }
                 task.put(subTaskId, data);
-                if (DEBUG) plugin.info("  " + taskId + " -> " + subTaskId + " = " + data);
+                if (DEBUG) plugin.info("  任务" + taskId + ": " + subTaskId + " = " + data);
                 subTasksMap.put(taskId, task);
             }
         }
