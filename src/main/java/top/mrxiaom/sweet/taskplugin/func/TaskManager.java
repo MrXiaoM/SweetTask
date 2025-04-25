@@ -162,9 +162,9 @@ public class TaskManager extends AbstractModule {
 
     public void checkTasksAsync(PlayerCache playerCaches, Runnable done) {
         plugin.getScheduler().runTaskAsync(() -> {
-            if (checkTasks(playerCaches)) {
-                plugin.getDatabase().submitCache(playerCaches, false);
-                //plugin.getDatabase().cleanExpiredTasks(playerCaches.player);
+            if (checkTasks(playerCaches)) { // 返回值是“任务列表是否有被修改”
+                // 如果任务列表被改了（多了任务或者少了任务），就清空数据库上的任务列表重新上传
+                plugin.getDatabase().submitCache(playerCaches, true);
             }
             if (done != null) {
                 plugin.getScheduler().runTask(done);

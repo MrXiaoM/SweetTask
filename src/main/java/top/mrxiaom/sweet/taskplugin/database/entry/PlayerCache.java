@@ -94,10 +94,7 @@ public class PlayerCache {
         }
         manager.plugin.getDatabase().submitRefreshCount(player, refreshCountDaily, refreshCountWeekly, refreshCountMonthly);
         tasks.clear();
-        manager.checkTasksAsync(this, () -> {
-            manager.plugin.getDatabase().submitCache(this, true);
-            done.run();
-        });
+        manager.checkTasksAsync(this, done);
     }
 
     public int getRefreshCountDaily() {
