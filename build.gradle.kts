@@ -18,8 +18,6 @@ repositories {
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://jitpack.io")
     maven("https://repo.rosewooddev.io/repository/public/")
-    maven("https://s01.oss.sonatype.org/content/groups/public/")
-    maven("https://oss.sonatype.org/content/groups/public/")
 }
 
 dependencies {
@@ -33,13 +31,13 @@ dependencies {
     compileOnly("net.milkbowl.vault:VaultAPI:1.7")
     compileOnly("org.black_ixx:playerpoints:3.2.7")
 
-    implementation("net.kyori:adventure-api:4.17.0")
+    implementation("net.kyori:adventure-api:4.20.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.4")
-    implementation("net.kyori:adventure-text-minimessage:4.17.0")
-    implementation("de.tr7zw:item-nbt-api:2.14.2-SNAPSHOT")
+    implementation("net.kyori:adventure-text-minimessage:4.20.0")
+    implementation("de.tr7zw:item-nbt-api:2.15.0")
     implementation("com.zaxxer:HikariCP:4.0.3") { isTransitive = false }
     implementation("org.jetbrains:annotations:24.0.0")
-    implementation("top.mrxiaom:PluginBase:1.3.8")
+    implementation("top.mrxiaom:PluginBase:1.4.0")
 }
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
