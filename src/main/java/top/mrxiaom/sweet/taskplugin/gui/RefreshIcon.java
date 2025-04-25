@@ -29,11 +29,14 @@ public class RefreshIcon {
     }
 
     public ItemStack generateIcon(Player player, EnumTaskType type, PlayerCache playerCache) {
+        int remainCount = playerCache.getRefreshCountRemain(type);
+
         List<Pair<String, Object>> pairs = new ArrayList<>();
         pairs.add(Pair.of("%money%", money));
-        pairs.add(Pair.of("%count%", playerCache.getRefreshCountRemain(type)));
+        pairs.add(Pair.of("%count%", remainCount));
+        pairs.add(Pair.of("%remain%", remainCount));
         pairs.add(Pair.of("%current%", playerCache.getRefreshCount(type)));
-        pairs.add(Pair.of("%max%", TaskManager.inst().getLimitCount(player, type)));
+        pairs.add(Pair.of("%max%", TaskManager.inst().getMaxRefreshCount(player, type)));
         IModifier<String> displayModifier = oldName -> Pair.replace(oldName, pairs);
         IModifier<List<String>> loreModifier = oldLore -> {
             List<String> lore = new ArrayList<>();

@@ -37,7 +37,11 @@ public class TaskManager extends AbstractModule {
     private final List<Pair<String, Integer>> taskDailyCounts = new ArrayList<>();
     private final List<Pair<String, Integer>> taskWeeklyCounts = new ArrayList<>();
     private final List<Pair<String, Integer>> taskMonthlyCounts = new ArrayList<>();
+    private final List<Pair<String, Integer>> refreshDailyCounts = new ArrayList<>();
+    private final List<Pair<String, Integer>> refreshWeeklyCounts = new ArrayList<>();
+    private final List<Pair<String, Integer>> refreshMonthlyCounts = new ArrayList<>();
     private int taskDailyCount, taskWeeklyCount, taskMonthlyCount;
+    private int refreshDailyCount, refreshWeeklyCount, refreshMonthlyCount;
     private LocalTime resetTime;
     public TaskManager(SweetTask plugin) {
         super(plugin);
@@ -59,18 +63,26 @@ public class TaskManager extends AbstractModule {
             resetTime = LocalTime.of(hour, minute);
             return true;
         } else {
+            resetTime = LocalTime.of(4, 0, 0);
             return false;
         }
     }
 
     @Override
     public void reloadConfig(MemoryConfiguration config) {
-        ConfigurationSection section;
-
         if (!parseResetTime(config.getString("reset-time", "4:00:00"))) {
-            warn("reset-time 设定错误，已使用默认值 4:00:00");
-            resetTime = LocalTime.of(4, 0, 0);
+            warn("[config.yml] reset-time 设定错误，已使用默认值 4:00:00");
         }
+
+        reloadMaxTasksCounts(config);
+        reloadMaxRefreshCounts(config);
+        reloadTasks(config);
+
+        info("加载了 " + tasks.size() + " 个任务，每日[" + tasksByDaily.size() + "]，每周[" + tasksByWeekly.size() + "]，每月[" + tasksByMonthly.size() + "]");
+    }
+
+    private void reloadMaxTasksCounts(MemoryConfiguration config) {
+        ConfigurationSection section;
 
         taskDailyCounts.clear();
         taskWeeklyCounts.clear();
@@ -81,9 +93,7 @@ public class TaskManager extends AbstractModule {
         if (section != null) for (String key : section.getKeys(false)) {
             int count = section.getInt(key);
             if (count < 0) continue;
-            if (key.equals("default")) {
-                taskDailyCount = count;
-            }
+            if (key.equals("default")) taskDailyCount = count;
             String perm = "sweettask.count.daily." + key;
             taskDailyCounts.add(Pair.of(perm, count));
         }
@@ -91,9 +101,7 @@ public class TaskManager extends AbstractModule {
         if (section != null) for (String key : section.getKeys(false)) {
             int count = section.getInt(key);
             if (count < 0) continue;
-            if (key.equals("default")) {
-                taskWeeklyCount = count;
-            }
+            if (key.equals("default")) taskWeeklyCount = count;
             String perm = "sweettask.count.weekly." + key;
             taskWeeklyCounts.add(Pair.of(perm, count));
         }
@@ -101,9 +109,7 @@ public class TaskManager extends AbstractModule {
         if (section != null) for (String key : section.getKeys(false)) {
             int count = section.getInt(key);
             if (count < 0) continue;
-            if (key.equals("default")) {
-                taskMonthlyCount = count;
-            }
+            if (key.equals("default")) taskMonthlyCount = count;
             String perm = "sweettask.count.monthly." + key;
             taskMonthlyCounts.add(Pair.of(perm, count));
         }
@@ -111,7 +117,46 @@ public class TaskManager extends AbstractModule {
         taskDailyCounts.sort(permComparator.reversed());
         taskWeeklyCounts.sort(permComparator.reversed());
         taskMonthlyCounts.sort(permComparator.reversed());
+    }
 
+    private void reloadMaxRefreshCounts(MemoryConfiguration config) {
+        ConfigurationSection section;
+
+        refreshDailyCounts.clear();
+        refreshWeeklyCounts.clear();
+        refreshMonthlyCounts.clear();
+        refreshDailyCount = taskWeeklyCount = taskMonthlyCount = 0;
+
+        section = config.getConfigurationSection("refresh-counts.daily");
+        if (section != null) for (String key : section.getKeys(false)) {
+            int count = section.getInt(key);
+            if (count < 0) continue;
+            if (key.equals("default")) refreshDailyCount = count;
+            String perm = "sweettask.refresh-count.daily." + key;
+            refreshDailyCounts.add(Pair.of(perm, count));
+        }
+        section = config.getConfigurationSection("refresh-counts.weekly");
+        if (section != null) for (String key : section.getKeys(false)) {
+            int count = section.getInt(key);
+            if (count < 0) continue;
+            if (key.equals("default")) refreshWeeklyCount = count;
+            String perm = "sweettask.refresh-count.weekly." + key;
+            refreshWeeklyCounts.add(Pair.of(perm, count));
+        }
+        section = config.getConfigurationSection("refresh-counts.monthly");
+        if (section != null) for (String key : section.getKeys(false)) {
+            int count = section.getInt(key);
+            if (count < 0) continue;
+            if (key.equals("default")) refreshMonthlyCount = count;
+            String perm = "sweettask.refresh-count.monthly." + key;
+            refreshMonthlyCounts.add(Pair.of(perm, count));
+        }
+
+        refreshDailyCounts.sort(permComparator.reversed());
+        refreshWeeklyCounts.sort(permComparator.reversed());
+        refreshMonthlyCounts.sort(permComparator.reversed());
+    }
+    private void reloadTasks(MemoryConfiguration config) {
         tasks.clear();
         tasksByDaily.clear();
         tasksByWeekly.clear();
@@ -143,7 +188,6 @@ public class TaskManager extends AbstractModule {
                 }
             });
         }
-        info("加载了 " + tasks.size() + " 个任务，每日[" + tasksByDaily.size() + "]，每周[" + tasksByWeekly.size() + "]，每月[" + tasksByMonthly.size() + "]");
     }
 
     public void showActionTips(Player player, TaskWrapper wrapper, int data) {
@@ -175,9 +219,9 @@ public class TaskManager extends AbstractModule {
     public boolean checkTasks(PlayerCache playerCaches) {
         boolean modified = playerCaches.removeOutdatedTasks(); // 先清理一下过期的任务
         Player player = playerCaches.player;
-        int needDaily = getDailyCount(player);
-        int needWeekly = getWeeklyCount(player);
-        int needMonthly = getMonthlyCount(player);
+        int needDaily = getDailyMaxTasksCount(player);
+        int needWeekly = getWeeklyMaxTasksCount(player);
+        int needMonthly = getMonthlyMaxTasksCount(player);
         Set<String> tasksDaily = new HashSet<>();
         Set<String> tasksWeekly = new HashSet<>();
         Set<String> tasksMonthly = new HashSet<>();
@@ -263,28 +307,40 @@ public class TaskManager extends AbstractModule {
         return modified;
     }
 
-    public int getLimitCount(Permissible player, EnumTaskType type) {
+    public int getMaxRefreshCount(Permissible player, EnumTaskType type) {
         switch (type) {
             case DAILY:
-                return getDailyCount(player);
+                return getDailyMaxRefreshCount(player);
             case WEEKLY:
-                return getWeeklyCount(player);
+                return getWeeklyMaxRefreshCount(player);
             case MONTHLY:
-                return getMonthlyCount(player);
+                return getMonthlyMaxRefreshCount(player);
         }
         return 0;
     }
 
-    public int getDailyCount(Permissible player) {
+    public int getDailyMaxTasksCount(Permissible player) {
         return getCount(taskDailyCounts, player, taskDailyCount);
     }
 
-    public int getWeeklyCount(Permissible player) {
+    public int getWeeklyMaxTasksCount(Permissible player) {
         return getCount(taskWeeklyCounts, player, taskWeeklyCount);
     }
 
-    public int getMonthlyCount(Permissible player) {
+    public int getMonthlyMaxTasksCount(Permissible player) {
         return getCount(taskMonthlyCounts, player, taskMonthlyCount);
+    }
+
+    public int getDailyMaxRefreshCount(Permissible player) {
+        return getCount(refreshDailyCounts, player, refreshDailyCount);
+    }
+
+    public int getWeeklyMaxRefreshCount(Permissible player) {
+        return getCount(refreshWeeklyCounts, player, refreshWeeklyCount);
+    }
+
+    public int getMonthlyMaxRefreshCount(Permissible player) {
+        return getCount(refreshMonthlyCounts, player, refreshMonthlyCount);
     }
 
     private int getCount(List<Pair<String, Integer>> permList, Permissible player, int def) {
@@ -295,6 +351,7 @@ public class TaskManager extends AbstractModule {
         }
         return def;
     }
+
 
     public LocalDateTime nextOutdate(EnumTaskType type) {
         LocalDateTime now = LocalDateTime.now();

@@ -39,13 +39,22 @@ public class Placeholders extends PlaceholderExpansion {
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String params) {
         if (params.equalsIgnoreCase("count_daily")) {
-            return String.valueOf(TaskManager.inst().getDailyCount(player));
+            return String.valueOf(TaskManager.inst().getDailyMaxTasksCount(player));
         }
         if (params.equalsIgnoreCase("count_weekly")) {
-            return String.valueOf(TaskManager.inst().getWeeklyCount(player));
+            return String.valueOf(TaskManager.inst().getWeeklyMaxTasksCount(player));
         }
         if (params.equalsIgnoreCase("count_monthly")) {
-            return String.valueOf(TaskManager.inst().getMonthlyCount(player));
+            return String.valueOf(TaskManager.inst().getMonthlyMaxTasksCount(player));
+        }
+        if (params.equalsIgnoreCase("refresh_count_daily")) {
+            return String.valueOf(TaskManager.inst().getDailyMaxRefreshCount(player));
+        }
+        if (params.equalsIgnoreCase("refresh_count_weekly")) {
+            return String.valueOf(TaskManager.inst().getWeeklyMaxRefreshCount(player));
+        }
+        if (params.equalsIgnoreCase("refresh_count_monthly")) {
+            return String.valueOf(TaskManager.inst().getMonthlyMaxRefreshCount(player));
         }
         return super.onPlaceholderRequest(player, params);
     }

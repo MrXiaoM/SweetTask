@@ -81,15 +81,15 @@ public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
                         EnumTaskType type = Util.valueOr(EnumTaskType.class, s.substring(18).trim(), null);
                         if (type != null) switch (type) {
                             case DAILY:
-                                refreshLimit = manager.getDailyCount(player);
+                                refreshLimit = manager.getDailyMaxRefreshCount(player);
                                 refreshCount = gui.playerCache.getRefreshCountDaily();
                                 break;
                             case WEEKLY:
-                                refreshLimit = manager.getWeeklyCount(player);
+                                refreshLimit = manager.getWeeklyMaxRefreshCount(player);
                                 refreshCount = gui.playerCache.getRefreshCountWeekly();
                                 break;
                             case MONTHLY:
-                                refreshLimit = manager.getMonthlyCount(player);
+                                refreshLimit = manager.getMonthlyMaxRefreshCount(player);
                                 refreshCount = gui.playerCache.getRefreshCountMonthly();
                                 break;
                             default:
@@ -189,11 +189,7 @@ public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
             for (int i = 0; i < task.subTasks.size(); i++) {
                 ITask subTask = task.subTasks.get(i);
                 String taskType = subTask.type();
-                Integer value = cache.get(i, taskType);
-                if (value == null) {
-                    cache.put(i, taskType, 0);
-                    value = 0;
-                }
+                int value = cache.get(i, taskType);
                 if (subTask instanceof TaskSubmitItem) {
                     TaskSubmitItem submitItem = (TaskSubmitItem) subTask;
                     // 提交任务物品
@@ -235,7 +231,6 @@ public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
                 } else {
                     t(player, "&e任务未完成");
                 }
-                // TODO: 提示任务未完成，或者已提交任务物品
             }
             return true;
         } else {

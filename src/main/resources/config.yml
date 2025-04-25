@@ -26,6 +26,20 @@ counts:
   monthly:
     default: 0
 
+# 周期任务权限对应可刷新次数
+# 格式为 sweettask.refresh-count.<类型>.<键>，如 sweettask.refresh-count.daily.default
+# 越大的数量越优先
+refresh-counts:
+  # 每日任务刷新次数
+  daily:
+    default: 5
+  # 每周任务刷新次数
+  weekly:
+    default: 5
+  # 每月任务刷新次数
+  monthly:
+    default: 5
+
 # 不同类型的任务完成提示
 # 支持 MiniMessage，以及 PAPI 变量
 done-tips:
