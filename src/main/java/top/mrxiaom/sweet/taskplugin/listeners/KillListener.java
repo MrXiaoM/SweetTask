@@ -20,7 +20,6 @@ import static top.mrxiaom.sweet.taskplugin.utils.Utils.getListOrEmpty;
 public class KillListener extends AbstractListener<LivingEntity, EntityMatcher> {
     public KillListener(SweetTask plugin) {
         super(plugin);
-        registerEvents();
     }
 
     @Override

@@ -21,7 +21,6 @@ import static top.mrxiaom.sweet.taskplugin.utils.Utils.getListOrEmpty;
 public class PlaceBlockListener extends AbstractListener<Block, BlockMatcher> {
     public PlaceBlockListener(SweetTask plugin) {
         super(plugin);
-        registerEvents();
     }
 
     @Override

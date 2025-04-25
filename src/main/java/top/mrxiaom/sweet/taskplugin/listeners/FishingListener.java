@@ -22,7 +22,6 @@ import static top.mrxiaom.sweet.taskplugin.utils.Utils.getListOrEmpty;
 public class FishingListener extends AbstractListener<ItemStack, ItemMatcher> {
     public FishingListener(SweetTask plugin) {
         super(plugin);
-        registerEvents();
     }
 
     @Override
