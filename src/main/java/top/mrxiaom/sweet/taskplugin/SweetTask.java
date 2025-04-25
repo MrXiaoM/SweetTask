@@ -37,7 +37,6 @@ public class SweetTask extends BukkitPlugin {
                 .adventure(true)
                 .database(true)
                 .reconnectDatabaseWhenReloadConfig(false)
-                .vaultEconomy(false)
                 .scanIgnore("top.mrxiaom.sweet.taskplugin.libs")
         );
     }
