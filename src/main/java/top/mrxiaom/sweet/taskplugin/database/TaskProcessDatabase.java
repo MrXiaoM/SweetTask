@@ -196,7 +196,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                     "(`player`, `count_daily`, `expire_time_daily`, `count_weekly`, `expire_time_weekly`, `count_monthly`, `expire_time_monthly`) " +
                     "VALUES(?, ?, ?, ?, ?, ?, ?) " +
                     "on duplicate key update `count_daily`=?, `expire_time_daily`=?, " +
-                    "`count_weekly`=?, `expire_time_weekly`=? " +
+                    "`count_weekly`=?, `expire_time_weekly`=?, " +
                     "`count_monthly`=?, `expire_time_monthly`=?;";
         } else if (plugin.options.database().isSQLite()) {
             sentence = "INSERT OR REPLACE INTO `" + TABLE_NAME + "`" +
@@ -472,7 +472,7 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
 
     private void clearTasks(Connection conn, String player) throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement(
-                "DELETE FROM TABLE `" + TABLE_NAME +"` WHERE `player`=?;"
+                "DELETE FROM `" + TABLE_NAME +"` WHERE `player`=?;"
         )) {
             ps.setString(1, player);
             ps.execute();
