@@ -73,7 +73,7 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
     }
 
     public class Impl<T, D extends IMenuData> extends Gui<AbstractModel<T, D>> {
-        public final IGui parent;
+        public final @Nullable IGui parent;
         public PlayerCache playerCache;
         public final D data;
         protected Impl(@Nullable IGui parent, @NotNull Player player, @NotNull AbstractModel<T, D> model, PlayerCache playerCache) {

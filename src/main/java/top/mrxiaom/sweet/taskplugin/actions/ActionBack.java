@@ -11,6 +11,8 @@ import top.mrxiaom.sweet.taskplugin.gui.Menus;
 
 import java.util.List;
 
+import static top.mrxiaom.pluginbase.func.AbstractPluginHolder.t;
+
 public class ActionBack implements IAction {
     public static final ActionBack INSTANCE = new ActionBack();
     public static final IActionProvider PROVIDER = s -> {
@@ -24,8 +26,11 @@ public class ActionBack implements IAction {
     @Override
     public void run(Player player, @Nullable List<Pair<String, Object>> replacements) {
         IGui gui = GuiManager.inst().getOpeningGui(player);
-        if (gui instanceof Menus.Impl) {
-            ((Menus.Impl<?, ?>) gui).parent.open();
+        IGui parent = gui instanceof Menus.Impl ? ((Menus.Impl<?, ?>) gui).parent : null;
+        if (parent != null) {
+            parent.open();
+        } else {
+            t(player, "&c当前不能返回");
         }
     }
 }
