@@ -2,9 +2,6 @@ package top.mrxiaom.sweet.taskplugin.matchers;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.jetbrains.annotations.Nullable;
-import top.mrxiaom.pluginbase.utils.ItemStackUtil;
-import top.mrxiaom.pluginbase.utils.Pair;
 
 import java.util.Objects;
 

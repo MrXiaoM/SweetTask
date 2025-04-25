@@ -1,5 +1,5 @@
 package top.mrxiaom.sweet.taskplugin.commands;
-        
+
 import com.google.common.collect.Lists;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -22,7 +22,10 @@ import top.mrxiaom.sweet.taskplugin.gui.IMenuCondition;
 import top.mrxiaom.sweet.taskplugin.gui.Menus;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @AutoRegister

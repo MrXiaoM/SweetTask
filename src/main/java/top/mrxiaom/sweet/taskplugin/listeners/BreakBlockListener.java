@@ -12,7 +12,8 @@ import top.mrxiaom.sweet.taskplugin.matchers.BlockMatcher;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 import top.mrxiaom.sweet.taskplugin.tasks.TaskBreakBlock;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 import static top.mrxiaom.sweet.taskplugin.utils.Utils.getListOrEmpty;
 

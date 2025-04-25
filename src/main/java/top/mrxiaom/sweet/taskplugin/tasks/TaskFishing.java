@@ -4,7 +4,6 @@ import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

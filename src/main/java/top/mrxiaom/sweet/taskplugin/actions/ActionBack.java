@@ -7,12 +7,9 @@ import top.mrxiaom.pluginbase.api.IActionProvider;
 import top.mrxiaom.pluginbase.func.GuiManager;
 import top.mrxiaom.pluginbase.gui.IGui;
 import top.mrxiaom.pluginbase.utils.Pair;
-import top.mrxiaom.sweet.taskplugin.func.AbstractPluginHolder;
 import top.mrxiaom.sweet.taskplugin.gui.Menus;
 
 import java.util.List;
-
-import static top.mrxiaom.pluginbase.func.AbstractPluginHolder.t;
 
 public class ActionBack implements IAction {
     public static final ActionBack INSTANCE = new ActionBack();
