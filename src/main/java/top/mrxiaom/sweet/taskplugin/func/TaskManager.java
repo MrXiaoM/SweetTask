@@ -200,7 +200,9 @@ public class TaskManager extends AbstractModule {
                     break;
             }
         }
-        if (DEBUG) info("玩家" + player.getName() + "需要 " + needDaily + "每日、" + needWeekly + "每周、" + needMonthly + "每月任务");
+        if (DEBUG && (needDaily > 0 || needWeekly > 0 || needMonthly > 0)) {
+            info("玩家" + player.getName() + "需要 " + needDaily + "每日、" + needWeekly + "每周、" + needMonthly + "每月任务");
+        }
         if (needDaily > 0) {
             List<String> available = new ArrayList<>(tasksByDaily.keySet());
             available.removeAll(tasksDaily);
