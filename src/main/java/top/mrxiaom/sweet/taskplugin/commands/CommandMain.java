@@ -36,7 +36,8 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (SweetTask.DEBUG && Debug.onCommand(plugin, sender, args)) return true;
         if (args.length >= 1 && "open".equalsIgnoreCase(args[0])) {
-            AbstractModel<?, ?> menu = Menus.inst().get(args.length >= 2 ? args[1] : "default");
+            Menus menus = Menus.inst();
+            AbstractModel<?, ?> menu = menus.get(args.length >= 2 ? args[1] : "default");
             if (menu == null) {
                 return t(sender, "菜单不存在");
             }
@@ -61,7 +62,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             PlayerCache cache = plugin.getDatabase().getTasks(target);
             TaskManager.inst().checkTasksAsync(cache, () -> {
                 if (menu instanceof IMenuCondition && !((IMenuCondition) menu).check(target)) return;
-                Menus.inst().create(target, menu).open();
+                menus.create(target, menu).open();
             });
             return true;
         }
