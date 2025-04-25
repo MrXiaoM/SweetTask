@@ -1,5 +1,6 @@
 package top.mrxiaom.sweet.taskplugin.gui;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -48,16 +49,12 @@ public class TaskIcon {
                         for (int i = 0; i < task.subTasks.size(); i++) {
                             ITask subTask = task.subTasks.get(i);
                             String taskType = subTask.type();
-                            Integer value = cache.get(i, taskType);
-                            if (value == null) {
-                                lore.add("§cERROR " + taskType);
-                            } else {
-                                List<Pair<String, Object>> replacements = subTask.actionReplacements(value);
-                                String action = Pair.replace(subTask.actionTips(), replacements);
-                                replacements.clear();
-                                for (String line : formatSubTasks) {
-                                    lore.add(line.replace("%action%", action));
-                                }
+                            int value = cache.get(i, taskType);
+                            List<Pair<String, Object>> replacements = subTask.actionReplacements(value);
+                            String action = Pair.replace(subTask.actionTips(), replacements);
+                            replacements.clear();
+                            for (String line : formatSubTasks) {
+                                lore.add(line.replace("%action%", action));
                             }
                         }
                         continue;

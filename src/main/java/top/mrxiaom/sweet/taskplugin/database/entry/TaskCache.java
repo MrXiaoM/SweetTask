@@ -1,6 +1,5 @@
 package top.mrxiaom.sweet.taskplugin.database.entry;
 
-import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.listeners.TaskWrapper;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
@@ -32,13 +31,11 @@ public class TaskCache {
         put(wrapper.index, wrapper.subTask.type(), data);
     }
 
-    @Nullable
-    public Integer get(int index, String subTask) {
-        return subTaskData.get(index + "-" + subTask);
+    public int get(int index, String subTask) {
+        return subTaskData.getOrDefault(index + "-" + subTask, 0);
     }
 
-    @Nullable
-    public Integer get(TaskWrapper wrapper) {
+    public int get(TaskWrapper wrapper) {
         return get(wrapper.index, wrapper.subTask.type());
     }
 
@@ -51,8 +48,7 @@ public class TaskCache {
     }
 
     public boolean hasDone() {
-        Integer i = subTaskData.get(taskId);
-        return i != null && i == 1;
+        return subTaskData.getOrDefault(taskId, 0) == 1;
     }
 
     public boolean checkDone(TaskWrapper wrapper) {
@@ -65,10 +61,9 @@ public class TaskCache {
         for (int i = 0; i < task.subTasks.size(); i++) {
             ITask subTask = task.subTasks.get(i);
             String taskType = subTask.type();
-            Integer value = get(i, taskType);
-            if (value == null) {
+            int value = get(i, taskType);
+            if (!subTaskData.containsKey(i + "-" + taskType)) {
                 put(i, taskType, 0);
-                value = 0;
             }
             if (value < subTask.getTargetValue()) {
                 taskDone = false;
