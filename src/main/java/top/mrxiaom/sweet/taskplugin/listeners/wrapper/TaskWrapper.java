@@ -1,4 +1,4 @@
-package top.mrxiaom.sweet.taskplugin.listeners;
+package top.mrxiaom.sweet.taskplugin.listeners.wrapper;
 
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;

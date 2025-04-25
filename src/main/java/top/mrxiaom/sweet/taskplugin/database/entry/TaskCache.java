@@ -1,7 +1,7 @@
 package top.mrxiaom.sweet.taskplugin.database.entry;
 
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
-import top.mrxiaom.sweet.taskplugin.listeners.TaskWrapper;
+import top.mrxiaom.sweet.taskplugin.listeners.wrapper.TaskWrapper;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 
 import java.time.LocalDateTime;
