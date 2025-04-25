@@ -60,7 +60,8 @@ public class CraftingListener extends AbstractListener<ItemStack, ItemMatcher> {
             if (e.isShiftClick()) {
                 int canCraftTimes = calcCanCraftTimes(craftingTable);
                 int canReceiveAmount = calcCanReceiveAmount(player.getInventory(), item);
-                amount = Math.min(canReceiveAmount, canCraftTimes * onceAmount);
+                int finalAmount = (int) Math.floor((double)canReceiveAmount / onceAmount) * onceAmount;
+                amount = Math.min(finalAmount, canCraftTimes * onceAmount);
             } else {
                 amount = onceAmount;
             }
