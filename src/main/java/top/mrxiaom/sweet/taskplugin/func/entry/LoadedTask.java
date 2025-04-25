@@ -86,6 +86,8 @@ public class LoadedTask {
             ITask task = ITask.load(parent, id, s);
             if (task != null) {
                 subTasks.add(task);
+            } else {
+                parent.warn("[tasks/" + id + "] 无效的子任务: " + s);
             }
         }
         List<IAction> rewards = loadActions(config, "rewards");
