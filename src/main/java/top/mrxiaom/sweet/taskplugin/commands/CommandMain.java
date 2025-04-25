@@ -34,6 +34,7 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (SweetTask.DEBUG && Debug.onCommand(plugin, sender, args)) return true;
         if (args.length >= 2 && "open".equalsIgnoreCase(args[0])) {
             AbstractModel<?, ?> menu = Menus.inst().get(args[1]);
             if (menu == null) {
@@ -98,6 +99,12 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        if (SweetTask.DEBUG) {
+            List<String> debugList = new ArrayList<>();
+            Boolean debug = Debug.onTabComplete(sender, args, debugList);
+            if (debug == null) return null;
+            if (debug) return debugList;
+        }
         if (args.length == 1) {
             return startsWith(sender.isOp() ? listOpArg0 : listArg0, args[0]);
         }
@@ -125,10 +132,10 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
         return emptyList;
     }
 
-    public List<String> startsWith(Collection<String> list, String s) {
+    public static List<String> startsWith(Collection<String> list, String s) {
         return startsWith(null, list, s);
     }
-    public List<String> startsWith(String[] addition, Collection<String> list, String s) {
+    public static List<String> startsWith(String[] addition, Collection<String> list, String s) {
         String s1 = s.toLowerCase();
         List<String> stringList = new ArrayList<>(list);
         if (addition != null) stringList.addAll(0, Lists.newArrayList(addition));
