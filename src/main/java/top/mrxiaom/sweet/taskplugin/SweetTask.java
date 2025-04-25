@@ -127,7 +127,9 @@ public class SweetTask extends BukkitPlugin {
         }
         if (has("PlayerPoints")) {
             PlayerPointsAPI impl = PlayerPoints.getInstance().getAPI();
-            economies.put("PlayerPoints", new PlayerPointsEconomy(impl));
+            PlayerPointsEconomy economy = new PlayerPointsEconomy(impl);
+            economies.put("PlayerPoints", economy);
+            economies.put("PLAYER_POINTS", economy);
         }
     }
 }
