@@ -112,5 +112,5 @@ other-icons:
       - '  &f刷新今日任务列表'
       - ''
       - refresh_operation:DAILY
-    left_click_commands:
+    left-click-commands:
       - '[open]refresh-daily'

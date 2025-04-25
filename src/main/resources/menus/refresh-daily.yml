@@ -43,5 +43,5 @@ other-icons:
   回:
     material: HOPPER
     display: '&e&l返回'
-    left_click_commands:
+    left-click-commands:
       - '[back]'
