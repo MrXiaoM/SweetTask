@@ -192,14 +192,14 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         String sentence;
         boolean mysql = plugin.options.database().isMySQL();
         if (mysql) {
-            sentence = "INSERT INTO `" + TABLE_NAME + "`" +
+            sentence = "INSERT INTO `" + REFRESH_TABLE_NAME + "`" +
                     "(`player`, `count_daily`, `expire_time_daily`, `count_weekly`, `expire_time_weekly`, `count_monthly`, `expire_time_monthly`) " +
                     "VALUES(?, ?, ?, ?, ?, ?, ?) " +
                     "on duplicate key update `count_daily`=?, `expire_time_daily`=?, " +
                     "`count_weekly`=?, `expire_time_weekly`=?, " +
                     "`count_monthly`=?, `expire_time_monthly`=?;";
         } else if (plugin.options.database().isSQLite()) {
-            sentence = "INSERT OR REPLACE INTO `" + TABLE_NAME + "`" +
+            sentence = "INSERT OR REPLACE INTO `" + REFRESH_TABLE_NAME + "`" +
                     "(`player`, `count_daily`, `expire_time_daily`, `count_weekly`, `expire_time_weekly`, `count_monthly`, `expire_time_monthly`) " +
                     "VALUES(?, ?, ?, ?, ?, ?, ?);";
         } else return;
@@ -276,8 +276,9 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         if (DEBUG) {
             plugin.info("玩家 " + player.getName() + " 的数据已拉取");
             for (TaskCache task : tasksMap.values()) {
-                plugin.info("  任务 " + task.taskId + " 的数据如下:");
+                plugin.info("  任务 " + task.taskId + " 的数据如下: (" + (task.hasDone() ? "已完成" : "未完成") + ")");
                 for (Map.Entry<String, Integer> entry : task.subTaskData.entrySet()) {
+                    if (entry.getKey().equals(task.taskId)) continue;
                     plugin.info("    " + entry.getKey() + " = " + entry.getValue());
                 }
             }
