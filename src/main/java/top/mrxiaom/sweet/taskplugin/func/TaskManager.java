@@ -355,29 +355,48 @@ public class TaskManager extends AbstractModule {
 
     public LocalDateTime nextOutdate(EnumTaskType type) {
         LocalDateTime now = LocalDateTime.now();
-        boolean addOneDay = now.toLocalTime().isAfter(resetTime);
+        LocalTime currentTime = now.toLocalTime();
         switch (type) {
             case DAILY: {
                 LocalDateTime time = now.toLocalDate()
                         .plusDays(1)
                         .atTime(resetTime);
-                return addOneDay ? time.plusDays(1) : time;
+                // 如果 当前时间 已经过了 过期时间
+                if (currentTime.isAfter(resetTime)) {
+                    // +1天
+                    return time.plusDays(1);
+                } else {
+                    return time;
+                }
             }
             case WEEKLY:
                 LocalDate date;
-                if (!now.getDayOfWeek().equals(DayOfWeek.MONDAY)) { // 重置回周一
+                // 如果今天不是周一，重置回本周一，再加一周
+                if (!now.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
                     date = now.toLocalDate()
                             .minusDays(now.getDayOfWeek().getValue() - 1)
                             .plusWeeks(1);
+                    // 返回下一周的过期时间
+                    return date.atTime(resetTime);
                 } else {
-                    date = now.toLocalDate()
-                            .plusWeeks(1);
+                    // 如果今天是周一，且 当前时间 已经过了 过期时间
+                    if (currentTime.isAfter(resetTime)) {
+                        // 返回下一周的 过期时间
+                        date = now.toLocalDate()
+                                .plusWeeks(1);
+                        return date.atTime(resetTime);
+                    } else {
+                        // 如果今天是周一，没到 过期时间，返回今天的 过期时间
+                        return now.toLocalDate().atTime(resetTime);
+                    }
                 }
-                return date.atTime(resetTime);
             case MONTHLY:
-                if (now.getDayOfMonth() == 1 && addOneDay) {
+                // 如果今天是当月1号，且没有到 过期时间
+                if (now.getDayOfMonth() == 1 && currentTime.isBefore(resetTime)) {
+                    // 返回今天的过期时间
                     return now.toLocalDate().atTime(resetTime);
                 }
+                // 否则返回下个月1号的 过期时间
                 return now.toLocalDate()
                         .plusMonths(1)
                         .withDayOfMonth(1)
