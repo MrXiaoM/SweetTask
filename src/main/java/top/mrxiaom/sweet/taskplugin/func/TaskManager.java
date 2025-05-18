@@ -355,7 +355,7 @@ public class TaskManager extends AbstractModule {
 
     public LocalDateTime nextOutdate(EnumTaskType type) {
         LocalDateTime now = LocalDateTime.now();
-        boolean addOneDay = now.toLocalTime().isBefore(resetTime);
+        boolean addOneDay = now.toLocalTime().isAfter(resetTime);
         switch (type) {
             case DAILY: {
                 LocalDateTime time = now.toLocalDate()
