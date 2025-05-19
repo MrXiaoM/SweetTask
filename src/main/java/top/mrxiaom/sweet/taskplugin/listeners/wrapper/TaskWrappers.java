@@ -4,10 +4,10 @@ import java.util.List;
 
 public class TaskWrappers<T> {
     public final T matcher;
-    public final List<TaskWrapper> subTasks;
+    public final List<TaskWrapper> tasks;
 
-    public TaskWrappers(T matcher, List<TaskWrapper> subTasks) {
+    public TaskWrappers(T matcher, List<TaskWrapper> tasks) {
         this.matcher = matcher;
-        this.subTasks = subTasks;
+        this.tasks = tasks;
     }
 }

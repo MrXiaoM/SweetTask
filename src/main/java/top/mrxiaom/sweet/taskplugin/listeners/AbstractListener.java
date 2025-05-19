@@ -74,8 +74,9 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
                 taskCollection = plugin.getDatabase().getTasks(player);
             }
             // 对所有满足条件的子任务数据 进行增加
-            for (TaskWrapper wrapper : value.subTasks) {
+            for (TaskWrapper wrapper : value.tasks) {
                 TaskCache taskCache = taskCollection.tasks.get(wrapper.task.id);
+                if (taskCache == null) continue; // 玩家有可能没有领取该类型的任务
                 int max = wrapper.subTask.getTargetValue();
                 int old = taskCache.get(wrapper, 0);
                 if (old >= max) continue; // 已经满了的子任务进度不提示消息
