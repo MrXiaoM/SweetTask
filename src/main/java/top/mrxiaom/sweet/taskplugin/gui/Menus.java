@@ -1,5 +1,6 @@
 package top.mrxiaom.sweet.taskplugin.gui;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
@@ -7,6 +8,8 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +30,37 @@ import java.util.function.BiConsumer;
 public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
     public Menus(BukkitPlugin plugin) {
         super(plugin, "[menus]");
+        plugin.getScheduler().runTaskTimer(this::updateItems, 20L, 20L);
+    }
+
+    private void updateItems() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            InventoryView view = player.getOpenInventory();
+            Inventory inv = view.getTopInventory();
+            InventoryHolder holder = inv.getHolder();
+            if (holder instanceof Impl) {
+                boolean modified = false;
+                Impl<?, ?> impl = (Impl<?, ?>) holder;
+                AbstractModel<?, ?> abstractModel = impl.getModel();
+                if (abstractModel instanceof MenuModel) {
+                    MenuModel model = (MenuModel) abstractModel;
+                    for (int i = 0; i < inv.getSize(); i++) {
+                        Character id = impl.getClickedId(i);
+                        TaskIcon icon = id == null ? null : model.mainIcon(id);
+                        if (icon != null) {
+                            ItemStack newIcon = model.applyMainIcon(impl, player, id, i, 0);
+                            if (newIcon != null) {
+                                inv.setItem(i, newIcon);
+                                modified = true;
+                            }
+                        }
+                    }
+                }
+                if (modified) {
+                    Util.submitInvUpdate(player);
+                }
+            }
+        }
     }
 
     private void saveMenu(File folder, String... names) {
@@ -82,6 +116,10 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
             this.parent = parent;
             this.playerCache = playerCache;
             this.data = model.createData(player, playerCache);
+        }
+
+        public AbstractModel<T, D> getModel() {
+            return model;
         }
 
         public void setClickLock(boolean lock) {
