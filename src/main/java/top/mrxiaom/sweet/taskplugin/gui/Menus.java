@@ -113,7 +113,7 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
             T icon = model.mainIcon(clickedId);
             if (icon != null) {
                 if (model.click(this, player, icon, click, slot)) {
-                    plugin.getScheduler().runTask(() -> updateInventory(view));
+                    plugin.getScheduler().runTask(() -> updateInventory(view.getTopInventory()));
                 }
                 return;
             }
