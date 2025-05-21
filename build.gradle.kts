@@ -37,6 +37,9 @@ dependencies {
     implementation("com.zaxxer:HikariCP:4.0.3") { isTransitive = false }
     implementation("org.jetbrains:annotations:24.0.0")
     implementation("top.mrxiaom:PluginBase:1.4.3")
+
+    testImplementation("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
+    testImplementation("junit:junit:4.13.2")
 }
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
