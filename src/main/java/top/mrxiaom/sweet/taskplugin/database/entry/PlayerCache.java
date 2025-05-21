@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.utils.Pair;
+import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
@@ -29,7 +30,6 @@ public class PlayerCache {
     public PlayerCache(Player player, Map<String, TaskCache> tasks) {
         this.player = player;
         this.tasks = tasks;
-        removeOutdatedTasks();
     }
 
     public void scheduleSubmit(int seconds) {
@@ -208,6 +208,9 @@ public class PlayerCache {
         for (String key : keys) {
             TaskCache sub = tasks.get(key);
             if (now.isAfter(sub.expireTime)) {
+                if (SweetTask.DEBUG) {
+                    SweetTask.getInstance().info("[" + player.getName() + "] 已移除过期任务 " + key + " (到期时间: " + sub.expireTime + ")");
+                }
                 tasks.remove(key);
                 modified = true;
             }

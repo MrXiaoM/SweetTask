@@ -40,9 +40,11 @@ public class Debug {
             }
             StringBuilder sb = new StringBuilder();
             for (TaskCache cache : playerCache.tasks.values()) {
-                sb.append("\n").append("  &e任务 ").append(cache.taskId).append(" 的子任务数据");
+                sb.append("\n").append("  &e任务 ").append(cache.taskId).append(" 的任务数据");
+                sb.append("\n").append("    &e到期时间: &f").append(cache.expireTime);
+                sb.append("\n").append("    &e子任务列表: &7(").append(cache.subTaskData.size()).append(")");
                 for (Map.Entry<String, Integer> entry : cache.subTaskData.entrySet()) {
-                    sb.append("\n").append("    &b").append(entry.getKey()).append(" : &f").append(entry.getValue());
+                    sb.append("\n").append("      &b").append(entry.getKey()).append(" : &f").append(entry.getValue());
                 }
             }
             return t(sender, nextSubmitTime + sb);

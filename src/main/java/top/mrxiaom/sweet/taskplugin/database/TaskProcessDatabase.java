@@ -262,27 +262,25 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
                 String subTaskId = result.getString("sub_task_id");
                 int data = result.getInt("data");
                 Timestamp expireTime = result.getTimestamp("expire_time");
-                Timestamp now = Timestamp.valueOf(LocalDateTime.now());
-                if (now.after(expireTime)) {
-                    if (DEBUG) plugin.warn("  任务" + taskId + ": 子任务 " + subTaskId + " 已到期 (" + expireTime.getTime() + ")");
-                    // 已过期任务不加入结果中
-                    continue;
-                }
+
                 TaskCache task = tasksMap.computeIfAbsent(taskId, it -> new TaskCache(it, expireTime.toLocalDateTime()));
                 task.put(subTaskId, data);
             }
         }
         PlayerCache cache = new PlayerCache(player, tasksMap);
         if (DEBUG) {
+            LocalDateTime now = LocalDateTime.now();
             plugin.info("玩家 " + player.getName() + " 的数据已拉取");
             for (TaskCache task : tasksMap.values()) {
                 plugin.info("  任务 " + task.taskId + " 的数据如下: (" + (task.hasDone() ? "已完成" : "未完成") + ")");
+                plugin.info("    到期时间 = " + task.expireTime + " (" + (now.isAfter(task.expireTime) ? "已到期" : "未到期") + ")");
                 for (Map.Entry<String, Integer> entry : task.subTaskData.entrySet()) {
                     if (entry.getKey().equals(task.taskId)) continue;
                     plugin.info("    " + entry.getKey() + " = " + entry.getValue());
                 }
             }
         }
+        cache.removeOutdatedTasks();
         // 获取玩家的刷新次数以及到期时间数据
         try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM `" + REFRESH_TABLE_NAME + "` " +
                 "WHERE `player`=?")) {
