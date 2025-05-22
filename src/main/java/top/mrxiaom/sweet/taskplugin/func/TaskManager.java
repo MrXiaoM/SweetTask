@@ -257,9 +257,9 @@ public class TaskManager extends AbstractModule {
                 String id = available.remove(index);
                 LoadedTask task = getTask(id);
                 if (task != null) {
-                    if (DEBUG) info("添加任务 " + task.id + ": " + task.name);
                     modified = true;
                     LocalDateTime expireTime = nextOutdate(task.type);
+                    if (DEBUG) info("添加任务 " + task.id + ": " + task.name + " (" + expireTime + "过期)");
                     playerCaches.addTask(task, expireTime);
                 } else {
                     if (DEBUG) warn("任务 " + id + " 不存在");
@@ -276,9 +276,9 @@ public class TaskManager extends AbstractModule {
                 String id = available.remove(index);
                 LoadedTask task = getTask(id);
                 if (task != null) {
-                    if (DEBUG) info("添加任务 " + task.id + ": " + task.name);
                     modified = true;
                     LocalDateTime expireTime = nextOutdate(task.type);
+                    if (DEBUG) info("添加任务 " + task.id + ": " + task.name + " (" + expireTime + "过期)");
                     playerCaches.addTask(task, expireTime);
                 } else {
                     if (DEBUG) warn("任务 " + id + " 不存在");
@@ -295,9 +295,9 @@ public class TaskManager extends AbstractModule {
                 String id = available.remove(index);
                 LoadedTask task = getTask(id);
                 if (task != null) {
-                    if (DEBUG) info("添加任务 " + task.id + ": " + task.name);
                     modified = true;
                     LocalDateTime expireTime = nextOutdate(task.type);
+                    if (DEBUG) info("添加任务 " + task.id + ": " + task.name + " (" + expireTime + "过期)");
                     playerCaches.addTask(task, expireTime);
                 } else {
                     if (DEBUG) warn("任务 " + id + " 不存在");

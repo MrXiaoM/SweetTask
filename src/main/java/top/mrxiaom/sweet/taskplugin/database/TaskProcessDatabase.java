@@ -157,7 +157,8 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
     public void onPlayerJoin(PlayerJoinEvent e) {
         if (disabling) return;
         Player player = e.getPlayer();
-        cleanExpiredTasks(player);
+        caches.remove(id(player));
+        // cleanExpiredTasks(player);
         PlayerCache cache = getTasks(player);
         TaskManager.inst().checkTasksAsync(cache);
     }
@@ -303,25 +304,6 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         }
         caches.put(id, cache);
         return cache;
-    }
-
-    public void cleanExpiredTasks(Player player) {
-        String id = id(player);
-        caches.remove(id);
-        String sentence;
-        if (plugin.options.database().isMySQL()) {
-            sentence = "DELETE FROM `" + TABLE_NAME + "` WHERE `player`=? AND NOW() >= `expire_time`;";
-        } else if (plugin.options.database().isSQLite()) {
-            sentence = "DELETE FROM `" + TABLE_NAME + "` WHERE `player`=? AND datetime('now') >= `expire_time`;";
-        } else return;
-        try (Connection conn = plugin.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sentence)) {
-            ps.setString(1, id);
-            ps.execute();
-            refreshCache(conn, id, player);
-        } catch (SQLException e) {
-            warn(e);
-        }
     }
 
     public void addTask(Player player, LoadedTask task, LocalDateTime expireTime) {
