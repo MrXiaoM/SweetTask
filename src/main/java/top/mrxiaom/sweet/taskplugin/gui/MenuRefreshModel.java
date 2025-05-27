@@ -85,6 +85,9 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
             return false;
         }
         icon.economy.take(player, icon.money);
+        if (SweetTask.DEBUG) {
+            SweetTask.getInstance().info("玩家 " + player.getName() + " 提交了刷新任务请求");
+        }
         gui.playerCache.submitRefresh(refreshType, () -> {
             if (!refreshTips.isEmpty()) {
                 AdventureUtil.sendMessage(player, refreshTips);

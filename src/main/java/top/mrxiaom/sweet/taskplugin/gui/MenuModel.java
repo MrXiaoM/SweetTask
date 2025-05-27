@@ -11,6 +11,7 @@ import top.mrxiaom.pluginbase.func.gui.IModifier;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
@@ -222,6 +223,9 @@ public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
                 }
             }
             if (taskDone) {
+                if (SweetTask.DEBUG) {
+                    SweetTask.getInstance().info("玩家 " + player.getName() + " 完成了任务 " + task.name + " (" + task.id + ")");
+                }
                 cache.put(task.id, 1);
                 task.giveRewards(player);
                 gui.getPlugin().getDatabase().submitCache(player);
