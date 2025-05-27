@@ -1,13 +1,16 @@
 plugins {
     java
     `maven-publish`
-    id ("com.github.johnrengelman.shadow") version "7.0.0"
+    id ("com.gradleup.shadow") version "8.3.0"
 }
 
 group = "top.mrxiaom.sweet.taskplugin"
 version = "1.0.0"
 val targetJavaVersion = 8
 val shadowGroup = "top.mrxiaom.sweet.taskplugin.libs"
+var isRelease = gradle.startParameter.taskNames.run {
+    contains("release") || contains("publishToMavenLocal")
+}
 
 repositories {
     mavenCentral()
@@ -36,7 +39,7 @@ dependencies {
     implementation("de.tr7zw:item-nbt-api:2.15.0")
     implementation("com.zaxxer:HikariCP:4.0.3") { isTransitive = false }
     implementation("org.jetbrains:annotations:24.0.0")
-    implementation("top.mrxiaom:PluginBase:1.4.3")
+    implementation("top.mrxiaom:PluginBase:1.4.4")
 
     testImplementation("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
     testImplementation("junit:junit:4.13.2")
@@ -48,6 +51,9 @@ java {
     }
 }
 tasks {
+    jar {
+        archiveClassifier.set("api")
+    }
     shadowJar {
         archiveClassifier.set("")
         mapOf(
@@ -61,6 +67,7 @@ tasks {
             relocate(original, "$shadowGroup.$target")
         }
     }
+    create("release")
     build {
         dependsOn(shadowJar)
     }
@@ -73,7 +80,13 @@ tasks {
     processResources {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
         from(sourceSets.main.get().resources.srcDirs) {
-            expand(mapOf("version" to version))
+            expand(mapOf(
+                "version" to if (isRelease) {
+                    project.version
+                } else {
+                    "${project.version}-SNAPSHOT"
+                }
+            ))
             include("plugin.yml")
         }
     }

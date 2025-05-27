@@ -39,6 +39,7 @@ public class SweetTask extends BukkitPlugin {
                 .reconnectDatabaseWhenReloadConfig(false)
                 .scanIgnore("top.mrxiaom.sweet.taskplugin.libs")
         );
+        DEBUG = getDescription().getVersion().endsWith("-SNAPSHOT");
     }
     TaskProcessDatabase taskProcessDatabase;
     Map<String, IEconomy> economies = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -63,6 +64,9 @@ public class SweetTask extends BukkitPlugin {
         MinecraftVersion.disableUpdateCheck();
         MinecraftVersion.disableBStats();
         MinecraftVersion.getVersion();
+        if (DEBUG) {
+            info("调试模式已开启");
+        }
     }
 
     @Override
