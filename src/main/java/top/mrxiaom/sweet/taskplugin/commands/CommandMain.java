@@ -77,6 +77,15 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             plugin.getDatabase().resetTask(task);
             return t(sender, "&a刷新完成，详见服务器控制台");
         }
+        if (args.length == 2 && "refresh".equalsIgnoreCase(args[0]) && sender.isOp()) {
+            Player player = Util.getOnlinePlayer(args[1]).orElse(null);
+            if (player == null) {
+                return t(sender, "&e玩家不在线 (或不存在)");
+            }
+            PlayerCache cache = plugin.getDatabase().getTasks(player);
+            cache.submitRefresh(null, () -> {});
+            return t(sender, "&a已刷新玩家 &e" + player.getName() + " &a的任务");
+        }
         if (args.length >= 1 && "reload".equalsIgnoreCase(args[0]) && sender.isOp()) {
             if (args.length == 2 && "database".equalsIgnoreCase(args[1])) {
                 DatabaseHolder db = plugin.options.database();
@@ -92,14 +101,10 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
 
     private static final List<String> emptyList = Lists.newArrayList();
     private static final List<String> listArg0 = Lists.newArrayList(
-            "open", "refresh");
+            "open");
     private static final List<String> listOpArg0 = Lists.newArrayList(
             "open", "refresh", "reset", "reload");
     private static final List<String> listArg1Reload = Lists.newArrayList("database");
-    private static final List<String> listArg1Refresh = Arrays.stream(EnumTaskType.values())
-            .map(Enum::name)
-            .map(String::toLowerCase)
-            .collect(Collectors.toList());
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
@@ -124,8 +129,8 @@ public class CommandMain extends AbstractModule implements CommandExecutor, TabC
             if ("open".equalsIgnoreCase(args[0])) {
                 return startsWith(Menus.inst().keys(sender), args[1]);
             }
-            if ("refresh".equalsIgnoreCase(args[0])) {
-                return startsWith(listArg1Refresh, args[1]);
+            if ("refresh".equalsIgnoreCase(args[0]) && sender.isOp()) {
+                return null;
             }
         }
         if (args.length == 3) {

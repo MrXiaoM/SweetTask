@@ -79,18 +79,20 @@ public class PlayerCache {
             refreshCountExpireMonthly = manager.nextOutdate(EnumTaskType.MONTHLY);
             refreshCountMonthly = 0;
         }
-        switch (type) {
-            case DAILY:
-                refreshCountDaily++;
-                break;
-            case WEEKLY:
-                refreshCountWeekly++;
-                break;
-            case MONTHLY:
-                refreshCountMonthly++;
-                break;
-            default:
-                return;
+        if (type != null) {
+            switch (type) {
+                case DAILY:
+                    refreshCountDaily++;
+                    break;
+                case WEEKLY:
+                    refreshCountWeekly++;
+                    break;
+                case MONTHLY:
+                    refreshCountMonthly++;
+                    break;
+                default:
+                    return;
+            }
         }
         manager.plugin.getDatabase().submitRefreshCount(player, refreshCountDaily, refreshCountWeekly, refreshCountMonthly);
         tasks.clear();
