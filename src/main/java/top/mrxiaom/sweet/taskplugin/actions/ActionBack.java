@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.api.IAction;
 import top.mrxiaom.pluginbase.api.IActionProvider;
 import top.mrxiaom.pluginbase.func.GuiManager;
-import top.mrxiaom.pluginbase.gui.IGui;
+import top.mrxiaom.pluginbase.gui.IGuiHolder;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.sweet.taskplugin.gui.Menus;
 
@@ -25,8 +25,8 @@ public class ActionBack implements IAction {
 
     @Override
     public void run(Player player, @Nullable List<Pair<String, Object>> replacements) {
-        IGui gui = GuiManager.inst().getOpeningGui(player);
-        IGui parent = gui instanceof Menus.Impl ? ((Menus.Impl<?, ?>) gui).parent : null;
+        IGuiHolder gui = GuiManager.inst().getOpeningGui(player);
+        IGuiHolder parent = gui instanceof Menus.Impl ? ((Menus.Impl<?, ?>) gui).parent : null;
         if (parent != null) {
             parent.open();
         } else {

@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.api.IAction;
 import top.mrxiaom.pluginbase.api.IActionProvider;
 import top.mrxiaom.pluginbase.func.GuiManager;
-import top.mrxiaom.pluginbase.gui.IGui;
+import top.mrxiaom.pluginbase.gui.IGuiHolder;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.sweet.taskplugin.gui.AbstractModel;
 import top.mrxiaom.sweet.taskplugin.gui.IMenuCondition;
@@ -32,7 +32,7 @@ public class ActionOpenGui implements IAction {
 
     @Override
     public void run(Player player, @Nullable List<Pair<String, Object>> replacements) {
-        IGui parent = GuiManager.inst().getOpeningGui(player);
+        IGuiHolder parent = GuiManager.inst().getOpeningGui(player);
         Menus menus = Menus.inst();
         AbstractModel<?, ?> menu = menus.get(id);
         if (menu != null) {

@@ -1,6 +1,7 @@
 package top.mrxiaom.sweet.taskplugin.utils;
 
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.pluginbase.utils.CollectionUtils;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
 
@@ -31,7 +32,7 @@ public class Utils {
             }
         }
         if (index == startIndex) return null;
-        List<String> split = Util.split(String.join("", list), ',');
+        List<String> split = CollectionUtils.split(String.join("", list), ',');
         list.clear();
         return Pair.of(split, index);
     }

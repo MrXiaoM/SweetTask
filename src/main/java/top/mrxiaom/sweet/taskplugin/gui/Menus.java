@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
-import top.mrxiaom.pluginbase.gui.IGui;
+import top.mrxiaom.pluginbase.gui.IGuiHolder;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
@@ -37,7 +37,7 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
         for (Player player : Bukkit.getOnlinePlayers()) {
             InventoryView view = player.getOpenInventory();
             Inventory inv = view.getTopInventory();
-            InventoryHolder holder = inv.getHolder();
+            InventoryHolder holder = Util.getHolder(inv);
             if (holder instanceof Impl) {
                 boolean modified = false;
                 Impl<?, ?> impl = (Impl<?, ?>) holder;
@@ -97,7 +97,7 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
     public Impl<?, ?> create(@NotNull Player player, @NotNull AbstractModel<?, ?> menu) {
         return create(null, player, menu);
     }
-    public Impl<?, ?> create(@Nullable IGui parent, @NotNull Player player, @NotNull AbstractModel<?, ?> menu) {
+    public Impl<?, ?> create(@Nullable IGuiHolder parent, @NotNull Player player, @NotNull AbstractModel<?, ?> menu) {
         PlayerCache playerCache = plugin.getDatabase().getTasks(player);
         return new Impl<>(parent, player, menu, playerCache);
     }
@@ -106,12 +106,13 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
         return instanceOf(Menus.class);
     }
 
-    public class Impl<T, D extends IMenuData> extends Gui<AbstractModel<T, D>> {
-        public final @Nullable IGui parent;
+    @SuppressWarnings({"unchecked"})
+    public class Impl<T, D extends IMenuData> extends Gui {
+        public final @Nullable IGuiHolder parent;
         public PlayerCache playerCache;
         public final D data;
         private boolean clickLock = false;
-        protected Impl(@Nullable IGui parent, @NotNull Player player, @NotNull AbstractModel<T, D> model, PlayerCache playerCache) {
+        protected Impl(@Nullable IGuiHolder parent, @NotNull Player player, @NotNull AbstractModel<T, D> model, PlayerCache playerCache) {
             super(player, model);
             this.parent = parent;
             this.playerCache = playerCache;
@@ -119,7 +120,7 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
         }
 
         public AbstractModel<T, D> getModel() {
-            return model;
+            return (AbstractModel<T, D>) model;
         }
 
         public void setClickLock(boolean lock) {
@@ -148,9 +149,9 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
             Character clickedId = getClickedId(slot);
             if (clickedId == null) return;
 
-            T icon = model.mainIcon(clickedId);
+            T icon = (T) model.mainIcon(clickedId);
             if (icon != null) {
-                if (model.click(this, player, icon, click, slot)) {
+                if (model.click((Impl) this, player, icon, click, slot)) {
                     plugin.getScheduler().runTask(() -> updateInventory(view.getTopInventory()));
                 }
                 return;

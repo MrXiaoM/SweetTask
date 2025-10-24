@@ -177,8 +177,9 @@ public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
     @Override
     public boolean click(
             Menus.Impl<TaskIcon, Data> gui, Player player,
-            TaskIcon icon, ClickType click, int invSlot
+            Object iconObj, ClickType click, int invSlot
     ) {
+        TaskIcon icon = (TaskIcon) iconObj;
         Pair<LoadedTask, TaskCache> pair = gui.data.getTask(icon.type, icon.index);
         if (pair != null) {
             LoadedTask task = pair.getKey();
@@ -228,7 +229,9 @@ public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
                 }
                 cache.put(task.id, 1);
                 task.giveRewards(player);
-                gui.getPlugin().getDatabase().submitCache(player);
+                gui.getPlugin().getScheduler().runTaskAsync(() -> {
+                    gui.getPlugin().getDatabase().submitCache(player);
+                });
             } else {
                 if (submitItemFlag) {
                     t(player, "&a已提交物品到任务");

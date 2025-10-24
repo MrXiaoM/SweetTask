@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.gui.IModifier;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
+import top.mrxiaom.pluginbase.utils.CollectionUtils;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
@@ -110,7 +111,7 @@ public class TaskIcon {
 
     @Nullable
     public static TaskIcon load(Menus parent, String parentId, ConfigurationSection section, String key) {
-        List<String> typeString = Util.split(section.getString(key + ".type", ""), '/');
+        List<String> typeString = CollectionUtils.split(section.getString(key + ".type", ""), '/');
         if (typeString.size() != 2) {
             parent.warn("[menus/" + parentId + "] 任务图标 " + key + " 的 type 格式有误");
             return null;

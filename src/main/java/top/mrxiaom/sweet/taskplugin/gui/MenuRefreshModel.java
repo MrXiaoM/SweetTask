@@ -64,7 +64,7 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
     @Override
     public boolean click(
             Menus.Impl<RefreshIcon, Data> gui, Player player,
-            RefreshIcon icon, ClickType click, int invSlot
+            Object iconObj, ClickType click, int invSlot
     ) {
         gui.setClickLock(true);
         Boolean refresh = gui.playerCache.canRefresh(refreshType);
@@ -78,6 +78,7 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
             player.closeInventory();
             return false;
         }
+        RefreshIcon icon = (RefreshIcon) iconObj;
         if (!icon.economy.has(player, icon.money)) {
             if (!icon.tipsNoMoney.isEmpty()) {
                 AdventureUtil.sendMessage(player, icon.tipsNoMoney);

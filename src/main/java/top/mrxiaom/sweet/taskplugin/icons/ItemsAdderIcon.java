@@ -2,7 +2,7 @@ package top.mrxiaom.sweet.taskplugin.icons;
 
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import top.mrxiaom.pluginbase.utils.IA;
+import top.mrxiaom.pluginbase.utils.depend.IA;
 
 public class ItemsAdderIcon implements IconProvider {
     private final String id;

@@ -4,7 +4,7 @@ import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import top.mrxiaom.pluginbase.utils.AdventureUtil;
-import top.mrxiaom.pluginbase.utils.PAPI;
+import top.mrxiaom.pluginbase.utils.depend.PAPI;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;

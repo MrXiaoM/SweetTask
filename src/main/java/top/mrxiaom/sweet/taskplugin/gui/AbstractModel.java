@@ -7,7 +7,7 @@ import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.gui.IModel;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
-import top.mrxiaom.pluginbase.gui.IGui;
+import top.mrxiaom.pluginbase.gui.IGuiHolder;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 
 import java.util.Map;
@@ -65,13 +65,13 @@ public abstract class AbstractModel<T, D extends IMenuData> implements IModel {
 
     @Override
     @SuppressWarnings({"unchecked"})
-    public ItemStack applyMainIcon(IGui instance, Player player, char id, int index, int appearTimes) {
+    public ItemStack applyMainIcon(IGuiHolder instance, Player player, char id, int index, int appearTimes) {
         return applyMainIcon((Menus.Impl<T, D>) instance, player, id, index, appearTimes);
     }
 
     @Override
     @SuppressWarnings({"unchecked"})
-    public ItemStack applyMainIcon(IGui instance, Player player, char id, int index, int appearTimes, AtomicBoolean ignore) {
+    public ItemStack applyMainIcon(IGuiHolder instance, Player player, char id, int index, int appearTimes, AtomicBoolean ignore) {
         return applyMainIcon((Menus.Impl<T, D>) instance, player, id, index, appearTimes, ignore);
     }
 
@@ -85,7 +85,7 @@ public abstract class AbstractModel<T, D extends IMenuData> implements IModel {
 
     public abstract boolean click(
             Menus.Impl<T, D> gui, Player player,
-            T icon, ClickType click, int invSlot
+            Object iconObj, ClickType click, int invSlot
     );
 
     public abstract D createData(Player player, PlayerCache playerCache);
