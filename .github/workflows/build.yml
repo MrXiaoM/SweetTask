@@ -32,6 +32,5 @@ jobs:
         with:
           name: SweetTask
           path: |
-            build/libs/*.jar
-            !build/libs/*-api.jar
+            out/*.jar
           if-no-files-found: error

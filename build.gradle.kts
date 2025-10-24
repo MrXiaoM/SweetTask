@@ -87,8 +87,14 @@ tasks {
         }
     }
     create("release")
-    build {
+    val copyTask = create<Copy>("copyBuildArtifact") {
         dependsOn(shadowJar)
+        from(shadowJar.get().outputs)
+        rename { "${project.name}-$version.jar" }
+        into(rootProject.file("out"))
+    }
+    build {
+        dependsOn(copyTask)
     }
     withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
