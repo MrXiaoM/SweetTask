@@ -77,7 +77,6 @@ tasks {
     shadowJar {
         mapOf(
             "top.mrxiaom.pluginbase" to "base",
-            "com.zaxxer.hikari" to "hikari",
             "de.tr7zw.changeme.nbtapi" to "nbtapi",
             "com.tcoded.folialib" to "folialib",
         ).forEach { (original, target) ->
