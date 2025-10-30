@@ -46,6 +46,7 @@ dependencies {
     base.library("net.kyori:adventure-platform-bukkit:4.4.0")
     base.library("net.kyori:adventure-text-minimessage:4.21.0")
     base.library("com.zaxxer:HikariCP:4.0.3")
+
     implementation("de.tr7zw:item-nbt-api:2.15.3")
     implementation("top.mrxiaom.pluginbase:library:$pluginBaseVersion")
     implementation("top.mrxiaom.pluginbase:paper:$pluginBaseVersion")
@@ -81,7 +82,6 @@ tasks {
             "top.mrxiaom.pluginbase" to "base",
             "com.zaxxer.hikari" to "hikari",
             "de.tr7zw.changeme.nbtapi" to "nbtapi",
-            "net.kyori" to "kyori",
         ).forEach { (original, target) ->
             relocate(original, "$shadowGroup.$target")
         }
