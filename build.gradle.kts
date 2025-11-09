@@ -29,6 +29,7 @@ repositories {
     maven("https://repo.helpch.at/releases/")
     maven("https://jitpack.io")
     maven("https://repo.rosewooddev.io/repository/public/")
+    maven("https://repo.momirealms.net/releases/")
 }
 
 dependencies {
@@ -41,6 +42,7 @@ dependencies {
     compileOnly("io.lumine:LumineUtils:1.20-SNAPSHOT")
     compileOnly("net.milkbowl.vault:VaultAPI:1.7")
     compileOnly("org.black_ixx:playerpoints:3.2.7")
+    compileOnly("net.momirealms:custom-fishing:2.3.7")
     compileOnly("org.jetbrains:annotations:24.0.0")
 
     base.library("net.kyori:adventure-api:4.21.0")

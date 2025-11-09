@@ -144,6 +144,9 @@ public class SweetTask extends BukkitPlugin {
         TaskFishing.register();
         TaskSubmitItem.register();
         TaskKill.register();
+        if (Bukkit.getPluginManager().isPluginEnabled("CustomFishing")) {
+            TaskCustomFishing.register();
+        }
     }
 
     private static boolean has(String pluginName) {
