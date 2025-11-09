@@ -20,13 +20,10 @@ import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.gui.AbstractModel;
 import top.mrxiaom.sweet.taskplugin.gui.IMenuCondition;
 import top.mrxiaom.sweet.taskplugin.gui.Menus;
-import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @AutoRegister
 public class CommandMain extends AbstractModule implements CommandExecutor, TabCompleter, Listener {

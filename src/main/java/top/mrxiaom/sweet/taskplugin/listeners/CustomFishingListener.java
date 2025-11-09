@@ -6,17 +6,14 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.inventory.ItemStack;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.listeners.wrapper.TaskWrapper;
 import top.mrxiaom.sweet.taskplugin.matchers.FishMatcher;
-import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 import top.mrxiaom.sweet.taskplugin.tasks.TaskCustomFishing;
-import top.mrxiaom.sweet.taskplugin.tasks.TaskFishing;
 
 import java.util.List;
 import java.util.Map;

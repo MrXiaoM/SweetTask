@@ -29,7 +29,7 @@ public class CustomFishMatcher implements FishMatcher {
     public boolean match(Context<Player> context) {
         String id = context.arg(ContextKeys.ID);
         if (id == null) return false;
-        if (requireId != null && !requireId.equals(id)) return false;
+        if (requireId != null && !requireId.equalsIgnoreCase(id)) return false;
         Float rawSize = context.arg(ContextKeys.SIZE);
         float size = rawSize == null ? 0.0f : rawSize;
         return requireSize == null || size >= requireSize;

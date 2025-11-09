@@ -1,12 +1,8 @@
 package top.mrxiaom.sweet.taskplugin.matchers;
 
 import net.momirealms.customfishing.api.mechanic.context.Context;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import top.mrxiaom.pluginbase.utils.ItemStackUtil;
-import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
 
 public interface FishMatcher {
