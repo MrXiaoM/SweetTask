@@ -44,6 +44,7 @@ public class FishingListener extends AbstractListener<ItemStack, ItemMatcher> {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onFishing(PlayerFishEvent e) {
         if (e.isCancelled()) return;
+        if (!e.getState().equals(PlayerFishEvent.State.CAUGHT_FISH)) return;
         Player player = e.getPlayer();
         if (e.getCaught() instanceof Item) {
             ItemStack item = ((Item) e.getCaught()).getItemStack();
