@@ -1,6 +1,5 @@
 # 任务类型
 # DAILY 每日，WEEKLY 每周，MONTHLY 每月
-# ONE_TIME 一次性
 type: DAILY
 # 任务的稀有度（百分比）
 # 每日、每周、每月任务能抽到该任务的概率
@@ -18,6 +17,7 @@ name: '示例任务'
 # 任务描述
 description: []
 # 子任务列表，编写规则详见插件文档
+# https://plugins.mcio.dev/docs/task/sub_tasks
 # 在子任务确定之后，尽量不要添加或删除任务
 # 如果要这么做，请在修改后执行 /sweettask reset <任务ID> 重置所有玩家的子任务计数
 sub-tasks:
