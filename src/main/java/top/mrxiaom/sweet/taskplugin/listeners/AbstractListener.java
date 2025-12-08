@@ -83,6 +83,7 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
                 if (old >= max) continue; // 已经满了的子任务进度不提示消息
                 // 增加后的数值
                 int data = strict(old + add, 0, max);
+                if (data == old) continue; // 如果数值未改变，不进行操作
                 taskCache.put(wrapper, data);
                 if (!changed) {
                     // 只打印第一条 Action 消息
