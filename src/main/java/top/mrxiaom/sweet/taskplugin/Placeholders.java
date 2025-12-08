@@ -22,6 +22,11 @@ public class Placeholders extends PlaceholderExpansion {
     }
 
     @Override
+    public boolean persist() {
+        return true;
+    }
+
+    @Override
     public @NotNull String getIdentifier() {
         return plugin.getDescription().getName().toLowerCase();
     }
