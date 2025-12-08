@@ -5,6 +5,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +37,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class SweetTask extends BukkitPlugin {
-    public static boolean DEBUG = false;
+    public static boolean DEBUG = BuildConstants.IS_DEVELOPMENT_BUILD;
     public static SweetTask getInstance() {
         return (SweetTask) BukkitPlugin.getInstance();
     }
@@ -49,7 +50,6 @@ public class SweetTask extends BukkitPlugin {
                 .reconnectDatabaseWhenReloadConfig(false)
                 .scanIgnore("top.mrxiaom.sweet.taskplugin.libs")
         );
-        DEBUG = getDescription().getVersion().endsWith("-SNAPSHOT");
         scheduler = new FoliaLibScheduler(this);
 
         getLogger().info("正在检查依赖库状态");
@@ -134,7 +134,11 @@ public class SweetTask extends BukkitPlugin {
         if (PAPI.isEnabled()) {
             new Placeholders(this).register();
         }
-        getLogger().info("SweetTask 加载完毕");
+        info("SweetTask 加载完毕");
+        if (BuildConstants.IS_DEVELOPMENT_BUILD) {
+            warn("你正在使用开发版本的 SweetTask，遇到漏洞请通过 Github 反馈!");
+            warn("https://github.com/MrXiaoM/SweetTask/issues");
+        }
     }
 
     private void registerBuiltInTasks() {

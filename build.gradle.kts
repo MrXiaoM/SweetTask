@@ -67,6 +67,7 @@ buildConfig {
     buildConfigField("String", "VERSION", "\"${project.version}\"")
     buildConfigField("java.time.Instant", "BUILD_TIME", "java.time.Instant.ofEpochSecond(${System.currentTimeMillis() / 1000L}L)")
     buildConfigField("String[]", "RESOLVED_LIBRARIES", base.join())
+    buildConfigField("boolean", "IS_DEVELOPMENT_BUILD", isRelease.not().toString())
 }
 java {
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
