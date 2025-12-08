@@ -141,6 +141,16 @@ public class SweetTask extends BukkitPlugin {
         }
     }
 
+    @Override
+    protected void beforeReloadConfig(FileConfiguration config) {
+        if (!BuildConstants.IS_DEVELOPMENT_BUILD) {
+            DEBUG = config.getBoolean("debug", false);
+            if (DEBUG) {
+                info("调试模式已开启");
+            }
+        }
+    }
+
     private void registerBuiltInTasks() {
         TaskBreakBlock.register();
         TaskPlaceBlock.register();

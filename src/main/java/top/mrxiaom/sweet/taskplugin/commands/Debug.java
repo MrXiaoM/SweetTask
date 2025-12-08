@@ -49,7 +49,7 @@ public class Debug {
             }
             return t(sender, nextSubmitTime + sb);
         }
-        if (args.length == 2 && "test".equalsIgnoreCase(args[0]) && sender instanceof Player) {
+        if (args.length == 2 && "test".equalsIgnoreCase(args[0]) && sender.isOp() && sender instanceof Player) {
             Player player = (Player) sender;
             LoadedTask task = TaskManager.inst().getTask(args[1]);
             if (task == null) {
