@@ -7,15 +7,14 @@ plugins {
 
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.0")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.1")
 }
 val base = top.mrxiaom.gradle.LibraryHelper(project)
 
 group = "top.mrxiaom.sweet.taskplugin"
 version = "1.0.0"
 val targetJavaVersion = 8
-val pluginBaseModules = listOf("library", "paper", "l10n", "actions", "gui", "misc")
-val pluginBaseVersion = "1.7.0"
+val pluginBaseModules = base.modules.run { listOf(library, paper, l10n, actions, gui, misc) }
 val shadowGroup = "top.mrxiaom.sweet.taskplugin.libs"
 var isRelease = gradle.startParameter.taskNames.run {
     contains("release") || contains("publishToMavenLocal")
@@ -51,11 +50,11 @@ dependencies {
     base.library("com.zaxxer:HikariCP:4.0.3")
 
     implementation("de.tr7zw:item-nbt-api:2.15.3")
-    for (artifact in pluginBaseModules) {
-        implementation("top.mrxiaom.pluginbase:$artifact:$pluginBaseVersion")
-    }
-    implementation("top.mrxiaom:LibrariesResolver-Lite:$pluginBaseVersion") { isTransitive = false }
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") { isTransitive = false }
+    for (artifact in pluginBaseModules) {
+        implementation(artifact)
+    }
+    implementation(base.resolver.lite)
 
     testImplementation("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
     testImplementation("junit:junit:4.13.2")
