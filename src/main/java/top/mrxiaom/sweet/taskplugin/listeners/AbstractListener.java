@@ -9,6 +9,7 @@ import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractModule;
+import top.mrxiaom.sweet.taskplugin.func.AbstractPluginHolder;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.listeners.wrapper.TaskWrapper;
@@ -105,6 +106,10 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
         if (changed /*&& taskCollection != null*/) {
             taskCollection.scheduleSubmit(30);
         }
+    }
+
+    public void unregister() {
+        super.unregister();
     }
 
     @SuppressWarnings({"ManualMinMaxCalculation", "SameParameterValue"})
