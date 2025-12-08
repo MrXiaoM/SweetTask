@@ -11,12 +11,13 @@ import static top.mrxiaom.sweet.taskplugin.utils.Utils.convert;
 import static top.mrxiaom.sweet.taskplugin.utils.Utils.getOrList;
 
 public class TaskFishing implements ITask {
+    public static final String TYPE = "fishing";
     @Override
     public String type() {
-        return "fishing";
+        return TYPE;
     }
     public static void register() {
-        ITask.registerParser("fishing", (args, actionTips, warn) -> {
+        ITask.registerParser(TYPE, (args, actionTips, warn) -> {
             Pair<List<String>, Integer> pair = getOrList(args, 1);
             List<ItemMatcher> items = convert(pair, args[1], "物品", ItemMatcher::of, warn);
             if (items == null) return null;

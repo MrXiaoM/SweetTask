@@ -11,12 +11,13 @@ import static top.mrxiaom.sweet.taskplugin.utils.Utils.convert;
 import static top.mrxiaom.sweet.taskplugin.utils.Utils.getOrList;
 
 public class TaskKill implements ITask {
+    public static final String TYPE = "kill";
     @Override
     public String type() {
-        return "kill";
+        return TYPE;
     }
     public static void register() {
-        ITask.registerParser("kill", (args, actionTips, warn) -> {
+        ITask.registerParser(TYPE, (args, actionTips, warn) -> {
             Pair<List<String>, Integer> pair = getOrList(args, 1);
             List<EntityMatcher> entities = convert(pair, args[1], "实体", EntityMatcher::of, warn);
             if (entities == null) return null;

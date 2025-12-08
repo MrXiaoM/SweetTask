@@ -14,12 +14,13 @@ import static top.mrxiaom.sweet.taskplugin.utils.Utils.convert;
 import static top.mrxiaom.sweet.taskplugin.utils.Utils.getOrList;
 
 public class TaskSubmitItem implements ITask {
+    public static final String TYPE = "submit";
     @Override
     public String type() {
-        return "submit";
+        return TYPE;
     }
     public static void register() {
-        ITask.registerParser("submit", (args, actionTips, warn) -> {
+        ITask.registerParser(TYPE, (args, actionTips, warn) -> {
             Pair<List<String>, Integer> pair = getOrList(args, 1);
             List<ItemMatcher> items = convert(pair, args[1], "物品", ItemMatcher::of, warn);
             if (items == null) return null;

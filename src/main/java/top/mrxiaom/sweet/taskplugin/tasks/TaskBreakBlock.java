@@ -11,12 +11,13 @@ import static top.mrxiaom.sweet.taskplugin.utils.Utils.convert;
 import static top.mrxiaom.sweet.taskplugin.utils.Utils.getOrList;
 
 public class TaskBreakBlock implements ITask {
+    public static final String TYPE = "break";
     @Override
     public String type() {
-        return "break";
+        return TYPE;
     }
     public static void register() {
-        ITask.registerParser("break", (args, actionTips, warn) -> {
+        ITask.registerParser(TYPE, (args, actionTips, warn) -> {
             Pair<List<String>, Integer> pair = getOrList(args, 1);
             List<BlockMatcher> blocks = convert(pair, args[1], "方块", BlockMatcher::of, warn);
             if (blocks == null) return null;
