@@ -126,11 +126,9 @@ public class PlayerCache {
     public Boolean canRefresh(EnumTaskType type) {
         switch (type) {
             case DAILY:
-                return canRefresh(type, TaskManager.inst().getDailyMaxRefreshCount(player));
             case WEEKLY:
-                return canRefresh(type, TaskManager.inst().getWeeklyMaxRefreshCount(player));
             case MONTHLY:
-                return canRefresh(type, TaskManager.inst().getMonthlyMaxRefreshCount(player));
+                return canRefresh(type, TaskManager.inst().getMaxRefreshCount(player, type));
         }
         return false;
     }
@@ -182,15 +180,15 @@ public class PlayerCache {
     public int getRefreshCountRemain(EnumTaskType type) {
         switch (type) {
             case DAILY: {
-                int max = TaskManager.inst().getDailyMaxRefreshCount(player);
+                int max = TaskManager.inst().getMaxRefreshCount(player, type);
                 return Math.max(0, max - getRefreshCountDaily());
             }
             case WEEKLY: {
-                int max = TaskManager.inst().getWeeklyMaxRefreshCount(player);
+                int max = TaskManager.inst().getMaxRefreshCount(player, type);
                 return Math.max(0, max - getRefreshCountWeekly());
             }
             case MONTHLY: {
-                int max = TaskManager.inst().getMonthlyMaxRefreshCount(player);
+                int max = TaskManager.inst().getMaxRefreshCount(player, type);
                 return Math.max(0, max - getRefreshCountMonthly());
             }
         }

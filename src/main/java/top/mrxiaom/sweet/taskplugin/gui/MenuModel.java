@@ -16,6 +16,7 @@ import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
+import top.mrxiaom.sweet.taskplugin.func.entry.TaskTypeInstance;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 import top.mrxiaom.sweet.taskplugin.tasks.TaskSubmitItem;
@@ -80,21 +81,22 @@ public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
                     if (refreshType != null) break;
                     if (s.startsWith("refresh_operation:")) {
                         EnumTaskType type = Util.valueOr(EnumTaskType.class, s.substring(18).trim(), null);
-                        if (type != null) switch (type) {
-                            case DAILY:
-                                refreshLimit = manager.getDailyMaxRefreshCount(player);
-                                refreshCount = gui.playerCache.getRefreshCountDaily();
-                                break;
-                            case WEEKLY:
-                                refreshLimit = manager.getWeeklyMaxRefreshCount(player);
-                                refreshCount = gui.playerCache.getRefreshCountWeekly();
-                                break;
-                            case MONTHLY:
-                                refreshLimit = manager.getMonthlyMaxRefreshCount(player);
-                                refreshCount = gui.playerCache.getRefreshCountMonthly();
-                                break;
-                            default:
-                                continue;
+                        TaskTypeInstance instance = manager.type(type);
+                        if (type != null && instance != null) {
+                            refreshLimit = instance.getMaxRefreshCount(player);
+                            switch (type) {
+                                case DAILY:
+                                    refreshCount = gui.playerCache.getRefreshCountDaily();
+                                    break;
+                                case WEEKLY:
+                                    refreshCount = gui.playerCache.getRefreshCountWeekly();
+                                    break;
+                                case MONTHLY:
+                                    refreshCount = gui.playerCache.getRefreshCountMonthly();
+                                    break;
+                                default:
+                                    continue;
+                            }
                         }
                         refreshType = type;
                         refreshAvailable = Math.max(0, refreshLimit - refreshCount);

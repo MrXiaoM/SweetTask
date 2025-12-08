@@ -24,7 +24,7 @@ import static top.mrxiaom.pluginbase.actions.ActionProviders.loadActions;
 public class LoadedTask {
     public final String id;
     public final EnumTaskType type;
-    public final double rarity;
+    public final int weight;
     public final IconProvider iconNormal;
     public final IconProvider iconDone;
     public final String name;
@@ -34,7 +34,7 @@ public class LoadedTask {
     public final List<String> rewardsLore;
     public final String overrideDoneTips;
 
-    public LoadedTask(String id, EnumTaskType type, double rarity,
+    public LoadedTask(String id, EnumTaskType type, int weight,
                       IconProvider iconNormal, IconProvider iconDone,
                       String name, List<String> description, List<ITask> subTasks,
                       List<IAction> rewards, List<String> rewardsLore,
@@ -42,7 +42,7 @@ public class LoadedTask {
     ) {
         this.id = id;
         this.type = type;
-        this.rarity = rarity;
+        this.weight = weight;
         this.iconNormal = iconNormal;
         this.iconDone = iconDone;
         this.name = name;
@@ -67,8 +67,8 @@ public class LoadedTask {
 
     @Nullable
     public static LoadedTask load(TaskManager parent, ConfigurationSection config, String id) {
-        double rarity = config.getDouble("rarity", 0.0) / 100.0;
-        if (rarity <= 0) {
+        int weight = config.getInt("rarity", 0);
+        if (weight <= 0) {
             parent.warn("[tasks/" + id + "] 任务稀有度 rarity 的数值有误");
             return null;
         }
@@ -93,7 +93,7 @@ public class LoadedTask {
         List<IAction> rewards = loadActions(config, "rewards");
         List<String> rewardsLore = config.getStringList("rewards-lore");
         String overrideDoneTips = config.getString("override-done-tips", null);
-        return new LoadedTask(id, type, rarity, iconNormal, iconDone, name, description, subTasks, rewards, rewardsLore, overrideDoneTips);
+        return new LoadedTask(id, type, weight, iconNormal, iconDone, name, description, subTasks, rewards, rewardsLore, overrideDoneTips);
     }
 
     private static IconProvider getIcon(SweetTask plugin, ConfigurationSection config, String key) {

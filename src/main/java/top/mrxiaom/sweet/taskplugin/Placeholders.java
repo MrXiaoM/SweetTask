@@ -39,22 +39,22 @@ public class Placeholders extends PlaceholderExpansion {
     @Override
     public @Nullable String onPlaceholderRequest(Player player, @NotNull String params) {
         if (params.equalsIgnoreCase("count_daily")) {
-            return String.valueOf(TaskManager.inst().getDailyMaxTasksCount(player));
+            return String.valueOf(TaskManager.inst().typeDaily().getMaxTasksCount(player));
         }
         if (params.equalsIgnoreCase("count_weekly")) {
-            return String.valueOf(TaskManager.inst().getWeeklyMaxTasksCount(player));
+            return String.valueOf(TaskManager.inst().typeWeekly().getMaxTasksCount(player));
         }
         if (params.equalsIgnoreCase("count_monthly")) {
-            return String.valueOf(TaskManager.inst().getMonthlyMaxTasksCount(player));
+            return String.valueOf(TaskManager.inst().typeMonthly().getMaxTasksCount(player));
         }
         if (params.equalsIgnoreCase("refresh_count_daily")) {
-            return String.valueOf(TaskManager.inst().getDailyMaxRefreshCount(player));
+            return String.valueOf(TaskManager.inst().typeDaily().getMaxRefreshCount(player));
         }
         if (params.equalsIgnoreCase("refresh_count_weekly")) {
-            return String.valueOf(TaskManager.inst().getWeeklyMaxRefreshCount(player));
+            return String.valueOf(TaskManager.inst().typeWeekly().getMaxRefreshCount(player));
         }
         if (params.equalsIgnoreCase("refresh_count_monthly")) {
-            return String.valueOf(TaskManager.inst().getMonthlyMaxRefreshCount(player));
+            return String.valueOf(TaskManager.inst().typeMonthly().getMaxRefreshCount(player));
         }
         return super.onPlaceholderRequest(player, params);
     }

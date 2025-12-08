@@ -5,6 +5,7 @@ import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.utils.AdventureUtil;
@@ -14,6 +15,7 @@ import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
+import top.mrxiaom.sweet.taskplugin.func.entry.TaskTypeInstance;
 import top.mrxiaom.sweet.taskplugin.listeners.wrapper.TaskWrapper;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
@@ -30,21 +32,33 @@ import static top.mrxiaom.sweet.taskplugin.SweetTask.DEBUG;
 @AutoRegister
 public class TaskManager extends AbstractModule {
     private final Map<String, LoadedTask> tasks = new HashMap<>();
-    private final Map<String, LoadedTask> tasksByDaily = new HashMap<>();
-    private final Map<String, LoadedTask> tasksByWeekly = new HashMap<>();
-    private final Map<String, LoadedTask> tasksByMonthly = new HashMap<>();
     private final Comparator<Pair<String, Integer>> permComparator = Comparator.comparingInt(Pair::getValue);
-    private final List<Pair<String, Integer>> taskDailyCounts = new ArrayList<>();
-    private final List<Pair<String, Integer>> taskWeeklyCounts = new ArrayList<>();
-    private final List<Pair<String, Integer>> taskMonthlyCounts = new ArrayList<>();
-    private final List<Pair<String, Integer>> refreshDailyCounts = new ArrayList<>();
-    private final List<Pair<String, Integer>> refreshWeeklyCounts = new ArrayList<>();
-    private final List<Pair<String, Integer>> refreshMonthlyCounts = new ArrayList<>();
-    private int taskDailyCount, taskWeeklyCount, taskMonthlyCount;
-    private int refreshDailyCount, refreshWeeklyCount, refreshMonthlyCount;
+    private final Map<EnumTaskType, TaskTypeInstance> taskTypes = new HashMap<>();
     private LocalTime resetTime;
     public TaskManager(SweetTask plugin) {
         super(plugin);
+        for (EnumTaskType taskType : EnumTaskType.values()) {
+            taskTypes.put(taskType, new TaskTypeInstance(taskType));
+        }
+    }
+
+    @NotNull
+    public TaskTypeInstance typeDaily() {
+        return type(EnumTaskType.DAILY);
+    }
+
+    @NotNull
+    public TaskTypeInstance typeWeekly() {
+        return type(EnumTaskType.WEEKLY);
+    }
+
+    @NotNull
+    public TaskTypeInstance typeMonthly() {
+        return type(EnumTaskType.MONTHLY);
+    }
+
+    public TaskTypeInstance type(EnumTaskType type) {
+        return taskTypes.get(type);
     }
 
     private boolean parseResetTime(String str) {
@@ -78,89 +92,56 @@ public class TaskManager extends AbstractModule {
         reloadMaxRefreshCounts(config);
         reloadTasks(config);
 
-        info("加载了 " + tasks.size() + " 个任务，每日[" + tasksByDaily.size() + "]，每周[" + tasksByWeekly.size() + "]，每月[" + tasksByMonthly.size() + "]");
+        StringBuilder sb = new StringBuilder();
+        sb.append("加载了 ").append(tasks.size()).append(" 个任务");
+        for (TaskTypeInstance type : taskTypes.values()) {
+            sb.append("，");
+            sb.append(type.getDisplayInLog());
+            sb.append("[").append(type.getTasks().size()).append("]");
+        }
+        info(sb.toString());
     }
 
     private void reloadMaxTasksCounts(MemoryConfiguration config) {
-        ConfigurationSection section;
-
-        taskDailyCounts.clear();
-        taskWeeklyCounts.clear();
-        taskMonthlyCounts.clear();
-        taskDailyCount = taskWeeklyCount = taskMonthlyCount = 0;
-
-        section = config.getConfigurationSection("counts.daily");
-        if (section != null) for (String key : section.getKeys(false)) {
-            int count = section.getInt(key);
-            if (count < 0) continue;
-            if (key.equals("default")) taskDailyCount = count;
-            String perm = "sweettask.count.daily." + key;
-            taskDailyCounts.add(Pair.of(perm, count));
+        for (TaskTypeInstance type : taskTypes.values()) {
+            List<Pair<String, Integer>> taskCounts = type.getMaxTaskCounts();
+            taskCounts.clear();
+            int taskCountDefault = 0;
+            ConfigurationSection section = config.getConfigurationSection("counts." + type.key());
+            if (section != null) for (String key : section.getKeys(false)) {
+                int count = section.getInt(key);
+                if (count < 0) continue;
+                if (key.equals("default")) taskCountDefault = count;
+                String perm = "sweettask.count." + type.key() + "." + key;
+                taskCounts.add(Pair.of(perm, count));
+            }
+            type.setMaxTaskCountDefault(taskCountDefault);
+            taskCounts.sort(permComparator.reversed());
         }
-        section = config.getConfigurationSection("counts.weekly");
-        if (section != null) for (String key : section.getKeys(false)) {
-            int count = section.getInt(key);
-            if (count < 0) continue;
-            if (key.equals("default")) taskWeeklyCount = count;
-            String perm = "sweettask.count.weekly." + key;
-            taskWeeklyCounts.add(Pair.of(perm, count));
-        }
-        section = config.getConfigurationSection("counts.monthly");
-        if (section != null) for (String key : section.getKeys(false)) {
-            int count = section.getInt(key);
-            if (count < 0) continue;
-            if (key.equals("default")) taskMonthlyCount = count;
-            String perm = "sweettask.count.monthly." + key;
-            taskMonthlyCounts.add(Pair.of(perm, count));
-        }
-
-        taskDailyCounts.sort(permComparator.reversed());
-        taskWeeklyCounts.sort(permComparator.reversed());
-        taskMonthlyCounts.sort(permComparator.reversed());
     }
 
     private void reloadMaxRefreshCounts(MemoryConfiguration config) {
-        ConfigurationSection section;
-
-        refreshDailyCounts.clear();
-        refreshWeeklyCounts.clear();
-        refreshMonthlyCounts.clear();
-        refreshDailyCount = taskWeeklyCount = taskMonthlyCount = 0;
-
-        section = config.getConfigurationSection("refresh-counts.daily");
-        if (section != null) for (String key : section.getKeys(false)) {
-            int count = section.getInt(key);
-            if (count < 0) continue;
-            if (key.equals("default")) refreshDailyCount = count;
-            String perm = "sweettask.refresh-count.daily." + key;
-            refreshDailyCounts.add(Pair.of(perm, count));
+        for (TaskTypeInstance type : taskTypes.values()) {
+            List<Pair<String, Integer>> refreshCounts = type.getMaxRefreshCounts();
+            refreshCounts.clear();
+            int refreshCountDefault = 0;
+            ConfigurationSection section = config.getConfigurationSection("refresh-counts." + type.key());
+            if (section != null) for (String key : section.getKeys(false)) {
+                int count = section.getInt(key);
+                if (count < 0) continue;
+                if (key.equals("default")) refreshCountDefault = count;
+                String perm = "sweettask.refresh-count." + type.key() + "." + key;
+                refreshCounts.add(Pair.of(perm, count));
+            }
+            type.setMaxRefreshCountDefault(refreshCountDefault);
+            refreshCounts.sort(permComparator.reversed());
         }
-        section = config.getConfigurationSection("refresh-counts.weekly");
-        if (section != null) for (String key : section.getKeys(false)) {
-            int count = section.getInt(key);
-            if (count < 0) continue;
-            if (key.equals("default")) refreshWeeklyCount = count;
-            String perm = "sweettask.refresh-count.weekly." + key;
-            refreshWeeklyCounts.add(Pair.of(perm, count));
-        }
-        section = config.getConfigurationSection("refresh-counts.monthly");
-        if (section != null) for (String key : section.getKeys(false)) {
-            int count = section.getInt(key);
-            if (count < 0) continue;
-            if (key.equals("default")) refreshMonthlyCount = count;
-            String perm = "sweettask.refresh-count.monthly." + key;
-            refreshMonthlyCounts.add(Pair.of(perm, count));
-        }
-
-        refreshDailyCounts.sort(permComparator.reversed());
-        refreshWeeklyCounts.sort(permComparator.reversed());
-        refreshMonthlyCounts.sort(permComparator.reversed());
     }
     private void reloadTasks(MemoryConfiguration config) {
         tasks.clear();
-        tasksByDaily.clear();
-        tasksByWeekly.clear();
-        tasksByMonthly.clear();
+        for (TaskTypeInstance type : taskTypes.values()) {
+            type.clearTasks();
+        }
         for (String path : config.getStringList("tasks-folder")) {
             File folder = plugin.resolve(path);
             if (!folder.exists()) {
@@ -174,16 +155,9 @@ public class TaskManager extends AbstractModule {
                 LoadedTask loaded = LoadedTask.load(this, cfg, id);
                 if (loaded != null) {
                     tasks.put(loaded.id, loaded);
-                    switch (loaded.type) {
-                        case DAILY:
-                            tasksByDaily.put(loaded.id, loaded);
-                            break;
-                        case WEEKLY:
-                            tasksByWeekly.put(loaded.id, loaded);
-                            break;
-                        case MONTHLY:
-                            tasksByMonthly.put(loaded.id, loaded);
-                            break;
+                    TaskTypeInstance type = taskTypes.get(loaded.type);
+                    if (type != null) {
+                        type.addTask(loaded);
                     }
                 }
             });
@@ -216,140 +190,112 @@ public class TaskManager extends AbstractModule {
         });
     }
 
+    private List<String> getWeightedKeys(Map<String, LoadedTask> tasks) {
+        List<String> list = new ArrayList<>();
+        for (LoadedTask task : tasks.values()) {
+            for (int i = 0; i < task.weight; i++) {
+                list.add(task.id);
+            }
+        }
+        return list;
+    }
+
+    private static class CheckTaskType {
+        private final TaskTypeInstance type;
+        private final Set<String> taskIds = new HashSet<>();
+        private int needed;
+        private CheckTaskType(TaskTypeInstance type, Permissible player) {
+            this.type = type;
+            this.needed = type.getMaxTasksCount(player);
+        }
+        private static Map<EnumTaskType, CheckTaskType> inst(Map<EnumTaskType, TaskTypeInstance> taskTypes, Permissible player) {
+            Map<EnumTaskType, CheckTaskType> checkTypes = new HashMap<>();
+            for (TaskTypeInstance type : taskTypes.values()) {
+                checkTypes.put(type.type(), new CheckTaskType(type, player));
+            }
+            return checkTypes;
+        }
+    }
+
     public boolean checkTasks(PlayerCache playerCaches) {
         boolean modified = playerCaches.removeOutdatedTasks(); // 先清理一下过期的任务
         Player player = playerCaches.player;
-        int needDaily = getDailyMaxTasksCount(player);
-        int needWeekly = getWeeklyMaxTasksCount(player);
-        int needMonthly = getMonthlyMaxTasksCount(player);
-        Set<String> tasksDaily = new HashSet<>();
-        Set<String> tasksWeekly = new HashSet<>();
-        Set<String> tasksMonthly = new HashSet<>();
+        Map<EnumTaskType, CheckTaskType> checkTypes = CheckTaskType.inst(taskTypes, player);
         for (TaskCache sub : playerCaches.tasks.values()) { // 遍历所有已缓存任务
             LoadedTask task = getTask(sub.taskId);
             if (task == null) continue;
             // 根据已缓存任务，计算各类型任务需求数量
-            switch (task.type) {
-                case DAILY:
-                    tasksDaily.add(task.id);
-                    if (needDaily > 0) needDaily--;
-                    break;
-                case WEEKLY:
-                    tasksWeekly.add(task.id);
-                    if (needWeekly > 0) needWeekly--;
-                    break;
-                case MONTHLY:
-                    tasksMonthly.add(task.id);
-                    if (needMonthly > 0) needMonthly--;
-                    break;
+            CheckTaskType check = checkTypes.get(task.type);
+            if (check != null) {
+                check.taskIds.add(task.id);
+                if (check.needed > 0) check.needed--;
             }
         }
-        if (DEBUG && (needDaily > 0 || needWeekly > 0 || needMonthly > 0)) {
-            info("玩家" + player.getName() + "需要 " + needDaily + "每日、" + needWeekly + "每周、" + needMonthly + "每月任务");
-        }
-        if (needDaily > 0) {
-            List<String> available = new ArrayList<>(tasksByDaily.keySet());
-            available.removeAll(tasksDaily);
-            if (DEBUG) info("可用的每日任务数量: " + available.size());
-            while (--needDaily >= 0) {
-                if (available.isEmpty()) break;
-                int index = new Random().nextInt(available.size());
-                String id = available.remove(index);
-                LoadedTask task = getTask(id);
-                if (task != null) {
-                    modified = true;
-                    LocalDateTime expireTime = nextOutdate(task.type);
-                    if (DEBUG) info("添加任务 " + task.id + ": " + task.name + " (" + expireTime + "过期)");
-                    playerCaches.addTask(task, expireTime);
-                } else {
-                    if (DEBUG) warn("任务 " + id + " 不存在");
+        if (DEBUG) {
+            boolean log = false;
+            StringBuilder sb = new StringBuilder();
+            sb.append("玩家").append(player.getName()).append("需要 ");
+            for (CheckTaskType check : checkTypes.values()) {
+                if (check.needed > 0) {
+                    if (!log) log = true;
+                    else sb.append("、");
+
+                    sb.append(check.needed);
+                    sb.append(check.type.getDisplayInLog());
                 }
             }
-        }
-        if (needWeekly > 0) {
-            List<String> available = new ArrayList<>(tasksByWeekly.keySet());
-            available.removeAll(tasksWeekly);
-            if (DEBUG) info("可用的每周任务数量: " + available.size());
-            while (--needWeekly >= 0) {
-                if (available.isEmpty()) break;
-                int index = new Random().nextInt(available.size());
-                String id = available.remove(index);
-                LoadedTask task = getTask(id);
-                if (task != null) {
-                    modified = true;
-                    LocalDateTime expireTime = nextOutdate(task.type);
-                    if (DEBUG) info("添加任务 " + task.id + ": " + task.name + " (" + expireTime + "过期)");
-                    playerCaches.addTask(task, expireTime);
-                } else {
-                    if (DEBUG) warn("任务 " + id + " 不存在");
-                }
+            if (log) {
+                info(sb.append("任务").toString());
             }
         }
-        if (needMonthly > 0) {
-            List<String> available = new ArrayList<>(tasksByMonthly.keySet());
-            available.removeAll(tasksMonthly);
-            if (DEBUG) info("可用的每月任务数量: " + available.size());
-            while (--needMonthly >= 0) {
-                if (available.isEmpty()) break;
-                int index = new Random().nextInt(available.size());
-                String id = available.remove(index);
-                LoadedTask task = getTask(id);
-                if (task != null) {
-                    modified = true;
-                    LocalDateTime expireTime = nextOutdate(task.type);
-                    if (DEBUG) info("添加任务 " + task.id + ": " + task.name + " (" + expireTime + "过期)");
-                    playerCaches.addTask(task, expireTime);
-                } else {
-                    if (DEBUG) warn("任务 " + id + " 不存在");
+        for (CheckTaskType check : checkTypes.values()) {
+            // 在玩家的任务数量不足的时候，为玩家添加任务
+            if (check.needed > 0) {
+                List<String> available = getWeightedKeys(check.type.getTasks());
+                available.removeIf(check.taskIds::contains);
+                if (DEBUG) {
+                    HashSet<String> sets = new HashSet<>(available);
+                    info("可用的" + check.type.getDisplayInLog() + "任务数量: " + sets.size());
+                    sets.clear();
                 }
+                if (doAddTasks(check.needed, available, playerCaches)) modified = true;
+                // 对临时新建的列表进行清理
+                available.clear();
+                check.taskIds.clear();
+            }
+        }
+        return modified;
+    }
+
+    private boolean doAddTasks(int needCount, List<String> weightedKeys, PlayerCache playerCache) {
+        boolean modified = false;
+        int needed = needCount;
+        while (--needed >= 0) {
+            if (weightedKeys.isEmpty()) break;
+            int index = new Random().nextInt(weightedKeys.size());
+
+            String id = weightedKeys.get(index); // 按权重随机获取任务键
+            weightedKeys.removeIf(id::equals);  // 获取之后，移除按权重列表的所有键
+            LoadedTask task = getTask(id); // 获取已加载任务配置
+
+            if (task != null) {
+                modified = true;
+                LocalDateTime expireTime = nextOutdate(task.type);
+                if (DEBUG) info("添加任务 " + task.id + ": " + task.name + " (" + expireTime + "过期)");
+                playerCache.addTask(task, expireTime);
+            } else {
+                if (DEBUG) warn("任务 " + id + " 不存在");
             }
         }
         return modified;
     }
 
     public int getMaxRefreshCount(Permissible player, EnumTaskType type) {
-        switch (type) {
-            case DAILY:
-                return getDailyMaxRefreshCount(player);
-            case WEEKLY:
-                return getWeeklyMaxRefreshCount(player);
-            case MONTHLY:
-                return getMonthlyMaxRefreshCount(player);
+        TaskTypeInstance instance = taskTypes.get(type);
+        if (instance != null) {
+            return instance.getMaxRefreshCount(player);
         }
         return 0;
-    }
-
-    public int getDailyMaxTasksCount(Permissible player) {
-        return getCount(taskDailyCounts, player, taskDailyCount);
-    }
-
-    public int getWeeklyMaxTasksCount(Permissible player) {
-        return getCount(taskWeeklyCounts, player, taskWeeklyCount);
-    }
-
-    public int getMonthlyMaxTasksCount(Permissible player) {
-        return getCount(taskMonthlyCounts, player, taskMonthlyCount);
-    }
-
-    public int getDailyMaxRefreshCount(Permissible player) {
-        return getCount(refreshDailyCounts, player, refreshDailyCount);
-    }
-
-    public int getWeeklyMaxRefreshCount(Permissible player) {
-        return getCount(refreshWeeklyCounts, player, refreshWeeklyCount);
-    }
-
-    public int getMonthlyMaxRefreshCount(Permissible player) {
-        return getCount(refreshMonthlyCounts, player, refreshMonthlyCount);
-    }
-
-    private int getCount(List<Pair<String, Integer>> permList, Permissible player, int def) {
-        for (Pair<String, Integer> pair : permList) {
-            if (player.hasPermission(pair.getKey())) {
-                return pair.getValue();
-            }
-        }
-        return def;
     }
 
     public LocalDateTime nextOutdate(EnumTaskType type) {
@@ -421,6 +367,36 @@ public class TaskManager extends AbstractModule {
 
     public Set<String> getTasksId() {
         return tasks.keySet();
+    }
+
+    @Deprecated
+    public int getDailyMaxTasksCount(Permissible player) {
+        return typeDaily().getMaxTasksCount(player);
+    }
+
+    @Deprecated
+    public int getWeeklyMaxTasksCount(Permissible player) {
+        return typeWeekly().getMaxTasksCount(player);
+    }
+
+    @Deprecated
+    public int getMonthlyMaxTasksCount(Permissible player) {
+        return typeMonthly().getMaxTasksCount(player);
+    }
+
+    @Deprecated
+    public int getDailyMaxRefreshCount(Permissible player) {
+        return typeDaily().getMaxRefreshCount(player);
+    }
+
+    @Deprecated
+    public int getWeeklyMaxRefreshCount(Permissible player) {
+        return typeWeekly().getMaxRefreshCount(player);
+    }
+
+    @Deprecated
+    public int getMonthlyMaxRefreshCount(Permissible player) {
+        return typeMonthly().getMaxRefreshCount(player);
     }
 
     public static TaskManager inst() {
