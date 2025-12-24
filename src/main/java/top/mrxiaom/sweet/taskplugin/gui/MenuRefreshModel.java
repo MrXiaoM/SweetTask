@@ -83,6 +83,7 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
             if (!icon.tipsNoMoney.isEmpty()) {
                 AdventureUtil.sendMessage(player, icon.tipsNoMoney);
             }
+            gui.setClickLock(false);
             return false;
         }
         icon.economy.take(player, icon.money);
