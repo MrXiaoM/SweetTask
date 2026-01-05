@@ -7,12 +7,12 @@ plugins {
 
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.1")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.2")
 }
 val base = top.mrxiaom.gradle.LibraryHelper(project)
 
 group = "top.mrxiaom.sweet.taskplugin"
-version = "1.0.0"
+version = "1.0.1"
 val targetJavaVersion = 8
 val pluginBaseModules = base.modules.run { listOf(library, paper, l10n, actions, gui, misc) }
 val shadowGroup = "top.mrxiaom.sweet.taskplugin.libs"
