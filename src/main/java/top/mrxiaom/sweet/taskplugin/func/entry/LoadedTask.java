@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import top.mrxiaom.pluginbase.actions.ActionProviders;
 import top.mrxiaom.pluginbase.api.IAction;
 import top.mrxiaom.pluginbase.utils.ItemStackUtil;
 import top.mrxiaom.pluginbase.utils.Pair;
@@ -22,6 +23,7 @@ import java.util.List;
 import static top.mrxiaom.pluginbase.actions.ActionProviders.loadActions;
 
 public class LoadedTask {
+    private final SweetTask plugin;
     public final String id;
     public final EnumTaskType type;
     public final int weight;
@@ -34,12 +36,14 @@ public class LoadedTask {
     public final List<String> rewardsLore;
     public final String overrideDoneTips;
 
+    @Deprecated
     public LoadedTask(String id, EnumTaskType type, int weight,
                       IconProvider iconNormal, IconProvider iconDone,
                       String name, List<String> description, List<ITask> subTasks,
                       List<IAction> rewards, List<String> rewardsLore,
                       String overrideDoneTips
     ) {
+        this.plugin = SweetTask.getInstance();
         this.id = id;
         this.type = type;
         this.weight = weight;
@@ -53,10 +57,38 @@ public class LoadedTask {
         this.overrideDoneTips = overrideDoneTips;
     }
 
-    public void giveRewards(Player player) {
-        for (IAction reward : rewards) {
-            reward.run(player);
+    protected LoadedTask(TaskManager parent, ConfigurationSection config, String id) {
+        this.plugin = parent.plugin;
+        this.id = id;
+        this.weight = config.getInt("rarity", 0);
+        if (weight <= 0) {
+            throw new IllegalArgumentException("任务稀有度 rarity 的数值有误");
         }
+        this.iconNormal = getIcon(parent.plugin, config, "icon.normal");
+        this.iconDone = getIcon(parent.plugin, config, "icon.done");
+        this.name = config.getString("name", id);
+        EnumTaskType type = Util.valueOr(EnumTaskType.class, config.getString("type"), null);
+        if (type == null) {
+            throw new IllegalArgumentException("任务类型输入有误");
+        }
+        this.type = type;
+        this.description = config.getStringList("description");
+        this.subTasks = new ArrayList<>();
+        for (String s : config.getStringList("sub-tasks")) {
+            ITask task = ITask.load(parent, id, s);
+            if (task != null) {
+                subTasks.add(task);
+            } else {
+                parent.warn("[tasks/" + id + "] 无效的子任务: " + s);
+            }
+        }
+        this.rewards = loadActions(config, "rewards");
+        this.rewardsLore = config.getStringList("rewards-lore");
+        this.overrideDoneTips = config.getString("override-done-tips", null);
+    }
+
+    public void giveRewards(Player player) {
+        plugin.getScheduler().runTask(() -> ActionProviders.run(plugin, player, rewards));
     }
 
     @NotNull
@@ -67,33 +99,12 @@ public class LoadedTask {
 
     @Nullable
     public static LoadedTask load(TaskManager parent, ConfigurationSection config, String id) {
-        int weight = config.getInt("rarity", 0);
-        if (weight <= 0) {
-            parent.warn("[tasks/" + id + "] 任务稀有度 rarity 的数值有误");
+        try {
+            return new LoadedTask(parent, config, id);
+        } catch (Throwable t) {
+            parent.warn("[tasks/" + id + "] " + t.getMessage());
             return null;
         }
-        IconProvider iconNormal = getIcon(parent.plugin, config, "icon.normal");
-        IconProvider iconDone = getIcon(parent.plugin, config, "icon.done");
-        String name = config.getString("name", id);
-        EnumTaskType type = Util.valueOr(EnumTaskType.class, config.getString("type"), null);
-        if (type == null) {
-            parent.warn("[tasks/" + id + "] 任务类型输入有误");
-            return null;
-        }
-        List<String> description = config.getStringList("description");
-        List<ITask> subTasks = new ArrayList<>();
-        for (String s : config.getStringList("sub-tasks")) {
-            ITask task = ITask.load(parent, id, s);
-            if (task != null) {
-                subTasks.add(task);
-            } else {
-                parent.warn("[tasks/" + id + "] 无效的子任务: " + s);
-            }
-        }
-        List<IAction> rewards = loadActions(config, "rewards");
-        List<String> rewardsLore = config.getStringList("rewards-lore");
-        String overrideDoneTips = config.getString("override-done-tips", null);
-        return new LoadedTask(id, type, weight, iconNormal, iconDone, name, description, subTasks, rewards, rewardsLore, overrideDoneTips);
     }
 
     private static IconProvider getIcon(SweetTask plugin, ConfigurationSection config, String key) {
