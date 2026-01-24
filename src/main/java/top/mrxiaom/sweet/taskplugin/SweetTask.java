@@ -164,6 +164,7 @@ public class SweetTask extends BukkitPlugin {
         TaskFishing.register();
         TaskSubmitItem.register();
         TaskKill.register();
+        TaskPlaceholder.register();
         if (Bukkit.getPluginManager().isPluginEnabled("CustomFishing")) {
             TaskCustomFishing.register();
         }
