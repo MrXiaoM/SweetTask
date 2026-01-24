@@ -192,13 +192,12 @@ public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
             boolean submitItemFlag = false;
             for (int i = 0; i < task.subTasks.size(); i++) {
                 ITask subTask = task.subTasks.get(i);
-                String taskType = subTask.type();
-                int value = cache.get(i, taskType);
+                int value = subTask.getValue(player, task, cache, i);
+                int target = subTask.getTargetValue();
                 if (subTask instanceof TaskSubmitItem) {
                     TaskSubmitItem submitItem = (TaskSubmitItem) subTask;
                     // 提交任务物品
                     PlayerInventory inv = player.getInventory();
-                    int target = submitItem.getTargetValue();
                     if (value < target) {
                         for (int slot = 0; slot < inv.getSize(); slot++) {
                             ItemStack item = inv.getItem(slot);
@@ -214,14 +213,14 @@ public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
                                     item = null;
                                 }
                                 inv.setItem(slot, item);
-                                cache.put(i, taskType, value);
+                                cache.put(i, subTask.type(), value);
                                 submitItemFlag = true;
                                 if (value == target) break;
                             }
                         }
                     }
                 }
-                if (value < subTask.getTargetValue()) {
+                if (value < target) {
                     taskDone = false;
                 }
             }

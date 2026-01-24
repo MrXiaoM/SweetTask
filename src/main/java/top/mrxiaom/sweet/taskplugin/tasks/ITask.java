@@ -1,9 +1,12 @@
 package top.mrxiaom.sweet.taskplugin.tasks;
 
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.utils.Pair;
+import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
+import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +23,13 @@ public interface ITask {
      * 该任务在 ActionBar 显示的消息提示
      */
     String actionTips();
+
+    /**
+     * 获取该任务当前进度
+     */
+    default int getValue(Player player, LoadedTask task, TaskCache cache, int index) {
+        return cache.get(index, type());
+    }
 
     /**
      * 该任务的目标进度数值

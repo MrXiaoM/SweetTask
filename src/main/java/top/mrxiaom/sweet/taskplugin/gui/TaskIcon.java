@@ -84,8 +84,7 @@ public class TaskIcon {
                     case "sub_tasks":
                         for (int i = 0; i < task.subTasks.size(); i++) {
                             ITask subTask = task.subTasks.get(i);
-                            String taskType = subTask.type();
-                            int value = cache.get(i, taskType);
+                            int value = subTask.getValue(player, task, cache, i);
                             List<Pair<String, Object>> replacements = subTask.actionReplacements(value);
                             String action = Pair.replace(subTask.actionTips(), replacements);
                             replacements.clear();
