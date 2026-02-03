@@ -1,6 +1,7 @@
 package top.mrxiaom.sweet.taskplugin.tasks;
 
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.taskplugin.listeners.CustomTask;
 
 import java.util.StringJoiner;
 
@@ -42,5 +43,12 @@ public class TaskCustom implements ITask {
     @Override
     public int getTargetValue() {
         return target;
+    }
+
+    /**
+     * @see CustomTask#inst()
+     */
+    public static CustomTask inst() {
+        return CustomTask.inst();
     }
 }
