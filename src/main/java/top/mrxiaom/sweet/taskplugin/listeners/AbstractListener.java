@@ -9,7 +9,6 @@ import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.AbstractModule;
-import top.mrxiaom.sweet.taskplugin.func.AbstractPluginHolder;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.listeners.wrapper.TaskWrapper;
@@ -65,6 +64,7 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
     protected abstract void handleLoadTask(Map<T, List<TaskWrapper>> map, LoadedTask task, ITask subTask, int index);
     protected abstract boolean isNotMatch(T matcher, E entry);
     protected void plus(Player player, E entry, int add) {
+        if (add == 0) return;
         PlayerCache taskCollection = null;
         boolean changed = false;
         // 遍历所有满足条件的 wrapper
