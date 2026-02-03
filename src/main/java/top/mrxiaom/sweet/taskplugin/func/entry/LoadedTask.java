@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.actions.ActionProviders;
@@ -25,6 +26,7 @@ import static top.mrxiaom.pluginbase.actions.ActionProviders.loadActions;
 public class LoadedTask {
     private final SweetTask plugin;
     public final String id;
+    public final @Nullable String permission;
     public final EnumTaskType type;
     public final int weight;
     public final IconProvider iconNormal;
@@ -45,6 +47,7 @@ public class LoadedTask {
     ) {
         this.plugin = SweetTask.getInstance();
         this.id = id;
+        this.permission = null;
         this.type = type;
         this.weight = weight;
         this.iconNormal = iconNormal;
@@ -60,6 +63,12 @@ public class LoadedTask {
     protected LoadedTask(TaskManager parent, ConfigurationSection config, String id) {
         this.plugin = parent.plugin;
         this.id = id;
+        String permission = config.getString("permission", "none");
+        if (permission.equalsIgnoreCase("none")) {
+            this.permission = null;
+        } else {
+            this.permission = permission;
+        }
         this.weight = config.getInt("rarity", 0);
         if (weight <= 0) {
             throw new IllegalArgumentException("任务稀有度 rarity 的数值有误");
@@ -85,6 +94,10 @@ public class LoadedTask {
         this.rewards = loadActions(config, "rewards");
         this.rewardsLore = config.getStringList("rewards-lore");
         this.overrideDoneTips = config.getString("override-done-tips", null);
+    }
+
+    public boolean hasPermission(Permissible p) {
+        return permission == null || p.hasPermission(permission);
     }
 
     public void giveRewards(Player player) {

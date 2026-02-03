@@ -190,11 +190,13 @@ public class TaskManager extends AbstractModule {
         });
     }
 
-    private List<String> getWeightedKeys(Map<String, LoadedTask> tasks) {
+    private List<String> getWeightedKeys(Map<String, LoadedTask> tasks, Permissible p) {
         List<String> list = new ArrayList<>();
         for (LoadedTask task : tasks.values()) {
-            for (int i = 0; i < task.weight; i++) {
-                list.add(task.id);
+            if (task.hasPermission(p)) {
+                for (int i = 0; i < task.weight; i++) {
+                    list.add(task.id);
+                }
             }
         }
         return list;
@@ -251,7 +253,7 @@ public class TaskManager extends AbstractModule {
         for (CheckTaskType check : checkTypes.values()) {
             // 在玩家的任务数量不足的时候，为玩家添加任务
             if (check.needed > 0) {
-                List<String> available = getWeightedKeys(check.type.getTasks());
+                List<String> available = getWeightedKeys(check.type.getTasks(), player);
                 available.removeIf(check.taskIds::contains);
                 if (DEBUG) {
                     HashSet<String> sets = new HashSet<>(available);
