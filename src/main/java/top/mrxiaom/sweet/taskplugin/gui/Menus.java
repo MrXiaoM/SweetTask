@@ -36,6 +36,9 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
     private void updateItems() {
         for (Player player : Bukkit.getOnlinePlayers()) {
             InventoryView view = player.getOpenInventory();
+            // https://github.com/MrXiaoM/SweetTask/issues/2
+            // noinspection ConstantValue: Mohist 之类的低版本服务端可能会返回 null
+            if (view == null) return;
             Inventory inv = view.getTopInventory();
             InventoryHolder holder = Util.getHolder(inv);
             if (holder instanceof Impl) {
