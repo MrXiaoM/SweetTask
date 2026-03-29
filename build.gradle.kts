@@ -1,13 +1,13 @@
 plugins {
     java
     `maven-publish`
-    id ("com.gradleup.shadow") version "8.3.0"
+    id ("com.gradleup.shadow") version "9.3.0"
     id ("com.github.gmazzo.buildconfig") version "5.6.7"
 }
 
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.11")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.13")
 }
 val base = top.mrxiaom.gradle.LibraryHelper(project)
 
@@ -41,7 +41,7 @@ dependencies {
     compileOnly("io.lumine:LumineUtils:1.20-SNAPSHOT")
     compileOnly("net.milkbowl.vault:VaultAPI:1.7")
     compileOnly("org.black_ixx:playerpoints:3.2.7")
-    compileOnly("net.momirealms:custom-fishing:2.3.7")
+    compileOnly("net.momirealms:custom-fishing:2.3.20")
     compileOnly("org.jetbrains:annotations:24.0.0")
 
     base.library("net.kyori:adventure-api:4.21.0")
@@ -49,7 +49,7 @@ dependencies {
     base.library("net.kyori:adventure-text-minimessage:4.21.0")
     base.library("com.zaxxer:HikariCP:4.0.3")
 
-    implementation("de.tr7zw:item-nbt-api:2.15.5")
+    implementation("de.tr7zw:item-nbt-api:2.15.6")
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") { isTransitive = false }
     for (artifact in pluginBaseModules) {
         implementation(artifact)
@@ -70,6 +70,7 @@ buildConfig {
     buildConfigField("boolean", "IS_DEVELOPMENT_BUILD", isRelease.not().toString())
 }
 java {
+    disableAutoTargetJvm()
     val javaVersion = JavaVersion.toVersion(targetJavaVersion)
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
@@ -79,6 +80,7 @@ java {
 }
 tasks {
     shadowJar {
+        configurations.add(project.configurations.runtimeClasspath.get())
         mapOf(
             "top.mrxiaom.pluginbase" to "base",
             "de.tr7zw.changeme.nbtapi" to "nbtapi",
@@ -87,8 +89,8 @@ tasks {
             relocate(original, "$shadowGroup.$target")
         }
     }
-    create("release")
-    val copyTask = create<Copy>("copyBuildArtifact") {
+    this.register("release")
+    val copyTask = this.register<Copy>("copyBuildArtifact") {
         dependsOn(shadowJar)
         from(shadowJar.get().outputs)
         rename { "${project.name}-$version.jar" }
@@ -111,7 +113,8 @@ tasks {
                     project.version
                 } else {
                     "${project.version}-SNAPSHOT"
-                }
+                },
+                "libraries" to base.addedLibraries.joinToString("\"\n  - \""),
             ))
             include("plugin.yml")
         }
