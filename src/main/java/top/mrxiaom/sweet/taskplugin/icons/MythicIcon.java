@@ -12,6 +12,9 @@ public class MythicIcon implements IconProvider {
     public MythicIcon(SweetTask plugin, String id) {
         this.plugin = plugin;
         this.id = id;
+        if (plugin.getMythic() == null) {
+            plugin.warn("加载了 MythicMobs 物品图标 " + id + "，但当前服务端未安装或不支持 MythicMobs");
+        }
     }
 
     @Nullable
