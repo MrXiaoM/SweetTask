@@ -20,6 +20,9 @@ public class MythicEntityMatcher implements EntityMatcher {
 
     @Override
     public boolean match(LivingEntity entity) {
+        if (mythic == null) {
+            return false;
+        }
         return mythicId.equals(mythic.getMobType(entity));
     }
 

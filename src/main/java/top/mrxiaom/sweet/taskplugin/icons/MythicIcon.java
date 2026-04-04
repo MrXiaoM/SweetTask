@@ -3,6 +3,7 @@ package top.mrxiaom.sweet.taskplugin.icons;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
+import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
 
 public class MythicIcon implements IconProvider {
     private final SweetTask plugin;
@@ -16,6 +17,10 @@ public class MythicIcon implements IconProvider {
     @Nullable
     @Override
     public ItemStack create() {
-        return plugin.getMythic().getItem(id);
+        IMythic mythic = plugin.getMythic();
+        if (mythic == null) {
+            return null;
+        }
+        return mythic.getItem(id);
     }
 }
