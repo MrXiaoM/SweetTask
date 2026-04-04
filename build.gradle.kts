@@ -7,7 +7,7 @@ plugins {
 
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.13")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.15")
 }
 val base = top.mrxiaom.gradle.LibraryHelper(project)
 
@@ -45,7 +45,7 @@ dependencies {
     compileOnly("org.jetbrains:annotations:24.0.0")
 
     base.library("net.kyori:adventure-api:4.21.0")
-    base.library("net.kyori:adventure-platform-bukkit:4.4.0")
+    base.library("net.kyori:adventure-text-serializer-gson:4.21.0")
     base.library("net.kyori:adventure-text-minimessage:4.21.0")
     base.library("com.zaxxer:HikariCP:4.0.3")
 
@@ -114,7 +114,7 @@ tasks {
                 } else {
                     "${project.version}-SNAPSHOT"
                 },
-                "libraries" to base.addedLibraries.joinToString("\"\n  - \""),
+                "libraries" to base.addedLibrariesYAML.joinToString("\n"),
             ))
             include("plugin.yml")
         }
