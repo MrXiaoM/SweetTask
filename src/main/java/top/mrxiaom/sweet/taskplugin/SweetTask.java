@@ -196,10 +196,15 @@ public class SweetTask extends BukkitPlugin {
             economies.put("Vault", new VaultEconomy(impl));
         }
         if (has("PlayerPoints")) {
-            PlayerPointsAPI impl = PlayerPoints.getInstance().getAPI();
-            PlayerPointsEconomy economy = new PlayerPointsEconomy(impl);
-            economies.put("PlayerPoints", economy);
-            economies.put("PLAYER_POINTS", economy);
+            try {
+                PlayerPointsAPI impl = PlayerPoints.getInstance().getAPI();
+                PlayerPointsEconomy economy = new PlayerPointsEconomy(impl);
+                economies.put("PlayerPoints", economy);
+                economies.put("PLAYER_POINTS", economy);
+            } catch (LinkageError ignored) {
+                warn("PlayerPoints 版本太老了，无法挂钩到点券经济");
+                warn("建议使用: https://modrinth.com/plugin/playerpoints");
+            }
         }
     }
 }
