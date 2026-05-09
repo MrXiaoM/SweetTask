@@ -10,4 +10,7 @@ public interface IMythic {
 
     @Nullable
     ItemStack getItem(String id);
+
+    @Nullable
+    String getMythicId(ItemStack item);
 }

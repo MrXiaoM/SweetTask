@@ -3,12 +3,15 @@ package top.mrxiaom.sweet.taskplugin.matchers;
 import de.tr7zw.changeme.nbtapi.NBT;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
 
 import java.util.Objects;
 
 public class MythicItemMatcher implements ItemMatcher {
+    private final IMythic mythic;
     private final String mythicId;
-    public MythicItemMatcher(String mythicId) {
+    public MythicItemMatcher(IMythic mythic, String mythicId) {
+        this.mythic = mythic;
         this.mythicId = mythicId;
     }
 
@@ -18,10 +21,7 @@ public class MythicItemMatcher implements ItemMatcher {
 
     @Override
     public boolean match(ItemStack item) {
-        if (item == null || item.getType().equals(Material.AIR)) return false;
-        return NBT.get(item, nbt -> {
-            return mythicId.equals(nbt.getString("MYTHIC_TYPE"));
-        });
+        return mythicId.equals(mythic.getMythicId(item));
     }
 
     @Override

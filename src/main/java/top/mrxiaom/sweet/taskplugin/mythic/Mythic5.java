@@ -1,6 +1,7 @@
 package top.mrxiaom.sweet.taskplugin.mythic;
 
 import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.items.ItemExecutor;
 import io.lumine.mythic.core.mobs.ActiveMob;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
@@ -20,5 +21,16 @@ public class Mythic5 implements IMythic {
     @Override
     public ItemStack getItem(String id) {
         return mythic.getItemManager().getItemStack(id);
+    }
+
+    @Nullable
+    @Override
+    public String getMythicId(ItemStack item) {
+        ItemExecutor itemManager = mythic.getItemManager();
+        if (itemManager.isMythicItem(item)) {
+            return itemManager.getMythicTypeFromItem(item);
+        } else {
+            return null;
+        }
     }
 }
