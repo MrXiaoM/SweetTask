@@ -1,3 +1,5 @@
+import top.mrxiaom.gradle.LibraryHelper
+
 plugins {
     java
     `maven-publish`
@@ -7,9 +9,9 @@ plugins {
 
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.15")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.20")
 }
-val base = top.mrxiaom.gradle.LibraryHelper(project)
+val base = LibraryHelper(project)
 
 group = "top.mrxiaom.sweet.taskplugin"
 version = "1.0.3"
@@ -44,12 +46,10 @@ dependencies {
     compileOnly("net.momirealms:custom-fishing:2.3.20")
     compileOnly("org.jetbrains:annotations:24.0.0")
 
-    base.library("net.kyori:adventure-api:4.21.0")
-    base.library("net.kyori:adventure-text-serializer-gson:4.21.0")
-    base.library("net.kyori:adventure-text-minimessage:4.21.0")
-    base.library("com.zaxxer:HikariCP:4.0.3")
+    base.library(LibraryHelper.adventure("4.22.0"))
+    base.library(base.depend.HikariCP)
 
-    implementation("de.tr7zw:item-nbt-api:2.15.6")
+    implementation(base.depend.nbtapi)
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") { isTransitive = false }
     for (artifact in pluginBaseModules) {
         implementation(artifact)
@@ -90,10 +90,11 @@ tasks {
         }
     }
     this.register("release")
+    val jarName = "${project.name}-$version.jar"
     val copyTask = this.register<Copy>("copyBuildArtifact") {
         dependsOn(shadowJar)
         from(shadowJar.get().outputs)
-        rename { "${project.name}-$version.jar" }
+        rename { jarName }
         into(rootProject.file("out"))
     }
     build {
