@@ -37,14 +37,14 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
     // compileOnly("org.spigotmc:spigot:1.20") // NMS
 
-    compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly("me.clip:placeholderapi:2.12.2")
     compileOnly("io.lumine:Mythic-Dist:4.13.0")
     compileOnly("io.lumine:Mythic:5.6.2")
     compileOnly("io.lumine:LumineUtils:1.20-SNAPSHOT")
     compileOnly("net.milkbowl.vault:VaultAPI:1.7")
-    compileOnly("org.black_ixx:playerpoints:3.2.7")
-    compileOnly("net.momirealms:custom-fishing:2.3.20")
-    compileOnly("org.jetbrains:annotations:24.0.0")
+    compileOnly("org.black_ixx:playerpoints:3.3.4")
+    compileOnly("net.momirealms:custom-fishing:2.3.22")
+    compileOnly(base.depend.annotations)
 
     base.library(LibraryHelper.adventure("4.22.0"))
     base.library(base.depend.HikariCP)
@@ -78,6 +78,16 @@ java {
     withSourcesJar()
     withJavadocJar()
 }
+
+val pluginVersion = if (isRelease) {
+    project.version.toString()
+} else {
+    "${project.version}-SNAPSHOT"
+}
+
+LibraryHelper.initJava(project, base, targetJavaVersion, true, pluginVersion)
+LibraryHelper.initPublishing(project)
+
 tasks {
     shadowJar {
         configurations.add(project.configurations.runtimeClasspath.get())
@@ -87,61 +97,6 @@ tasks {
             "com.tcoded.folialib" to "folialib",
         ).forEach { (original, target) ->
             relocate(original, "$shadowGroup.$target")
-        }
-    }
-    this.register("release")
-    val jarName = "${project.name}-$version.jar"
-    val copyTask = this.register<Copy>("copyBuildArtifact") {
-        dependsOn(shadowJar)
-        from(shadowJar.get().outputs)
-        rename { jarName }
-        into(rootProject.file("out"))
-    }
-    build {
-        dependsOn(copyTask)
-    }
-    withType<JavaCompile>().configureEach {
-        options.encoding = "UTF-8"
-        if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible) {
-            options.release.set(targetJavaVersion)
-        }
-    }
-    processResources {
-        duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        from(sourceSets.main.get().resources.srcDirs) {
-            expand(mapOf(
-                "version" to if (isRelease) {
-                    project.version
-                } else {
-                    "${project.version}-SNAPSHOT"
-                },
-                "libraries" to base.addedLibrariesYAML.joinToString("\n"),
-            ))
-            include("plugin.yml")
-        }
-    }
-    javadoc {
-        (options as StandardJavadocDocletOptions).apply {
-            links("https://hub.spigotmc.org/javadocs/spigot/")
-
-            locale("zh_CN")
-            encoding("UTF-8")
-            docEncoding("UTF-8")
-            addBooleanOption("keywords", true)
-            addBooleanOption("Xdoclint:none", true)
-        }
-    }
-}
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = project.group.toString()
-            artifactId = rootProject.name
-            version = project.version.toString()
-
-            artifact(tasks["shadowJar"]).classifier = null
-            artifact(tasks["sourcesJar"])
-            artifact(tasks["javadocJar"])
         }
     }
 }
