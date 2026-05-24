@@ -10,7 +10,7 @@ softdepend:
   - CustomFishing
 authors: [ MrXiaoM ]
 folia-supported: true
-# PluginBase Libraries ${libraries}
+# PluginBase Libraries ${libraries_config}
 commands:
   sweettask:
     description: 'The main command of SweetTask'
