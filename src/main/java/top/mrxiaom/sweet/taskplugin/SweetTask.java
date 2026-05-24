@@ -17,6 +17,7 @@ import top.mrxiaom.pluginbase.paper.PaperFactory;
 import top.mrxiaom.pluginbase.resolver.DefaultLibraryResolver;
 import top.mrxiaom.pluginbase.utils.ClassLoaderWrapper;
 import top.mrxiaom.pluginbase.utils.ConfigUtils;
+import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.pluginbase.utils.depend.PAPI;
 import top.mrxiaom.pluginbase.utils.inventory.InventoryFactory;
 import top.mrxiaom.pluginbase.utils.item.ItemEditor;
@@ -126,7 +127,18 @@ public class SweetTask extends BukkitPlugin {
                 info("支持 MythicMobs " + v);
             } else if (v.startsWith("4.")) {
                 mythic = new Mythic4();
-                info("支持 MythicMobs " + v);
+                Integer subVersion = Util.parseInt(v.substring(2).split("\\.")[0]).orElse(null);
+                if (subVersion != null && subVersion < 10) {
+                    warn("你的 MythicMobs 版本 " + v + " 似乎低于 4.10.0，使用过低的版本会导致物品无法被识别");
+                    warn("请升级你的 MythicMobs 版本，或者不嫌麻烦的话，你可以为每个物品配置添加以下配置 (NBT)");
+                    warn("###########################");
+                    warn("物品ID:");
+                    warn("  NBT:");
+                    warn("    MYTHIC_TYPE: 物品ID");
+                    warn("###########################");
+                } else {
+                    info("支持 MythicMobs " + v);
+                }
             } else {
                 warn("不支持的 MythicMobs 版本 " + v);
             }
