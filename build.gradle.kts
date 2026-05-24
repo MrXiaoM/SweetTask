@@ -9,7 +9,7 @@ plugins {
 
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.20")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.23")
 }
 val base = LibraryHelper(project)
 
@@ -46,8 +46,9 @@ dependencies {
     compileOnly("net.momirealms:custom-fishing:2.3.22")
     compileOnly(base.depend.annotations)
 
-    base.library(LibraryHelper.adventure("4.22.0"))
+    base.library(LibraryHelper.adventure("4.25.0"))
     base.library(base.depend.HikariCP)
+    base.collectPluginHolders()
 
     implementation(base.depend.nbtapi)
     implementation("com.github.technicallycoded:FoliaLib:0.4.4") { isTransitive = false }
