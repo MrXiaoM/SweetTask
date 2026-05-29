@@ -9,12 +9,12 @@ plugins {
 
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.23")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.24")
 }
 val base = LibraryHelper(project)
 
 group = "top.mrxiaom.sweet.taskplugin"
-version = "1.0.4"
+version = "1.0.5"
 val targetJavaVersion = 8
 val pluginBaseModules = base.modules.run { listOf(library, paper, l10n, actions, gui, misc) }
 val shadowGroup = "top.mrxiaom.sweet.taskplugin.libs"
@@ -90,6 +90,7 @@ LibraryHelper.initJava(project, base, targetJavaVersion, true, pluginVersion)
 LibraryHelper.initPublishing(project)
 
 tasks {
+    register("release")
     shadowJar {
         configurations.add(project.configurations.runtimeClasspath.get())
         mapOf(
