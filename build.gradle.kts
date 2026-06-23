@@ -9,7 +9,7 @@ plugins {
 
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.24")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.27")
 }
 val base = LibraryHelper(project)
 
@@ -70,15 +70,6 @@ buildConfig {
     buildConfigField("java.time.Instant", "BUILD_TIME", "java.time.Instant.ofEpochSecond(${System.currentTimeMillis() / 1000L}L)")
     buildConfigField("String[]", "RESOLVED_LIBRARIES", base.join())
     buildConfigField("boolean", "IS_DEVELOPMENT_BUILD", isRelease.not().toString())
-}
-java {
-    disableAutoTargetJvm()
-    val javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
-    }
-    withSourcesJar()
-    withJavadocJar()
 }
 
 val pluginVersion = if (isRelease) {
