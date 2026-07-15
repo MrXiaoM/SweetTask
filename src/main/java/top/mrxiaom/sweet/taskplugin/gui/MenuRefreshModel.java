@@ -70,12 +70,12 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
         Boolean refresh = gui.playerCache.canRefresh(refreshType);
         if (refresh == null) {
             t(player, "&e你已经完成过任务了，不可刷新");
-            player.closeInventory();
+            gui.getPlugin().getScheduler().closeInventory(player);
             return false;
         }
         if (!refresh) {
             t(player, "&e你的刷新次数已耗尽");
-            player.closeInventory();
+            gui.getPlugin().getScheduler().closeInventory(player);
             return false;
         }
         RefreshIcon icon = (RefreshIcon) iconObj;
@@ -88,7 +88,7 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
         }
         icon.economy.take(player, icon.money);
         if (SweetTask.DEBUG) {
-            SweetTask.getInstance().info("玩家 " + player.getName() + " 提交了刷新任务请求");
+            gui.getPlugin().info("玩家 " + player.getName() + " 提交了刷新任务请求");
         }
         gui.playerCache.submitRefresh(refreshType, () -> {
             if (!refreshTips.isEmpty()) {
@@ -97,7 +97,7 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
             if (gui.parent != null) {
                 gui.parent.open();
             } else {
-                player.closeInventory();
+                gui.getPlugin().getScheduler().closeInventory(player);
             }
             gui.setClickLock(false);
         });
