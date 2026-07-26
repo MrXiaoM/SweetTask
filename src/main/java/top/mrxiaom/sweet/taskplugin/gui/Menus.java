@@ -10,11 +10,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.BukkitPlugin;
+import top.mrxiaom.pluginbase.api.InventoryViewAccessor;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
 import top.mrxiaom.pluginbase.gui.IGuiHolder;
@@ -35,7 +35,7 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
 
     private void updateItems() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            InventoryView view = player.getOpenInventory();
+            InventoryViewAccessor view = Util.getOpenInventory(player);
             // https://github.com/MrXiaoM/SweetTask/issues/2
             // noinspection ConstantValue: Mohist 之类的低版本服务端可能会返回 null
             if (view == null) return;
@@ -145,7 +145,7 @@ public class Menus extends AbstractGuisModule<AbstractModel<?, ?>> {
                 InventoryAction action, ClickType click,
                 InventoryType.SlotType slotType, int slot,
                 ItemStack currentItem, ItemStack cursor,
-                InventoryView view, InventoryClickEvent event
+                InventoryViewAccessor view, InventoryClickEvent event
         ) {
             event.setCancelled(true);
             if (clickLock) return;
