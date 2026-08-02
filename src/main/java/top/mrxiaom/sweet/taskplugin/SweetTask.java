@@ -21,7 +21,6 @@ import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.pluginbase.utils.depend.PAPI;
 import top.mrxiaom.pluginbase.utils.inventory.InventoryFactory;
 import top.mrxiaom.pluginbase.utils.item.ItemEditor;
-import top.mrxiaom.pluginbase.utils.scheduler.FoliaLibScheduler;
 import top.mrxiaom.sweet.taskplugin.actions.ActionBack;
 import top.mrxiaom.sweet.taskplugin.actions.ActionOpenGui;
 import top.mrxiaom.sweet.taskplugin.database.TaskProcessDatabase;
@@ -53,7 +52,6 @@ public class SweetTask extends BukkitPlugin {
                 .reconnectDatabaseWhenReloadConfig(false)
                 .scanIgnore("top.mrxiaom.sweet.taskplugin.libs")
         );
-        scheduler = new FoliaLibScheduler(this);
 
         try {
             //noinspection ResultOfMethodCallIgnored
