@@ -31,6 +31,9 @@ public interface BlockMatcher {
                 }
             }
         }
+        if (lower.startsWith("craft-engine:")) {
+            return new CraftEngineBlockMatcher(s.substring(13));
+        }
         Pair<Material, Integer> pair = ItemStackUtil.parseMaterial(s);
         if (pair != null) {
             return new VanillaBlockMatcher(pair.key(), pair.value());
