@@ -14,12 +14,15 @@ public interface ItemMatcher {
 
     @Nullable
     static ItemMatcher of(String s) {
-        if (s.equalsIgnoreCase("ANY")) return AnyItemMatcher.INSTANCE;
+        String lower = s.toLowerCase();
+        if (lower.equals("any")) {
+            return AnyItemMatcher.INSTANCE;
+        }
         IMythic mythic = SweetTask.getInstance().getMythic();
-        if (s.startsWith("craft-engine:")) {
+        if (lower.startsWith("craft-engine:")) {
             return new CraftEngineItemMatcher(s.substring(13));
         }
-        if (s.startsWith("mythic:") && mythic != null) {
+        if (lower.startsWith("mythic:") && mythic != null) {
             return new MythicItemMatcher(mythic, s.substring(7));
         }
         Pair<Material, Integer> pair = ItemStackUtil.parseMaterial(s.toUpperCase());
