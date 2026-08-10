@@ -13,7 +13,7 @@ import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
 import top.mrxiaom.sweet.taskplugin.listeners.wrapper.TaskWrapper;
 import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
-import top.mrxiaom.sweet.taskplugin.tasks.TaskCrafting;
+import top.mrxiaom.sweet.taskplugin.tasks.TaskConsume;
 
 import java.util.List;
 import java.util.Map;
@@ -28,9 +28,9 @@ public class ConsumeListener extends AbstractListener<ItemStack, ItemMatcher> {
 
     @Override
     protected void handleLoadTask(Map<ItemMatcher, List<TaskWrapper>> map, LoadedTask task, ITask subTask, int index) {
-        if (subTask instanceof TaskCrafting) {
+        if (subTask instanceof TaskConsume) {
             TaskWrapper wrapper = new TaskWrapper(task, subTask, index);
-            for (ItemMatcher item : ((TaskCrafting) subTask).items) {
+            for (ItemMatcher item : ((TaskConsume) subTask).items) {
                 List<TaskWrapper> list = getListOrEmpty(map, item);
                 list.add(wrapper);
             }
