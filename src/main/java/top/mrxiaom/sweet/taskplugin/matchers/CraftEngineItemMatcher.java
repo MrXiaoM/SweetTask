@@ -1,23 +1,29 @@
 package top.mrxiaom.sweet.taskplugin.matchers;
 
+import net.momirealms.craftengine.bukkit.api.CraftEngineItems;
+import net.momirealms.craftengine.bukkit.item.BukkitItemDefinition;
+import net.momirealms.craftengine.core.util.Key;
 import org.bukkit.inventory.ItemStack;
-import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
 
 import java.util.Objects;
 
 public class CraftEngineItemMatcher implements ItemMatcher {
-    private final String itemId;
+    private final Key itemId;
     public CraftEngineItemMatcher(String itemId) {
-        this.itemId = itemId;
+        this.itemId = Key.of(itemId);
     }
 
-    public String getItemId() {
+    public Key getItemId() {
         return itemId;
     }
 
     @Override
     public boolean match(ItemStack item) {
-        return mythicId.equals(mythic.getMythicId(item));
+        BukkitItemDefinition customItem = CraftEngineItems.byItemStack(item);
+        if (customItem != null) {
+            return itemId.equals(customItem.id());
+        }
+        return false;
     }
 
     @Override

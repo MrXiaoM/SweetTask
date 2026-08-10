@@ -16,6 +16,9 @@ public interface ItemMatcher {
     static ItemMatcher of(String s) {
         if (s.equalsIgnoreCase("ANY")) return AnyItemMatcher.INSTANCE;
         IMythic mythic = SweetTask.getInstance().getMythic();
+        if (s.startsWith("craft-engine:")) {
+            return new CraftEngineItemMatcher(s.substring(13));
+        }
         if (s.startsWith("mythic:") && mythic != null) {
             return new MythicItemMatcher(mythic, s.substring(7));
         }

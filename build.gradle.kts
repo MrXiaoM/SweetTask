@@ -45,6 +45,8 @@ dependencies {
     compileOnly("net.milkbowl.vault:VaultAPI:1.7")
     compileOnly("org.black_ixx:playerpoints:3.3.4")
     compileOnly("net.momirealms:custom-fishing:2.3.22")
+    compileOnly("net.momirealms:craft-engine-core:26.7.4")
+    compileOnly("net.momirealms:craft-engine-bukkit:26.7.4")
     compileOnly(base.depend.annotations)
 
     base.library(LibraryHelper.adventure("4.25.0"))
