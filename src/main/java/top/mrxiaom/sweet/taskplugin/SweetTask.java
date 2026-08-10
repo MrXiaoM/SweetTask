@@ -174,6 +174,7 @@ public class SweetTask extends BukkitPlugin {
 
     private void registerBuiltInTasks() {
         TaskBreakBlock.register();
+        TaskBreed.register();
         TaskPlaceBlock.register();
         TaskConsume.register();
         TaskCrafting.register();
