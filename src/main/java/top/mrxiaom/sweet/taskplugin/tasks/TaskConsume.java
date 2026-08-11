@@ -29,7 +29,7 @@ public class TaskConsume implements ITask {
                 warn.accept("未输入数量");
                 return null;
             }
-            return new TaskFishing(items, target, actionTips);
+            return new TaskConsume(items, target, actionTips);
         });
     }
     public final List<ItemMatcher> items;
