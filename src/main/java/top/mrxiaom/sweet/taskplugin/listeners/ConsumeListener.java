@@ -48,10 +48,7 @@ public class ConsumeListener extends AbstractListener<ItemStack, ItemMatcher> {
         Player player = e.getPlayer();
         ItemStack item = e.getItem();
         if (!isEmpty(item)) {
-            int amount = item.getAmount();
-            if (amount > 0) {
-                plus(player, item, amount);
-            }
+            plus(player, item, 1);
         }
     }
 
