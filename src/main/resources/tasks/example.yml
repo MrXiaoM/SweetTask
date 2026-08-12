@@ -17,6 +17,11 @@ rarity: 50
 icon:
   normal: DIAMOND_ORE
   done: BOOK
+  # 也可以用 PluginBase 的图标格式，有限支持，没有变量
+  #done:
+  #  type: icon
+  #  material: BOOK
+  #  glow: true
 # 任务名
 name: '示例任务'
 # 任务描述
