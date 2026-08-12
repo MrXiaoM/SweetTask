@@ -1,7 +1,8 @@
-package top.mrxiaom.sweet.taskplugin.matchers;
+package top.mrxiaom.sweet.taskplugin.matchers.entity;
 
 import org.bukkit.entity.LivingEntity;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
+import top.mrxiaom.sweet.taskplugin.matchers.EntityMatcher;
 import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
 
 import java.util.Objects;

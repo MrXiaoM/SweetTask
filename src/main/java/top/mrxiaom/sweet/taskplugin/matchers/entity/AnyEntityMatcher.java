@@ -1,6 +1,7 @@
-package top.mrxiaom.sweet.taskplugin.matchers;
+package top.mrxiaom.sweet.taskplugin.matchers.entity;
 
 import org.bukkit.entity.LivingEntity;
+import top.mrxiaom.sweet.taskplugin.matchers.EntityMatcher;
 
 public class AnyEntityMatcher implements EntityMatcher {
     public static final AnyEntityMatcher INSTANCE = new AnyEntityMatcher();

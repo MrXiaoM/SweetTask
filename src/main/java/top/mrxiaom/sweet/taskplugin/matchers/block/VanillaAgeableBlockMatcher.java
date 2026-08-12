@@ -1,9 +1,10 @@
-package top.mrxiaom.sweet.taskplugin.matchers;
+package top.mrxiaom.sweet.taskplugin.matchers.block;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
+import top.mrxiaom.sweet.taskplugin.matchers.BlockMatcher;
 
 import java.util.Objects;
 

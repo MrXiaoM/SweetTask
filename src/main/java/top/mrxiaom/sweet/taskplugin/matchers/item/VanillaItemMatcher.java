@@ -1,15 +1,16 @@
-package top.mrxiaom.sweet.taskplugin.matchers;
+package top.mrxiaom.sweet.taskplugin.matchers.item;
 
 import org.bukkit.Material;
-import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 
 import java.util.Objects;
 
-public class VanillaBlockMatcher implements BlockMatcher {
+public class VanillaItemMatcher implements ItemMatcher {
     private final Material material;
     private final Integer dataValue;
 
-    public VanillaBlockMatcher(Material material, Integer dataValue) {
+    public VanillaItemMatcher(Material material, Integer dataValue) {
         this.material = material;
         this.dataValue = dataValue;
     }
@@ -24,18 +25,19 @@ public class VanillaBlockMatcher implements BlockMatcher {
 
     @Override
     @SuppressWarnings({"deprecation"})
-    public boolean match(Block block) {
+    public boolean match(ItemStack item) {
+        if (item == null || item.getType().equals(Material.AIR)) return false;
         if (dataValue == null) {
-            return material.equals(block.getType());
+            return material.equals(item.getType());
         }
-        return material.equals(block.getType()) && dataValue.byteValue() == block.getData();
+        return material.equals(item.getType()) && dataValue.shortValue() == item.getDurability();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof VanillaBlockMatcher)) return false;
-        VanillaBlockMatcher that = (VanillaBlockMatcher) o;
+        if (!(o instanceof VanillaItemMatcher)) return false;
+        VanillaItemMatcher that = (VanillaItemMatcher) o;
         return material == that.material && Objects.equals(dataValue, that.dataValue);
     }
 

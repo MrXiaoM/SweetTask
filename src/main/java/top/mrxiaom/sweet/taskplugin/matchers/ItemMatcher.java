@@ -6,6 +6,10 @@ import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.utils.ItemStackUtil;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
+import top.mrxiaom.sweet.taskplugin.matchers.item.AnyItemMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.item.CraftEngineItemMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.item.MythicItemMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.item.VanillaItemMatcher;
 import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
 
 public interface ItemMatcher {

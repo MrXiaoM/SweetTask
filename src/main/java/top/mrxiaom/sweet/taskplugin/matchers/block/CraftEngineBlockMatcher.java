@@ -1,9 +1,10 @@
-package top.mrxiaom.sweet.taskplugin.matchers;
+package top.mrxiaom.sweet.taskplugin.matchers.block;
 
 import net.momirealms.craftengine.bukkit.api.CraftEngineBlocks;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.util.Key;
 import org.bukkit.block.Block;
+import top.mrxiaom.sweet.taskplugin.matchers.BlockMatcher;
 
 import java.util.Objects;
 

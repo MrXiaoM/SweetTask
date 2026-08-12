@@ -4,6 +4,9 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.taskplugin.matchers.entity.AnyEntityMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.entity.MythicEntityMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.entity.VanillaEntityMatcher;
 
 public interface EntityMatcher {
 
