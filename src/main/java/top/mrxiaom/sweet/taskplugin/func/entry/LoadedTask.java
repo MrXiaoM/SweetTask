@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.actions.ActionProviders;
 import top.mrxiaom.pluginbase.api.IAction;
+import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
 import top.mrxiaom.pluginbase.utils.ItemStackUtil;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
@@ -121,6 +122,10 @@ public class LoadedTask {
     }
 
     private static IconProvider getIcon(SweetTask plugin, ConfigurationSection config, String key) {
+        if (config.isConfigurationSection(key) && "icon".equalsIgnoreCase(config.getString(key + ".type"))) {
+            LoadedIcon icon = LoadedIcon.load(config, key);
+            return new PluginBaseIcon(icon);
+        }
         String str = config.getString(key, null);
         if (str != null) {
             if (str.startsWith("mythic-")) {
