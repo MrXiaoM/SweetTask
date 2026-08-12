@@ -1,5 +1,6 @@
 package top.mrxiaom.sweet.taskplugin.matchers.item;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
@@ -20,6 +21,7 @@ public class MythicItemMatcher implements ItemMatcher {
 
     @Override
     public boolean match(ItemStack item) {
+        if (item == null || item.getType().equals(Material.AIR)) return false;
         return mythicId.equals(mythic.getMythicId(item));
     }
 

@@ -32,21 +32,38 @@ repositories {
     maven("https://jitpack.io")
     maven("https://repo.rosewooddev.io/repository/public/")
     maven("https://repo.momirealms.net/releases/")
+    maven("https://nexus.phoenixdevt.fr/repository/maven-public/")
+    maven("https://r.irepo.space/maven/")
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
     // compileOnly("org.spigotmc:spigot:1.20") // NMS
 
+    // Vault
+    compileOnly("net.milkbowl.vault:VaultAPI:1.7")
+    // PlayerPoints
+    compileOnly("org.black_ixx:playerpoints:3.3.4")
+    // PlaceholderAPI
     compileOnly("me.clip:placeholderapi:2.12.2")
+    // MythicMobs
     compileOnly("io.lumine:Mythic-Dist:4.13.0")
     compileOnly("io.lumine:Mythic:5.6.2")
     compileOnly("io.lumine:LumineUtils:1.20-SNAPSHOT")
-    compileOnly("net.milkbowl.vault:VaultAPI:1.7")
-    compileOnly("org.black_ixx:playerpoints:3.3.4")
+    // MMOItems
+    compileOnly("io.lumine:MythicLib-dist:1.7.1-SNAPSHOT")
+    compileOnly("net.Indyuce:MMOItems-API:6.10.1-SNAPSHOT")
+    // ItemsAdder
+    compileOnly("com.github.LoneDev6:api-itemsadder:3.6.1")
+    // CustomFishing
     compileOnly("net.momirealms:custom-fishing:2.3.22")
+    // CraftEngine
     compileOnly("net.momirealms:craft-engine-core:26.7.4")
     compileOnly("net.momirealms:craft-engine-bukkit:26.7.4")
+    // SX-Item
+    compileOnly("com.github.Saukiya:SX-Item:4.4.9")
+    // NeigeItems
+    compileOnly("pers.neige.neigeitems:NeigeItems:1.21.128")
     compileOnly(base.depend.annotations)
 
     base.library(LibraryHelper.adventure("4.25.0"))

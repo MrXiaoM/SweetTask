@@ -8,6 +8,12 @@ softdepend:
   - PlaceholderAPI
   - MythicMobs
   - CustomFishing
+  - CraftEngine
+  - ItemsAdder
+  - MythicLib
+  - MMOItems
+  - SXItem
+  - NeigeItems
 authors: [ MrXiaoM ]
 folia-supported: true
 # PluginBase Libraries ${libraries_config}

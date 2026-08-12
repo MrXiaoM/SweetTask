@@ -3,6 +3,7 @@ package top.mrxiaom.sweet.taskplugin.matchers.item;
 import net.momirealms.craftengine.bukkit.api.CraftEngineItems;
 import net.momirealms.craftengine.bukkit.item.BukkitItemDefinition;
 import net.momirealms.craftengine.core.util.Key;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 
@@ -20,6 +21,7 @@ public class CraftEngineItemMatcher implements ItemMatcher {
 
     @Override
     public boolean match(ItemStack item) {
+        if (item == null || item.getType().equals(Material.AIR)) return false;
         BukkitItemDefinition customItem = CraftEngineItems.byItemStack(item);
         if (customItem != null) {
             return itemId.equals(customItem.id());
