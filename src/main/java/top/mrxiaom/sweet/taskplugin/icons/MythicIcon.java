@@ -1,25 +1,35 @@
 package top.mrxiaom.sweet.taskplugin.icons;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
-import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
-import top.mrxiaom.sweet.taskplugin.gui.TaskIcon;
 import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
 
 public class MythicIcon implements PluginIcon {
-    public static final Provider PROVIDER = (plugin, config, key) -> {
-        String str = config.getString(key, null);
-        if (str != null) {
-            String lower = str.toLowerCase();
-            if (lower.startsWith("mythic-") || lower.startsWith("mythic:")) {
-                String id = str.substring(7);
-                return new MythicIcon(plugin, id);
+    public static final Provider PROVIDER = new Provider() {
+        @Nullable
+        @Override
+        public PluginIcon load(@NotNull SweetTask plugin, @NotNull ConfigurationSection config, @NotNull String key) {
+            String str = config.getString(key, null);
+            if (str != null) {
+                return load(plugin, str);
             }
+            return null;
         }
-        return null;
+        @Nullable
+        @Override
+        public PluginIcon load(@NotNull SweetTask plugin, @NotNull String input) {
+            String lower = input.toLowerCase();
+            if (lower.startsWith("mythic-") || lower.startsWith("mythic:")) {
+                String id = input.substring(7);
+                return new MythicIcon(plugin, id);
+
+            }
+            return null;
+        }
     };
     private final SweetTask plugin;
     private final String id;
@@ -34,7 +44,7 @@ public class MythicIcon implements PluginIcon {
 
     @Nullable
     @Override
-    public ItemStack create(@NotNull TaskIcon icon, @NotNull Player player, @NotNull TaskCache cache) {
+    public ItemStack create(@Nullable Player player) {
         IMythic mythic = plugin.getMythic();
         if (mythic == null) {
             return null;

@@ -1,40 +1,50 @@
 package top.mrxiaom.sweet.taskplugin.icons;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import pers.neige.neigeitems.manager.ItemManager;
-import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
-import top.mrxiaom.sweet.taskplugin.gui.TaskIcon;
+import top.mrxiaom.sweet.taskplugin.SweetTask;
 
 public class NeigeItemsIcon implements PluginIcon {
-    public static final Provider PROVIDER = (plugin, config, key) -> {
-        String str = config.getString(key, null);
-        if (str != null) {
-            String lower = str.toLowerCase();
+    public static final Provider PROVIDER = new Provider() {
+        @Nullable
+        @Override
+        public PluginIcon load(@NotNull SweetTask plugin, @NotNull ConfigurationSection config, @NotNull String key) {
+            String str = config.getString(key, null);
+            if (str != null) {
+                return load(plugin, str);
+            }
+            return null;
+        }
+        @Nullable
+        @Override
+        public PluginIcon load(@NotNull SweetTask plugin, @NotNull String input) {
+            String lower = input.toLowerCase();
             if (lower.startsWith("ni:")) {
-                String id = str.substring(3);
+                String id = input.substring(3);
                 return new NeigeItemsIcon(id);
             }
             if (lower.startsWith("neigeitem:")) {
-                String id = str.substring(10);
+                String id = input.substring(10);
                 return new NeigeItemsIcon(id);
             }
             if (lower.startsWith("neige-item:")) {
-                String id = str.substring(11);
+                String id = input.substring(11);
                 return new NeigeItemsIcon(id);
             }
             if (lower.startsWith("neigeitems:")) {
-                String id = str.substring(11);
+                String id = input.substring(11);
                 return new NeigeItemsIcon(id);
             }
             if (lower.startsWith("neige-items:")) {
-                String id = str.substring(12);
+                String id = input.substring(12);
                 return new NeigeItemsIcon(id);
             }
+            return null;
         }
-        return null;
     };
     private final String id;
     public NeigeItemsIcon(String id) {
@@ -43,7 +53,11 @@ public class NeigeItemsIcon implements PluginIcon {
 
     @Nullable
     @Override
-    public ItemStack create(@NotNull TaskIcon icon, @NotNull Player player, @NotNull TaskCache cache) {
-        return ItemManager.INSTANCE.getItemStack(id, player);
+    public ItemStack create(@Nullable Player player) {
+        if (player != null) {
+            return ItemManager.INSTANCE.getItemStack(id, player);
+        } else {
+            return ItemManager.INSTANCE.getItemStack(id);
+        }
     }
 }

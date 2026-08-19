@@ -2,11 +2,8 @@ package top.mrxiaom.sweet.taskplugin.icons;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
-import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
-import top.mrxiaom.sweet.taskplugin.gui.TaskIcon;
 
 public class PluginBaseIcon implements PluginIcon {
     public static final Provider PROVIDER = (plugin, config, key) -> {
@@ -22,7 +19,7 @@ public class PluginBaseIcon implements PluginIcon {
     }
     @Nullable
     @Override
-    public ItemStack create(@NotNull TaskIcon icon, @NotNull Player player, @NotNull TaskCache cache) {
+    public ItemStack create(@Nullable Player player) {
         return this.icon.generateIcon(player);
     }
 }

@@ -107,7 +107,7 @@ public class LoadedTask {
     @NotNull
     public ItemStack getIcon(TaskIcon icon, Player player, TaskCache cache) {
         PluginIcon provider = cache.hasDone() ? iconDone : iconNormal;
-        ItemStack item = provider.create(icon, player, cache);
+        ItemStack item = provider.create(player);
         return item != null ? item : new ItemStack(Material.PAPER);
     }
 

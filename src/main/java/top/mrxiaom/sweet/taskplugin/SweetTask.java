@@ -15,6 +15,7 @@ import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.actions.ActionProviders;
 import top.mrxiaom.pluginbase.api.IRegistry;
 import top.mrxiaom.pluginbase.data.SimpleRegistry;
+import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
 import top.mrxiaom.pluginbase.paper.PaperFactory;
 import top.mrxiaom.pluginbase.resolver.DefaultLibraryResolver;
 import top.mrxiaom.pluginbase.utils.ClassLoaderWrapper;
@@ -273,6 +274,15 @@ public class SweetTask extends BukkitPlugin {
     }
 
     private void registerBuiltInPluginIcons() {
+        LoadedIcon.material().register((input) -> {
+            for (PluginIcon.Provider provider : pluginIcons.all()) {
+                PluginIcon icon = provider.load(this, input);
+                if (icon != null) {
+                    return new PluginBaseMaterial(icon);
+                }
+            }
+            return null;
+        });
         pluginIcons.register(VanillaIcon.PROVIDER);
         pluginIcons.register(PluginBaseIcon.PROVIDER);
 
