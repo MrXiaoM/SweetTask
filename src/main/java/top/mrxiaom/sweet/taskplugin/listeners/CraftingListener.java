@@ -60,7 +60,7 @@ public class CraftingListener extends AbstractListener<ItemStack, ItemMatcher> {
             if (e.isShiftClick()) {
                 int canCraftTimes = calcCanCraftTimes(craftingTable);
                 int canReceiveAmount = calcCanReceiveAmount(player.getInventory(), item);
-                int finalAmount = (int) Math.floor((double)canReceiveAmount / onceAmount) * onceAmount;
+                int finalAmount = (canReceiveAmount / onceAmount) * onceAmount;
                 amount = Math.min(finalAmount, canCraftTimes * onceAmount);
             } else {
                 amount = onceAmount;
@@ -77,7 +77,9 @@ public class CraftingListener extends AbstractListener<ItemStack, ItemMatcher> {
     private static int calcCanCraftTimes(@NotNull CraftingInventory craftingTable) {
         int canCraftTimes = 64;
         boolean atLeastOnce = false;
-        for (ItemStack material : craftingTable.getMatrix()) {
+        ItemStack[] matrix = craftingTable.getMatrix();
+        for (int i = 0; i < matrix.length; i++) {
+            ItemStack material = matrix[i];
             if (isEmpty(material)) continue;
             atLeastOnce = true;
             int count = material.getAmount();
@@ -92,13 +94,14 @@ public class CraftingListener extends AbstractListener<ItemStack, ItemMatcher> {
      */
     private static int calcCanReceiveAmount(@NotNull PlayerInventory inv, @NotNull ItemStack item) {
         int canReceiveAmount = 0;
-        for (int i = 0; i < inv.getSize(); i++) {
+        int maxStackSize = item.getType().getMaxStackSize();
+        for (int i = 0, size = inv.getSize(); i < size; i++) {
             ItemStack itemStack = inv.getItem(i);
             boolean empty = isEmpty(itemStack);
             if (empty || item.isSimilar(itemStack)) {
                 // 空的格子可以容纳 {最大堆叠数量 - 0} 个物品
                 // 可以和输出物品堆叠的物品可以容纳 {最大堆叠数量 - 物品数量} 个物品
-                canReceiveAmount += item.getType().getMaxStackSize() - (empty ? 0 : itemStack.getAmount());
+                canReceiveAmount += maxStackSize - (empty ? 0 : itemStack.getAmount());
             }
         }
         return canReceiveAmount;
