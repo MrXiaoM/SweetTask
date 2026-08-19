@@ -8,6 +8,13 @@ import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
 import java.util.Objects;
 
 public class MythicEntityMatcher implements EntityMatcher {
+    public static final Provider PROVIDER = (input) -> {
+        String lower = input.toLowerCase();
+        if (lower.startsWith("mythic:")) {
+            return new MythicEntityMatcher(input.substring(7));
+        }
+        return null;
+    };
     private final String mythicId;
     private final SweetTask plugin = SweetTask.getInstance();
 

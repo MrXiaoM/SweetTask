@@ -10,6 +10,19 @@ import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 import java.util.Objects;
 
 public class CraftEngineItemMatcher implements ItemMatcher {
+    public static final Provider PROVIDER = (input) -> {
+        String lower = input.toLowerCase();
+        if (lower.startsWith("craft-engine:")) {
+            return new CraftEngineItemMatcher(input.substring(13));
+        }
+        if (lower.startsWith("craftengine:")) {
+            return new CraftEngineItemMatcher(input.substring(12));
+        }
+        if (lower.startsWith("ce:")) {
+            return new CraftEngineItemMatcher(input.substring(3));
+        }
+        return null;
+    };
     private final Key itemId;
     public CraftEngineItemMatcher(String itemId) {
         this.itemId = Key.of(itemId);

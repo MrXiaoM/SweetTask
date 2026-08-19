@@ -8,6 +8,25 @@ import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 import java.util.Objects;
 
 public class NeigeItemsItemMatcher implements ItemMatcher {
+    public static final Provider PROVIDER = (input) -> {
+        String lower = input.toLowerCase();
+        if (lower.startsWith("neige-items:")) {
+            return new NeigeItemsItemMatcher(input.substring(12));
+        }
+        if (lower.startsWith("neige-item:")) {
+            return new NeigeItemsItemMatcher(input.substring(11));
+        }
+        if (lower.startsWith("neigeitems:")) {
+            return new NeigeItemsItemMatcher(input.substring(10));
+        }
+        if (lower.startsWith("neigeitem:")) {
+            return new NeigeItemsItemMatcher(input.substring(9));
+        }
+        if (lower.startsWith("ni:")) {
+            return new NeigeItemsItemMatcher(input.substring(3));
+        }
+        return null;
+    };
     private final String itemId;
     public NeigeItemsItemMatcher(String itemId) {
         this.itemId = itemId;

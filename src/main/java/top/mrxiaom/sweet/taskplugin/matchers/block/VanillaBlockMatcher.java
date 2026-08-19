@@ -2,11 +2,29 @@ package top.mrxiaom.sweet.taskplugin.matchers.block;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+import top.mrxiaom.pluginbase.utils.ItemStackUtil;
+import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.sweet.taskplugin.matchers.BlockMatcher;
 
 import java.util.Objects;
 
 public class VanillaBlockMatcher implements BlockMatcher {
+    public static final Provider PROVIDER = new Provider() {
+        @Override
+        public @Nullable BlockMatcher parse(@NonNull String input) {
+            Pair<Material, Integer> pair = ItemStackUtil.parseMaterial(input);
+            if (pair != null) {
+                return new VanillaBlockMatcher(pair.key(), pair.value());
+            }
+            return null;
+        }
+        @Override
+        public int getPriority() {
+            return 2000;
+        }
+    };
     private final Material material;
     private final Integer dataValue;
 

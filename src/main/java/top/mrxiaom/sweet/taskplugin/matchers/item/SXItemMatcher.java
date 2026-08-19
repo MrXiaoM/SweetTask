@@ -8,6 +8,19 @@ import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 import java.util.Objects;
 
 public class SXItemMatcher implements ItemMatcher {
+    public static final Provider PROVIDER = (input) -> {
+        String lower = input.toLowerCase();
+        if (lower.startsWith("sx-item:")) {
+            return new SXItemMatcher(input.substring(8));
+        }
+        if (lower.startsWith("sxitem:")) {
+            return new SXItemMatcher(input.substring(7));
+        }
+        if (lower.startsWith("si:")) {
+            return new SXItemMatcher(input.substring(3));
+        }
+        return null;
+    };
     private final String itemId;
     public SXItemMatcher(String itemId) {
         this.itemId = itemId;

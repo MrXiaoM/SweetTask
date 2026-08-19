@@ -9,6 +9,13 @@ import top.mrxiaom.sweet.taskplugin.matchers.BlockMatcher;
 import java.util.Objects;
 
 public class CraftEngineBlockMatcher implements BlockMatcher {
+    public static final Provider PROVIDER = (input) -> {
+        String lower = input.toLowerCase();
+        if (lower.startsWith("craft-engine:")) {
+            return new CraftEngineBlockMatcher(input.substring(13));
+        }
+        return null;
+    };
     private final Key blockId;
 
     public CraftEngineBlockMatcher(String blockId) {

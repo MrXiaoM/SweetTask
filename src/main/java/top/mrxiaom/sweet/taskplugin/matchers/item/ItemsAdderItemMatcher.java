@@ -8,6 +8,19 @@ import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 import java.util.Objects;
 
 public class ItemsAdderItemMatcher implements ItemMatcher {
+    public static final Provider PROVIDER = (input) -> {
+        String lower = input.toLowerCase();
+        if (lower.startsWith("items-adder:")) {
+            return new ItemsAdderItemMatcher(input.substring(12));
+        }
+        if (lower.startsWith("itemsadder:")) {
+            return new ItemsAdderItemMatcher(input.substring(11));
+        }
+        if (lower.startsWith("ia:")) {
+            return new ItemsAdderItemMatcher(input.substring(3));
+        }
+        return null;
+    };
     private final String itemId;
     public ItemsAdderItemMatcher(String itemId) {
         this.itemId = itemId;

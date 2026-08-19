@@ -4,11 +4,31 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
+import top.mrxiaom.pluginbase.utils.CollectionUtils;
+import top.mrxiaom.pluginbase.utils.ItemStackUtil;
+import top.mrxiaom.pluginbase.utils.Pair;
+import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.matchers.BlockMatcher;
 
+import java.util.List;
 import java.util.Objects;
 
 public class VanillaAgeableBlockMatcher implements BlockMatcher {
+    public static final Provider PROVIDER = (input) -> {
+        String lower = input.toLowerCase();
+        if (lower.startsWith("age:")) {
+            List<String> split = CollectionUtils.split(input.substring(4), ':');
+            if (split.size() == 2) {
+                String minAgeStr = split.get(0);
+                Integer minAge = minAgeStr.isEmpty() ? Integer.valueOf(-1) : Util.parseInt(minAgeStr).orElse(null);
+                Pair<Material, Integer> pair = ItemStackUtil.parseMaterial(split.get(1));
+                if (minAge != null && pair != null) {
+                    return new VanillaAgeableBlockMatcher(pair.key(), pair.value(), minAge);
+                }
+            }
+        }
+        return null;
+    };
     private final Material material;
     private final Integer dataValue;
     private final int minAge;

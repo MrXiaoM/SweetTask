@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.actions.ActionProviders;
+import top.mrxiaom.pluginbase.api.IRegistry;
+import top.mrxiaom.pluginbase.data.SimpleRegistry;
 import top.mrxiaom.pluginbase.paper.PaperFactory;
 import top.mrxiaom.pluginbase.resolver.DefaultLibraryResolver;
 import top.mrxiaom.pluginbase.utils.ClassLoaderWrapper;
@@ -27,6 +29,16 @@ import top.mrxiaom.sweet.taskplugin.database.TaskProcessDatabase;
 import top.mrxiaom.sweet.taskplugin.economy.IEconomy;
 import top.mrxiaom.sweet.taskplugin.economy.PlayerPointsEconomy;
 import top.mrxiaom.sweet.taskplugin.economy.VaultEconomy;
+import top.mrxiaom.sweet.taskplugin.matchers.BlockMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.EntityMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.block.AnyBlockMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.block.CraftEngineBlockMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.block.VanillaBlockMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.entity.AnyEntityMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.entity.MythicEntityMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.entity.VanillaEntityMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.item.*;
 import top.mrxiaom.sweet.taskplugin.mythic.IMythic;
 import top.mrxiaom.sweet.taskplugin.mythic.Mythic4;
 import top.mrxiaom.sweet.taskplugin.mythic.Mythic5;
@@ -87,9 +99,12 @@ public class SweetTask extends BukkitPlugin {
         return PaperFactory.createInventoryFactory();
     }
 
-    TaskProcessDatabase taskProcessDatabase;
-    Map<String, IEconomy> economies = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    IMythic mythic;
+    private final Map<String, IEconomy> economies = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private final IRegistry<ItemMatcher.Provider> itemMatchers = new SimpleRegistry<>();
+    private final IRegistry<BlockMatcher.Provider> blockMatchers = new SimpleRegistry<>();
+    private final IRegistry<EntityMatcher.Provider> entityMatchers = new SimpleRegistry<>();
+    private TaskProcessDatabase taskProcessDatabase;
+    private IMythic mythic;
 
     public IMythic getMythic() {
         return mythic;
@@ -102,6 +117,18 @@ public class SweetTask extends BukkitPlugin {
 
     public TaskProcessDatabase getDatabase() {
         return taskProcessDatabase;
+    }
+
+    public IRegistry<ItemMatcher.Provider> itemMatchers() {
+        return itemMatchers;
+    }
+
+    public IRegistry<BlockMatcher.Provider> blockMatchers() {
+        return blockMatchers;
+    }
+
+    public IRegistry<EntityMatcher.Provider> entityMatchers() {
+        return entityMatchers;
     }
 
     @Override
@@ -143,6 +170,9 @@ public class SweetTask extends BukkitPlugin {
         }
         ActionProviders.registerActionProvider(ActionOpenGui.PROVIDER);
         ActionProviders.registerActionProvider(ActionBack.PROVIDER);
+        registerBuiltInItemMatchers();
+        registerBuiltInBlockMatchers();
+        registerBuiltInEntityMatchers();
         registerBuiltInTasks();
         loadEconomyProviders();
         options.registerDatabase(
@@ -188,6 +218,32 @@ public class SweetTask extends BukkitPlugin {
         if (Bukkit.getPluginManager().isPluginEnabled("CustomFishing")) {
             TaskCustomFishing.register();
         }
+    }
+
+    private void registerBuiltInItemMatchers() {
+        itemMatchers.register(AnyItemMatcher.PROVIDER);
+        itemMatchers.register(VanillaItemMatcher.PROVIDER);
+
+        itemMatchers.register(CraftEngineItemMatcher.PROVIDER);
+        itemMatchers.register(ItemsAdderItemMatcher.PROVIDER);
+        itemMatchers.register(MMOItemsItemMatcher.PROVIDER);
+        itemMatchers.register(MythicItemMatcher.PROVIDER);
+        itemMatchers.register(NeigeItemsItemMatcher.PROVIDER);
+        itemMatchers.register(SXItemMatcher.PROVIDER);
+    }
+
+    private void registerBuiltInBlockMatchers() {
+        blockMatchers.register(AnyBlockMatcher.PROVIDER);
+        blockMatchers.register(VanillaBlockMatcher.PROVIDER);
+
+        blockMatchers.register(CraftEngineBlockMatcher.PROVIDER);
+    }
+
+    private void registerBuiltInEntityMatchers() {
+        entityMatchers.register(AnyEntityMatcher.PROVIDER);
+        entityMatchers.register(VanillaEntityMatcher.PROVIDER);
+
+        entityMatchers.register(MythicEntityMatcher.PROVIDER);
     }
 
     private static boolean has(String pluginName) {

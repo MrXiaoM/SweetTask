@@ -1,12 +1,10 @@
 package top.mrxiaom.sweet.taskplugin.matchers;
 
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.mrxiaom.pluginbase.utils.Util;
-import top.mrxiaom.sweet.taskplugin.matchers.entity.AnyEntityMatcher;
-import top.mrxiaom.sweet.taskplugin.matchers.entity.MythicEntityMatcher;
-import top.mrxiaom.sweet.taskplugin.matchers.entity.VanillaEntityMatcher;
+import top.mrxiaom.pluginbase.api.WithPriority;
+import top.mrxiaom.sweet.taskplugin.SweetTask;
 
 public interface EntityMatcher {
 
@@ -14,17 +12,16 @@ public interface EntityMatcher {
 
     @Nullable
     static EntityMatcher of(String s) {
-        String lower = s.toLowerCase();
-        if (lower.equalsIgnoreCase("ANY")) {
-            return AnyEntityMatcher.INSTANCE;
-        }
-        if (lower.startsWith("mythic:")) {
-            return new MythicEntityMatcher(s.substring(7));
-        }
-        EntityType entityType = Util.valueOr(EntityType.class, s, null);
-        if (entityType != null) {
-            return new VanillaEntityMatcher(entityType);
+        for (Provider provider : SweetTask.getInstance().entityMatchers().all()) {
+            EntityMatcher matcher = provider.parse(s);
+            if (matcher != null) {
+                return matcher;
+            }
         }
         return null;
+    }
+
+    interface Provider extends WithPriority {
+        @Nullable EntityMatcher parse(@NotNull String input);
     }
 }
