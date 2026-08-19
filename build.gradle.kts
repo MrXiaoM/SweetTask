@@ -89,6 +89,9 @@ buildConfig {
     buildConfigField("String[]", "RESOLVED_LIBRARIES", base.join())
     buildConfigField("boolean", "IS_DEVELOPMENT_BUILD", isRelease.not().toString())
 }
+configurations.compileOnly.configure {
+    exclude(group="org.jspecify", module="jspecify")
+}
 
 val pluginVersion = if (isRelease) {
     project.version.toString()

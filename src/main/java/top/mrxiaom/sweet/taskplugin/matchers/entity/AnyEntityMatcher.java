@@ -1,15 +1,15 @@
 package top.mrxiaom.sweet.taskplugin.matchers.entity;
 
 import org.bukkit.entity.LivingEntity;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.sweet.taskplugin.matchers.EntityMatcher;
 
 public class AnyEntityMatcher implements EntityMatcher {
     public static final AnyEntityMatcher INSTANCE = new AnyEntityMatcher();
     public static final Provider PROVIDER = new Provider() {
         @Override
-        public @Nullable EntityMatcher parse(@NonNull String input) {
+        public @Nullable EntityMatcher parse(@NotNull String input) {
             if (input.equalsIgnoreCase("ANY")) {
                 return INSTANCE;
             }

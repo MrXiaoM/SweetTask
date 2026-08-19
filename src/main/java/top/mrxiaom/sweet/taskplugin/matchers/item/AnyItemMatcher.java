@@ -1,15 +1,15 @@
 package top.mrxiaom.sweet.taskplugin.matchers.item;
 
 import org.bukkit.inventory.ItemStack;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 
 public class AnyItemMatcher implements ItemMatcher {
     public static final AnyItemMatcher INSTANCE = new AnyItemMatcher();
     public static final Provider PROVIDER = new Provider() {
         @Override
-        public @Nullable ItemMatcher parse(@NonNull String input) {
+        public @Nullable ItemMatcher parse(@NotNull String input) {
             if (input.equalsIgnoreCase("any")) {
                 return INSTANCE;
             }

@@ -2,8 +2,8 @@ package top.mrxiaom.sweet.taskplugin.matchers.item;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.utils.ItemStackUtil;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
@@ -13,7 +13,7 @@ import java.util.Objects;
 public class VanillaItemMatcher implements ItemMatcher {
     public static final Provider PROVIDER = new Provider() {
         @Override
-        public @Nullable ItemMatcher parse(@NonNull String input) {
+        public @Nullable ItemMatcher parse(@NotNull String input) {
             Pair<Material, Integer> pair = ItemStackUtil.parseMaterial(input);
             if (pair != null) {
                 return new VanillaItemMatcher(pair.getKey(), pair.getValue());

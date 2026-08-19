@@ -2,8 +2,8 @@ package top.mrxiaom.sweet.taskplugin.matchers.entity;
 
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.matchers.EntityMatcher;
 
@@ -12,7 +12,7 @@ import java.util.Objects;
 public class VanillaEntityMatcher implements EntityMatcher {
     public static final Provider PROVIDER = new Provider() {
         @Override
-        public @Nullable EntityMatcher parse(@NonNull String input) {
+        public @Nullable EntityMatcher parse(@NotNull String input) {
             EntityType entityType = Util.valueOr(EntityType.class, input, null);
             if (entityType != null) {
                 return new VanillaEntityMatcher(entityType);
