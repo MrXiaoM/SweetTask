@@ -14,7 +14,9 @@ import top.mrxiaom.pluginbase.utils.ItemStackUtil;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
+import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
+import top.mrxiaom.sweet.taskplugin.gui.TaskIcon;
 import top.mrxiaom.sweet.taskplugin.icons.*;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
@@ -30,8 +32,8 @@ public class LoadedTask {
     public final @Nullable String permission;
     public final EnumTaskType type;
     public final int weight;
-    public final IconProvider iconNormal;
-    public final IconProvider iconDone;
+    public final PluginIcon iconNormal;
+    public final PluginIcon iconDone;
     public final String name;
     public final List<String> description;
     public final List<ITask> subTasks;
@@ -41,7 +43,7 @@ public class LoadedTask {
 
     @Deprecated
     public LoadedTask(String id, EnumTaskType type, int weight,
-                      IconProvider iconNormal, IconProvider iconDone,
+                      PluginIcon iconNormal, PluginIcon iconDone,
                       String name, List<String> description, List<ITask> subTasks,
                       List<IAction> rewards, List<String> rewardsLore,
                       String overrideDoneTips
@@ -106,8 +108,9 @@ public class LoadedTask {
     }
 
     @NotNull
-    public ItemStack getIcon(boolean done) {
-        ItemStack item = (done ? iconDone : iconNormal).create();
+    public ItemStack getIcon(TaskIcon icon, Player player, TaskCache cache) {
+        PluginIcon provider = cache.hasDone() ? iconDone : iconNormal;
+        ItemStack item = provider.create(icon, player, cache);
         return item != null ? item : new ItemStack(Material.PAPER);
     }
 
@@ -121,24 +124,12 @@ public class LoadedTask {
         }
     }
 
-    private static IconProvider getIcon(SweetTask plugin, ConfigurationSection config, String key) {
-        if (config.isConfigurationSection(key) && "icon".equalsIgnoreCase(config.getString(key + ".type"))) {
-            LoadedIcon icon = LoadedIcon.load(config, key);
-            return new PluginBaseIcon(icon);
-        }
-        String str = config.getString(key, null);
-        if (str != null) {
-            if (str.startsWith("mythic-")) {
-                String id = str.substring(7);
-                return new MythicIcon(plugin, id);
-            }
-            if (str.startsWith("ia-")) {
-                String id = str.substring(3);
-                return new ItemsAdderIcon(id);
-            }
-            Pair<Material, Integer> pair = ItemStackUtil.parseMaterial(str);
-            if (pair != null) {
-                return new VanillaIcon(pair);
+    @NotNull
+    private static PluginIcon getIcon(SweetTask plugin, ConfigurationSection config, String key) {
+        for (PluginIcon.Provider provider : plugin.pluginIcons().all()) {
+            PluginIcon icon = provider.load(plugin, config, key);
+            if (icon != null) {
+                return icon;
             }
         }
         return DefaultIcon.INSTANCE;

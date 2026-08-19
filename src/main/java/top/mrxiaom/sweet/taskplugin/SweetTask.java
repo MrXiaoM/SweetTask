@@ -29,6 +29,7 @@ import top.mrxiaom.sweet.taskplugin.database.TaskProcessDatabase;
 import top.mrxiaom.sweet.taskplugin.economy.IEconomy;
 import top.mrxiaom.sweet.taskplugin.economy.PlayerPointsEconomy;
 import top.mrxiaom.sweet.taskplugin.economy.VaultEconomy;
+import top.mrxiaom.sweet.taskplugin.icons.*;
 import top.mrxiaom.sweet.taskplugin.matchers.BlockMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.EntityMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
@@ -103,6 +104,7 @@ public class SweetTask extends BukkitPlugin {
     private final IRegistry<ItemMatcher.Provider> itemMatchers = new SimpleRegistry<>();
     private final IRegistry<BlockMatcher.Provider> blockMatchers = new SimpleRegistry<>();
     private final IRegistry<EntityMatcher.Provider> entityMatchers = new SimpleRegistry<>();
+    private final IRegistry<PluginIcon.Provider> pluginIcons = new SimpleRegistry<>();
     private TaskProcessDatabase taskProcessDatabase;
     private IMythic mythic;
 
@@ -129,6 +131,10 @@ public class SweetTask extends BukkitPlugin {
 
     public IRegistry<EntityMatcher.Provider> entityMatchers() {
         return entityMatchers;
+    }
+
+    public IRegistry<PluginIcon.Provider> pluginIcons() {
+        return pluginIcons;
     }
 
     @Override
@@ -173,6 +179,7 @@ public class SweetTask extends BukkitPlugin {
         registerBuiltInItemMatchers();
         registerBuiltInBlockMatchers();
         registerBuiltInEntityMatchers();
+        registerBuiltInPluginIcons();
         registerBuiltInTasks();
         loadEconomyProviders();
         options.registerDatabase(
@@ -244,6 +251,14 @@ public class SweetTask extends BukkitPlugin {
         entityMatchers.register(VanillaEntityMatcher.PROVIDER);
 
         entityMatchers.register(MythicEntityMatcher.PROVIDER);
+    }
+
+    private void registerBuiltInPluginIcons() {
+        pluginIcons.register(VanillaIcon.PROVIDER);
+        pluginIcons.register(PluginBaseIcon.PROVIDER);
+
+        pluginIcons.register(MythicIcon.PROVIDER);
+        pluginIcons.register(ItemsAdderIcon.PROVIDER);
     }
 
     private static boolean has(String pluginName) {

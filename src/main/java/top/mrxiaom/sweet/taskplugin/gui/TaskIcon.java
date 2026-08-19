@@ -104,7 +104,7 @@ public class TaskIcon {
             }
             return Pair.replace(lore, pairs);
         };
-        ItemStack baseItem = task.getIcon(cache.hasDone());
+        ItemStack baseItem = task.getIcon(this, player, cache);
         return icon.generateIcon(baseItem, player, displayModifier, loreModifier);
     }
 
