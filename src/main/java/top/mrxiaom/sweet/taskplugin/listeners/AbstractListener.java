@@ -68,14 +68,17 @@ public abstract class AbstractListener<E, T> extends AbstractModule implements L
         PlayerCache taskCollection = null;
         boolean changed = false;
         // 遍历所有满足条件的 wrapper
-        for (TaskWrappers<T> value : wrappers) {
+        for (int w = 0, wSize = wrappers.size(); w < wSize; w++) {
+            TaskWrappers<T> value = wrappers.get(w);
             if (isNotMatch(value.matcher, entry)) continue;
             if (taskCollection == null) {
                 // 满足条件了才拉取缓存数据
                 taskCollection = plugin.getDatabase().getTasks(player);
             }
             // 对所有满足条件的子任务数据 进行增加
-            for (TaskWrapper wrapper : value.tasks) {
+            List<TaskWrapper> tasks = value.tasks;
+            for (int t = 0, tSize = tasks.size(); t < tSize; t++) {
+                TaskWrapper wrapper = tasks.get(t);
                 TaskCache taskCache = taskCollection.tasks.get(wrapper.task.id);
                 if (taskCache == null) continue; // 玩家有可能没有领取该类型的任务
                 int max = wrapper.subTask.getTargetValue();

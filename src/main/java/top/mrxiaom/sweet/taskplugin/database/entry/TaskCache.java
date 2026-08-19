@@ -5,6 +5,7 @@ import top.mrxiaom.sweet.taskplugin.listeners.wrapper.TaskWrapper;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -66,12 +67,17 @@ public class TaskCache {
     public boolean checkDone(LoadedTask task) {
         if (!task.id.equals(taskId)) return false;
         boolean taskDone = true;
-        for (int i = 0; i < task.subTasks.size(); i++) {
-            ITask subTask = task.subTasks.get(i);
-            String taskType = subTask.type();
-            int value = get(i, taskType);
-            if (!subTaskData.containsKey(i + "-" + taskType)) {
-                put(i, taskType, 0);
+        List<ITask> subTasks = task.subTasks;
+        for (int i = 0, size = subTasks.size(); i < size; i++) {
+            ITask subTask = subTasks.get(i);
+            String key = i + "-" + subTask.type();
+            Integer valueObj = subTaskData.get(key);
+            int value;
+            if (valueObj == null) {
+                subTaskData.put(key, 0);
+                value = 0;
+            } else {
+                value = valueObj;
             }
             if (value < subTask.getTargetValue()) {
                 taskDone = false;

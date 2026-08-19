@@ -13,6 +13,7 @@ import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -204,14 +205,15 @@ public class PlayerCache {
     public boolean removeOutdatedTasks() {
         boolean modified = false;
         LocalDateTime now = LocalDateTime.now();
-        List<String> keys = Lists.newArrayList(tasks.keySet());
-        for (String key : keys) {
-            TaskCache sub = tasks.get(key);
+        Iterator<Map.Entry<String, TaskCache>> it = tasks.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, TaskCache> entry = it.next();
+            TaskCache sub = entry.getValue();
             if (now.isAfter(sub.expireTime)) {
                 if (SweetTask.DEBUG) {
-                    SweetTask.getInstance().info("[" + player.getName() + "] 已移除过期任务 " + key + " (到期时间: " + sub.expireTime + ")");
+                    SweetTask.getInstance().info("[" + player.getName() + "] 已移除过期任务 " + entry.getKey() + " (到期时间: " + sub.expireTime + ")");
                 }
-                tasks.remove(key);
+                it.remove();
                 modified = true;
             }
         }

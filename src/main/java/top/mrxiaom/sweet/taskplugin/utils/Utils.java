@@ -63,12 +63,6 @@ public class Utils {
     }
 
     public static <K, T> List<T> getListOrEmpty(Map<K, List<T>> map, K key) {
-        List<T> value = map.get(key);
-        if (value != null) {
-            return value;
-        }
-        List<T> list = new ArrayList<>();
-        map.put(key, list);
-        return list;
+        return map.computeIfAbsent(key, k -> new ArrayList<>());
     }
 }

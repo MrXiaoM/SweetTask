@@ -257,15 +257,16 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
         try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM `" + TABLE_NAME + "` " +
                 "WHERE `player`=?")) {
             ps.setString(1, id);
-            ResultSet result = ps.executeQuery();
-            while (result.next()) {
-                String taskId = result.getString("task_id");
-                String subTaskId = result.getString("sub_task_id");
-                int data = result.getInt("data");
-                Timestamp expireTime = result.getTimestamp("expire_time");
+            try (ResultSet result = ps.executeQuery()) {
+                while (result.next()) {
+                    String taskId = result.getString("task_id");
+                    String subTaskId = result.getString("sub_task_id");
+                    int data = result.getInt("data");
+                    Timestamp expireTime = result.getTimestamp("expire_time");
 
-                TaskCache task = tasksMap.computeIfAbsent(taskId, it -> new TaskCache(it, expireTime.toLocalDateTime()));
-                task.put(subTaskId, data);
+                    TaskCache task = tasksMap.computeIfAbsent(taskId, it -> new TaskCache(it, expireTime.toLocalDateTime()));
+                    task.put(subTaskId, data);
+                }
             }
         }
         PlayerCache cache = new PlayerCache(player, tasksMap);
@@ -402,11 +403,12 @@ public class TaskProcessDatabase extends AbstractPluginHolder implements IDataba
             )) {
                 ps.setString(1, task.id);
                 ps.setString(2, task.id);
-                ResultSet resultSet = ps.executeQuery();
-                while (resultSet.next()) {
-                    String player = resultSet.getString("player");
-                    Timestamp expireTime = resultSet.getTimestamp("expire_time");
-                    players.put(player, expireTime.toLocalDateTime());
+                try (ResultSet resultSet = ps.executeQuery()) {
+                    while (resultSet.next()) {
+                        String player = resultSet.getString("player");
+                        Timestamp expireTime = resultSet.getTimestamp("expire_time");
+                        players.put(player, expireTime.toLocalDateTime());
+                    }
                 }
             }
             if (players.isEmpty()) {
