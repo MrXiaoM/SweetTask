@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static top.mrxiaom.sweet.taskplugin.SweetTask.DEBUG;
 
@@ -274,7 +275,7 @@ public class TaskManager extends AbstractModule {
         int needed = needCount;
         while (--needed >= 0) {
             if (weightedKeys.isEmpty()) break;
-            int index = new Random().nextInt(weightedKeys.size());
+            int index = ThreadLocalRandom.current().nextInt(weightedKeys.size());
 
             String id = weightedKeys.get(index); // 按权重随机获取任务键
             weightedKeys.removeIf(id::equals);  // 获取之后，移除按权重列表的所有键
