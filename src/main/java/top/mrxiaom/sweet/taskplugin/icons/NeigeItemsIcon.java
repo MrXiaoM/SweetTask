@@ -4,38 +4,46 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import top.mrxiaom.pluginbase.utils.depend.IA;
+import pers.neige.neigeitems.manager.ItemManager;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.gui.TaskIcon;
 
-public class ItemsAdderIcon implements PluginIcon {
+public class NeigeItemsIcon implements PluginIcon {
     public static final Provider PROVIDER = (plugin, config, key) -> {
         String str = config.getString(key, null);
         if (str != null) {
             String lower = str.toLowerCase();
-            if (lower.startsWith("ia-") || lower.startsWith("ia:")) {
+            if (lower.startsWith("ni:")) {
                 String id = str.substring(3);
-                return new ItemsAdderIcon(id);
+                return new NeigeItemsIcon(id);
             }
-            if (lower.startsWith("itemsadder-") || lower.startsWith("itemsadder:")) {
+            if (lower.startsWith("neigeitem:")) {
+                String id = str.substring(10);
+                return new NeigeItemsIcon(id);
+            }
+            if (lower.startsWith("neige-item:")) {
                 String id = str.substring(11);
-                return new ItemsAdderIcon(id);
+                return new NeigeItemsIcon(id);
             }
-            if (lower.startsWith("items-adder-") || lower.startsWith("items-adder:")) {
+            if (lower.startsWith("neigeitems:")) {
+                String id = str.substring(11);
+                return new NeigeItemsIcon(id);
+            }
+            if (lower.startsWith("neige-items:")) {
                 String id = str.substring(12);
-                return new ItemsAdderIcon(id);
+                return new NeigeItemsIcon(id);
             }
         }
         return null;
     };
     private final String id;
-    public ItemsAdderIcon(String id) {
+    public NeigeItemsIcon(String id) {
         this.id = id;
     }
 
     @Nullable
     @Override
     public ItemStack create(@NotNull TaskIcon icon, @NotNull Player player, @NotNull TaskCache cache) {
-        return IA.get(id).orElse(null);
+        return ItemManager.INSTANCE.getItemStack(id, player);
     }
 }

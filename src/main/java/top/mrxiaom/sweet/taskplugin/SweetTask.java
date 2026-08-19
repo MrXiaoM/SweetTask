@@ -257,8 +257,11 @@ public class SweetTask extends BukkitPlugin {
         pluginIcons.register(VanillaIcon.PROVIDER);
         pluginIcons.register(PluginBaseIcon.PROVIDER);
 
-        pluginIcons.register(MythicIcon.PROVIDER);
+        pluginIcons.register(CraftEngineIcon.PROVIDER);
         pluginIcons.register(ItemsAdderIcon.PROVIDER);
+        pluginIcons.register(MythicIcon.PROVIDER);
+        pluginIcons.register(NeigeItemsIcon.PROVIDER);
+        pluginIcons.register(SXItemIcon.PROVIDER);
     }
 
     private static boolean has(String pluginName) {
