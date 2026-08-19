@@ -86,7 +86,8 @@ public class TaskTypeInstance {
     }
 
     private int getCount(List<Pair<String, Integer>> permList, Permissible player, int def) {
-        for (Pair<String, Integer> pair : permList) {
+        for (int i = 0, size = permList.size(); i < size; i++) {
+            Pair<String, Integer> pair = permList.get(i);
             if (player.hasPermission(pair.getKey())) {
                 return pair.getValue();
             }
