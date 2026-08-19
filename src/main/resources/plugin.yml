@@ -12,7 +12,7 @@ softdepend:
   - ItemsAdder
   - MythicLib
   - MMOItems
-  - SXItem
+  - SX-Item
   - NeigeItems
 authors: [ MrXiaoM ]
 folia-supported: true

@@ -176,12 +176,15 @@ public class SweetTask extends BukkitPlugin {
         }
         ActionProviders.registerActionProvider(ActionOpenGui.PROVIDER);
         ActionProviders.registerActionProvider(ActionBack.PROVIDER);
+
         registerBuiltInItemMatchers();
         registerBuiltInBlockMatchers();
         registerBuiltInEntityMatchers();
         registerBuiltInPluginIcons();
         registerBuiltInTasks();
+
         loadEconomyProviders();
+
         options.registerDatabase(
                 taskProcessDatabase = new TaskProcessDatabase(this)
         );
@@ -222,7 +225,7 @@ public class SweetTask extends BukkitPlugin {
         TaskPlaceholder.register();
         TaskPlain.register();
         TaskCustom.register();
-        if (Bukkit.getPluginManager().isPluginEnabled("CustomFishing")) {
+        if (has("CustomFishing")) {
             TaskCustomFishing.register();
         }
     }
@@ -231,37 +234,63 @@ public class SweetTask extends BukkitPlugin {
         itemMatchers.register(AnyItemMatcher.PROVIDER);
         itemMatchers.register(VanillaItemMatcher.PROVIDER);
 
-        itemMatchers.register(CraftEngineItemMatcher.PROVIDER);
-        itemMatchers.register(ItemsAdderItemMatcher.PROVIDER);
-        itemMatchers.register(MMOItemsItemMatcher.PROVIDER);
-        itemMatchers.register(MythicItemMatcher.PROVIDER);
-        itemMatchers.register(NeigeItemsItemMatcher.PROVIDER);
-        itemMatchers.register(SXItemMatcher.PROVIDER);
+        if (has("CraftEngine")) {
+            itemMatchers.register(CraftEngineItemMatcher.PROVIDER);
+        }
+        if (has("ItemsAdder")) {
+            itemMatchers.register(ItemsAdderItemMatcher.PROVIDER);
+        }
+        if (has("MMOItems")) {
+            itemMatchers.register(MMOItemsItemMatcher.PROVIDER);
+        }
+        if (has("MythicMobs") && mythic != null) {
+            itemMatchers.register(MythicItemMatcher.PROVIDER);
+        }
+        if (has("NeigeItems")) {
+            itemMatchers.register(NeigeItemsItemMatcher.PROVIDER);
+        }
+        if (has("SX-Item")) {
+            itemMatchers.register(SXItemMatcher.PROVIDER);
+        }
     }
 
     private void registerBuiltInBlockMatchers() {
         blockMatchers.register(AnyBlockMatcher.PROVIDER);
         blockMatchers.register(VanillaBlockMatcher.PROVIDER);
 
-        blockMatchers.register(CraftEngineBlockMatcher.PROVIDER);
+        if (has("CraftEngine")) {
+            blockMatchers.register(CraftEngineBlockMatcher.PROVIDER);
+        }
     }
 
     private void registerBuiltInEntityMatchers() {
         entityMatchers.register(AnyEntityMatcher.PROVIDER);
         entityMatchers.register(VanillaEntityMatcher.PROVIDER);
 
-        entityMatchers.register(MythicEntityMatcher.PROVIDER);
+        if (has("MythicMobs") && mythic != null) {
+            entityMatchers.register(MythicEntityMatcher.PROVIDER);
+        }
     }
 
     private void registerBuiltInPluginIcons() {
         pluginIcons.register(VanillaIcon.PROVIDER);
         pluginIcons.register(PluginBaseIcon.PROVIDER);
 
-        pluginIcons.register(CraftEngineIcon.PROVIDER);
-        pluginIcons.register(ItemsAdderIcon.PROVIDER);
-        pluginIcons.register(MythicIcon.PROVIDER);
-        pluginIcons.register(NeigeItemsIcon.PROVIDER);
-        pluginIcons.register(SXItemIcon.PROVIDER);
+        if (has("CraftEngine")) {
+            pluginIcons.register(CraftEngineIcon.PROVIDER);
+        }
+        if (has("ItemsAdder")) {
+            pluginIcons.register(ItemsAdderIcon.PROVIDER);
+        }
+        if (has("MythicMobs") && mythic != null) {
+            pluginIcons.register(MythicIcon.PROVIDER);
+        }
+        if (has("NeigeItems")) {
+            pluginIcons.register(NeigeItemsIcon.PROVIDER);
+        }
+        if (has("SX-Item")) {
+            pluginIcons.register(SXItemIcon.PROVIDER);
+        }
     }
 
     private static boolean has(String pluginName) {
