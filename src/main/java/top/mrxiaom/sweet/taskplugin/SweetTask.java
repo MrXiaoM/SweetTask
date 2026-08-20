@@ -36,6 +36,7 @@ import top.mrxiaom.sweet.taskplugin.matchers.EntityMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.block.AnyBlockMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.block.CraftEngineBlockMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.block.VanillaAgeableBlockMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.block.VanillaBlockMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.entity.AnyEntityMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.entity.MythicEntityMatcher;
@@ -258,6 +259,7 @@ public class SweetTask extends BukkitPlugin {
     private void registerBuiltInBlockMatchers() {
         blockMatchers.register(AnyBlockMatcher.PROVIDER);
         blockMatchers.register(VanillaBlockMatcher.PROVIDER);
+        blockMatchers.register(VanillaAgeableBlockMatcher.PROVIDER);
 
         if (has("CraftEngine")) {
             blockMatchers.register(CraftEngineBlockMatcher.PROVIDER);
