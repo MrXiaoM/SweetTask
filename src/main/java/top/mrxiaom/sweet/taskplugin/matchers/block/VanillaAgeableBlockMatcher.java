@@ -17,7 +17,7 @@ public class VanillaAgeableBlockMatcher implements BlockMatcher {
     public static final Provider PROVIDER = (input) -> {
         String lower = input.toLowerCase();
         if (lower.startsWith("age:")) {
-            List<String> split = CollectionUtils.split(input.substring(4), ':');
+            List<String> split = CollectionUtils.split(input.substring(4), ':', 2);
             if (split.size() == 2) {
                 String minAgeStr = split.get(0);
                 Integer minAge = minAgeStr.isEmpty() ? Integer.valueOf(-1) : Util.parseInt(minAgeStr).orElse(null);
