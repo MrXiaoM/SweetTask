@@ -9,7 +9,7 @@ plugins {
 
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.7.34")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.8.0")
 }
 val base = LibraryHelper(project)
 
@@ -17,7 +17,7 @@ println("Group:   $group")
 println("Version: $version")
 
 val targetJavaVersion = 8
-val pluginBaseModules = base.modules.run { listOf(library, paper, l10n, actions, gui, misc) }
+val pluginBaseModules = base.modules.run { listOf(library, message, paper, l10n, actions, gui, misc) }
 val shadowGroup = "top.mrxiaom.sweet.taskplugin.libs"
 var isRelease = gradle.startParameter.taskNames.run {
     contains("release") || contains("publishToMavenLocal")
