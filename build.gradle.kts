@@ -58,8 +58,8 @@ dependencies {
     // CustomFishing
     compileOnly("net.momirealms:custom-fishing:2.3.22")
     // CraftEngine
-    compileOnly("net.momirealms:craft-engine-core:26.7.4")
-    compileOnly("net.momirealms:craft-engine-bukkit:26.7.4")
+    compileOnly("net.momirealms:craft-engine-core:26.9.1")
+    compileOnly("net.momirealms:craft-engine-bukkit:26.9.1")
     // SX-Item
     compileOnly("com.github.Saukiya:SX-Item:4.4.9")
     // NeigeItems
@@ -70,7 +70,7 @@ dependencies {
     base.library(base.depend.HikariCP)
     base.collectPluginHolders()
 
-    implementation("de.tr7zw:item-nbt-api:2.16.0")
+    implementation("de.tr7zw:item-nbt-api:2.16.1")
     for (artifact in pluginBaseModules) {
         implementation(artifact)
     }
