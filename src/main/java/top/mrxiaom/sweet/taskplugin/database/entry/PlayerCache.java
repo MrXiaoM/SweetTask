@@ -1,6 +1,5 @@
 package top.mrxiaom.sweet.taskplugin.database.entry;
 
-import com.google.common.collect.Lists;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.utils.Pair;
@@ -96,7 +95,20 @@ public class PlayerCache {
             }
         }
         manager.plugin.getDatabase().submitRefreshCount(player, refreshCountDaily, refreshCountWeekly, refreshCountMonthly);
-        tasks.clear();
+        if (type == null) {
+            tasks.clear();
+        } else {
+            List<String> toRemove = new ArrayList<>();
+            tasks.forEach((id, task) -> {
+                LoadedTask taskConfig = manager.getTask(task.taskId);
+                if (taskConfig != null && taskConfig.type.equals(type)) {
+                    toRemove.add(id);
+                }
+            });
+            for (String id : toRemove) {
+                tasks.remove(id);
+            }
+        }
         manager.checkTasksAsync(this, done);
     }
 
