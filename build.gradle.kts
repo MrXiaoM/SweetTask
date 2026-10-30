@@ -9,7 +9,7 @@ plugins {
 
 buildscript {
     repositories.mavenCentral()
-    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.8.1")
+    dependencies.classpath("top.mrxiaom:LibrariesResolver-Gradle:1.8.2")
 }
 val base = LibraryHelper(project)
 
@@ -45,7 +45,7 @@ dependencies {
     // PlayerPoints
     compileOnly("org.black_ixx:playerpoints:3.3.4")
     // PlaceholderAPI
-    compileOnly("me.clip:placeholderapi:2.12.2")
+    compileOnly("me.clip:placeholderapi:2.12.3")
     // MythicMobs
     compileOnly("io.lumine:Mythic-Dist:4.13.0")
     compileOnly("io.lumine:Mythic:5.6.2")
