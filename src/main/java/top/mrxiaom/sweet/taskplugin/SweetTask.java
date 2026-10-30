@@ -223,6 +223,7 @@ public class SweetTask extends BukkitPlugin {
         TaskFishing.register();
         TaskShear.register();
         TaskSubmitItem.register();
+        TaskTame.register();
         TaskKill.register();
         TaskPlaceholder.register();
         TaskPlain.register();
