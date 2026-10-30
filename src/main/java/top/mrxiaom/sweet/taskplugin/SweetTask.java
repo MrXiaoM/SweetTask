@@ -32,12 +32,15 @@ import top.mrxiaom.sweet.taskplugin.economy.PlayerPointsEconomy;
 import top.mrxiaom.sweet.taskplugin.economy.VaultEconomy;
 import top.mrxiaom.sweet.taskplugin.icons.*;
 import top.mrxiaom.sweet.taskplugin.matchers.BlockMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.EnchantMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.EntityMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.block.AnyBlockMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.block.CraftEngineBlockMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.block.VanillaAgeableBlockMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.block.VanillaBlockMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.enchant.AnyEnchantMatcher;
+import top.mrxiaom.sweet.taskplugin.matchers.enchant.VanillaEnchantMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.entity.AnyEntityMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.entity.MythicEntityMatcher;
 import top.mrxiaom.sweet.taskplugin.matchers.entity.VanillaEntityMatcher;
@@ -106,6 +109,7 @@ public class SweetTask extends BukkitPlugin {
     private final IRegistry<ItemMatcher.Provider> itemMatchers = new SimpleRegistry<>();
     private final IRegistry<BlockMatcher.Provider> blockMatchers = new SimpleRegistry<>();
     private final IRegistry<EntityMatcher.Provider> entityMatchers = new SimpleRegistry<>();
+    private final IRegistry<EnchantMatcher.Provider> enchantMatchers = new SimpleRegistry<>();
     private final IRegistry<PluginIcon.Provider> pluginIcons = new SimpleRegistry<>();
     private TaskProcessDatabase taskProcessDatabase;
     private IMythic mythic;
@@ -125,6 +129,10 @@ public class SweetTask extends BukkitPlugin {
 
     public IRegistry<ItemMatcher.Provider> itemMatchers() {
         return itemMatchers;
+    }
+
+    public IRegistry<EnchantMatcher.Provider> enchantMatchers() {
+        return enchantMatchers;
     }
 
     public IRegistry<BlockMatcher.Provider> blockMatchers() {
@@ -274,6 +282,11 @@ public class SweetTask extends BukkitPlugin {
         if (has("MythicMobs") && mythic != null) {
             entityMatchers.register(MythicEntityMatcher.PROVIDER);
         }
+    }
+
+    private void registerBuiltInEnchantMatchers() {
+        enchantMatchers.register(AnyEnchantMatcher.PROVIDER);
+        enchantMatchers.register(VanillaEnchantMatcher.PROVIDER);
     }
 
     private void registerBuiltInPluginIcons() {

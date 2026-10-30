@@ -13,13 +13,18 @@ import java.util.function.Function;
 public class Utils {
     @Nullable
     public static Pair<List<String>, Integer> getOrList(String[] args, int startIndex) {
+        return getOrList((Object[]) args, startIndex);
+    }
+
+    @Nullable
+    public static Pair<List<String>, Integer> getOrList(Object[] args, int startIndex) {
         List<String> list = new ArrayList<>();
         boolean flag = false;
         int index = startIndex;
         for (int i = startIndex; i < args.length; i++) {
-            String s = args[i];
+            String s = String.valueOf(args[i]);
             if (flag) {
-                list.add(s);
+                list.add(s.trim());
                 index = i + 1;
                 break;
             }
@@ -27,7 +32,7 @@ public class Utils {
                 list.add(",");
                 flag = true;
             } else {
-                list.add(s);
+                list.add(s.trim());
             }
         }
         if (index == startIndex) return null;
