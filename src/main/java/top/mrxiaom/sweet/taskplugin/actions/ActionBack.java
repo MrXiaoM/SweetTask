@@ -8,11 +8,10 @@ import top.mrxiaom.pluginbase.api.IActionProvider;
 import top.mrxiaom.pluginbase.func.GuiManager;
 import top.mrxiaom.pluginbase.gui.IGuiHolder;
 import top.mrxiaom.pluginbase.utils.Pair;
+import top.mrxiaom.sweet.taskplugin.Messages;
 import top.mrxiaom.sweet.taskplugin.gui.Menus;
 
 import java.util.List;
-
-import static top.mrxiaom.pluginbase.func.AbstractPluginHolder.t;
 
 public class ActionBack implements IAction {
     public static final ActionBack INSTANCE = new ActionBack();
@@ -39,7 +38,7 @@ public class ActionBack implements IAction {
         if (parent != null) {
             parent.open();
         } else {
-            t(player, "&c当前不能返回");
+            Messages.Menu.back__deny.tm(player);
         }
     }
 }

@@ -7,14 +7,13 @@ import org.bukkit.inventory.ItemStack;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
 import top.mrxiaom.pluginbase.utils.AdventureUtil;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.taskplugin.Messages;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static top.mrxiaom.pluginbase.func.AbstractPluginHolder.t;
 
 public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshModel.Data> implements IMenuCondition {
     public final EnumTaskType refreshType;
@@ -69,12 +68,12 @@ public class MenuRefreshModel extends AbstractModel<RefreshIcon, MenuRefreshMode
         gui.setClickLock(true);
         Boolean refresh = gui.playerCache.canRefresh(refreshType);
         if (refresh == null) {
-            t(player, "&e你已经完成过任务了，不可刷新");
+            Messages.Menu.refresh__deny_done.tm(player);
             gui.getPlugin().getScheduler().closeInventory(player);
             return false;
         }
         if (!refresh) {
-            t(player, "&e你的刷新次数已耗尽");
+            Messages.Menu.refresh__deny_count.tm(player);
             gui.getPlugin().getScheduler().closeInventory(player);
             return false;
         }

@@ -1,14 +1,6 @@
 package top.mrxiaom.sweet.taskplugin.tasks;
 
-import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
-import top.mrxiaom.sweet.taskplugin.matchers.ItemMatcher;
-
-import java.util.Collections;
-import java.util.List;
-
-import static top.mrxiaom.sweet.taskplugin.utils.Utils.convert;
-import static top.mrxiaom.sweet.taskplugin.utils.Utils.getOrList;
 
 public class TaskGainExp implements ITask {
     public static final String TYPE = "gain_exp";

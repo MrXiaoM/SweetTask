@@ -8,13 +8,12 @@ import top.mrxiaom.pluginbase.api.IActionProvider;
 import top.mrxiaom.pluginbase.func.GuiManager;
 import top.mrxiaom.pluginbase.gui.IGuiHolder;
 import top.mrxiaom.pluginbase.utils.Pair;
+import top.mrxiaom.sweet.taskplugin.Messages;
 import top.mrxiaom.sweet.taskplugin.gui.AbstractModel;
 import top.mrxiaom.sweet.taskplugin.gui.IMenuCondition;
 import top.mrxiaom.sweet.taskplugin.gui.Menus;
 
 import java.util.List;
-
-import static top.mrxiaom.pluginbase.func.AbstractPluginHolder.t;
 
 public class ActionOpenGui implements IAction {
     public static final IActionProvider PROVIDER = input -> {
@@ -51,7 +50,8 @@ public class ActionOpenGui implements IAction {
             if (menu instanceof IMenuCondition && !((IMenuCondition) menu).check(player)) return;
             menus.create(parent, player, menu).open();
         } else {
-            t(player, "&c找不到菜单 " + id);
+            Messages.Menu.open__not_found.tm(player,
+                    Pair.of("%menu%", id));
         }
     }
 }

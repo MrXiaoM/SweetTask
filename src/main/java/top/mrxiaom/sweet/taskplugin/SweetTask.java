@@ -15,6 +15,7 @@ import top.mrxiaom.pluginbase.BukkitPlugin;
 import top.mrxiaom.pluginbase.actions.ActionProviders;
 import top.mrxiaom.pluginbase.api.IRegistry;
 import top.mrxiaom.pluginbase.data.SimpleRegistry;
+import top.mrxiaom.pluginbase.func.LanguageManager;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
 import top.mrxiaom.pluginbase.paper.PaperFactory;
 import top.mrxiaom.pluginbase.resolver.DefaultLibraryResolver;
@@ -186,6 +187,13 @@ public class SweetTask extends BukkitPlugin {
         }
         ActionProviders.registerActionProvider(ActionOpenGui.PROVIDER);
         ActionProviders.registerActionProvider(ActionBack.PROVIDER);
+
+        LanguageManager.inst()
+                .setLangFile("messages.yml")
+                .register(Messages.class)
+                .register(Messages.Command.class)
+                .register(Messages.Menu.class)
+                .reload();
 
         registerBuiltInItemMatchers();
         registerBuiltInBlockMatchers();

@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import top.mrxiaom.pluginbase.api.WithPriority;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
-import top.mrxiaom.sweet.taskplugin.matchers.item.*;
 
 public interface ItemMatcher {
 

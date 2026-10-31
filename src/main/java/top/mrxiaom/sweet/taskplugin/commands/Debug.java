@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.RayTraceResult;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.taskplugin.Messages;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.TaskProcessDatabase;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
@@ -30,7 +31,7 @@ public class Debug {
         if (args.length == 2 && "print".equalsIgnoreCase(args[0])) {
             Player player = Util.getOnlinePlayer(args[1]).orElse(null);
             if (player == null) {
-                return t(sender, "&e玩家不在线");
+                return Messages.player__not_online.tm(sender);
             }
             PlayerCache playerCache = plugin.getDatabase().getTasks(player);
             String nextSubmitTime = "&f提交计划时间: &e";

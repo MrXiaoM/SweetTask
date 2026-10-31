@@ -1,12 +1,10 @@
 package top.mrxiaom.sweet.taskplugin.listeners;
 
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.entity.EntityBreedEvent;
-import org.bukkit.event.player.PlayerShearEntityEvent;
 import top.mrxiaom.pluginbase.func.AutoRegister;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.func.entry.LoadedTask;
@@ -14,7 +12,6 @@ import top.mrxiaom.sweet.taskplugin.listeners.wrapper.TaskWrapper;
 import top.mrxiaom.sweet.taskplugin.matchers.EntityMatcher;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 import top.mrxiaom.sweet.taskplugin.tasks.TaskBreed;
-import top.mrxiaom.sweet.taskplugin.tasks.TaskShear;
 
 import java.util.List;
 import java.util.Map;

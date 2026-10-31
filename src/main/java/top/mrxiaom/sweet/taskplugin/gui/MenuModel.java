@@ -11,6 +11,7 @@ import top.mrxiaom.pluginbase.func.gui.IModifier;
 import top.mrxiaom.pluginbase.func.gui.LoadedIcon;
 import top.mrxiaom.pluginbase.utils.Pair;
 import top.mrxiaom.pluginbase.utils.Util;
+import top.mrxiaom.sweet.taskplugin.Messages;
 import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.PlayerCache;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
@@ -25,8 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static top.mrxiaom.pluginbase.func.AbstractPluginHolder.t;
 
 public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
     private final List<String> opRefreshAvailable, opRefreshTaskDone, opRefreshMaxTimes,
@@ -235,9 +234,9 @@ public class MenuModel extends AbstractModel<TaskIcon, MenuModel.Data> {
                 });
             } else {
                 if (submitItemFlag) {
-                    t(player, "&a已提交物品到任务");
+                    Messages.Menu.task__submit__done.tm(player);
                 } else {
-                    t(player, "&e任务未完成");
+                    Messages.Menu.task__submit__not_yet.tm(player);
                 }
             }
             return true;

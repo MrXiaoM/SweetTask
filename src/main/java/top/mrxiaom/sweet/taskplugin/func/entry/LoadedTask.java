@@ -14,7 +14,8 @@ import top.mrxiaom.sweet.taskplugin.SweetTask;
 import top.mrxiaom.sweet.taskplugin.database.entry.TaskCache;
 import top.mrxiaom.sweet.taskplugin.func.TaskManager;
 import top.mrxiaom.sweet.taskplugin.gui.TaskIcon;
-import top.mrxiaom.sweet.taskplugin.icons.*;
+import top.mrxiaom.sweet.taskplugin.icons.DefaultIcon;
+import top.mrxiaom.sweet.taskplugin.icons.PluginIcon;
 import top.mrxiaom.sweet.taskplugin.tasks.EnumTaskType;
 import top.mrxiaom.sweet.taskplugin.tasks.ITask;
 
